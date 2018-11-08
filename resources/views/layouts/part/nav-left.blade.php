@@ -5,20 +5,19 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ asset('theme/AdminLTE/dist/img/user2-160x160.jpg')}}" class="img-circle" alt="User Image">
+          <!-- <img src="{{ asset('theme/AdminLTE/dist/img/user2-160x160.jpg')}}" class="img-circle" alt="User Image"> -->
+          <div style="font-size: 36px; color:grey;">
+            <i class="fa fa-user fa-10x"></i>
+          </div>
         </div>
         <div class="pull-left info">
-          <p>User</p>
+          <p>{{ Auth::user()->name }}</p>
         </div>
       </div>
       
       <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu">        
-        <li class="treeview">
-          <a href="{{ url('dashboard') }}">
-            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-          </a>
-        </li>
+
+      <ul class="sidebar-menu" data-widget="tree">        
         <li class="treeview">  
             <a href="#control-sidebar-notification-tab" data-toggle="tab">
               <div data-toggle="control-sidebar">
@@ -31,16 +30,6 @@
               </div>
             </a>
         </li>
-        <!-- search form -->
-	      <form action="#" method="get" class="sidebar-form">
-	        <div class="input-group">
-	          <input type="text" name="q" class="form-control" placeholder="Search...">
-	          <span class="input-group-btn">
-	                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-	                </button>
-	              </span>
-	        </div>
-	      </form>
         <li>
           <a href="#control-sidebar-recent-tab" data-toggle="tab">
             <div data-toggle="control-sidebar">
@@ -51,12 +40,6 @@
                 <small class="label pull-right bg-green">5</small>
               </span>
           </div>
-          </a>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-user-plus"></i>
-            <span>Invite People</span>
           </a>
         </li>
         <li class="treeview">
@@ -71,30 +54,25 @@
             </div> 
           </a>
         </li>
+        <!-- search form -->
+	      <form action="#" method="get" class="sidebar-form">
+	        <div class="input-group">
+	          <input type="text" name="q" class="form-control" placeholder="Search...">
+	          <span class="input-group-btn">
+	                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+	                </button>
+	              </span>
+	        </div>
+	      </form>
+        <!-- @foreach($roleMenus as $menu)
         <li class="treeview">
-          <a href="{{ url('index')}}">
-            <i class="fa fa-folder-open"></i>
-            <span>Index</span>
+          <a href="{{ $menu->url }}">
+            <i class="fa {{$menu->icon}}"></i>
+            <span>{{$menu->name}}</span>
           </a>
         </li>
-        <li class="treeview">
-          <a href="{{route('survey')}}">
-            <i class="fa fa-files-o"></i>
-            <span>Survey</span>
-          </a>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-plus"></i>
-            <span>Create New Team</span>
-          </a>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-calendar"></i>
-            <span>Calendar</span>
-          </a>
-        </li>
+        @endforeach -->
+        @each('layouts.part.partial-menu',$roleMenus,'menu','layouts.part.partial-menu-nothing')
         <li class="header">
         <span></span>
         </li>
@@ -132,11 +110,6 @@
           <a href="#">
             <i class="fa fa-info-circle"></i>
             <span>Information</span>
-          </a>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-gear"></i> <span>Setting</span>
           </a>
         </li>
       </ul>

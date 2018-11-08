@@ -35,7 +35,7 @@
   <!-- /.login-logo -->
   <div class="login-box-body">
 
-    <form action="#" method="POST" action="{{ route('password.request') }}" aria-label="{{ __('Reset Password') }}">
+    <form method="POST" action="{{ route('password.email') }}" aria-label="{{ __('Reset Password') }}">
       @csrf
 
       <div class="form-group has-feedback">
