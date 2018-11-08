@@ -39,7 +39,7 @@
       @csrf
 
       <div class="form-group">
-        <input type="text" class="form-control" placeholder="Nama Depan" name="nama_depan" value="nama_depan" value="{{ old('nama_depan') }}">
+        <input type="text" class="form-control" placeholder="Nama Depan Ganti" name="nama_depan" value="nama_depan" value="{{ old('nama_depan') }}">
         @if ($errors->has('nama_depan'))
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $errors->first('nama_depan') }}</strong>

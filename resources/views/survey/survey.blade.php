@@ -277,7 +277,7 @@
               <!-- form-group -->
         <div class="modal-footer">
           <a href="{{route('survey.add.question')}}">
-            <button type="submit" class="btn btn-primary pull-right" >OK</button>
+            <button type="button" class="btn btn-primary pull-right" >OK</button>
           </a>
         </div>
       </div>

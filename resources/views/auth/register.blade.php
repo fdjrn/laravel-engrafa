@@ -35,7 +35,7 @@
   <!-- /.login-logo -->
   <div class="login-box-body">
 
-    <form action="#" method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}">
       @csrf
 
       <div class="form-group">
@@ -79,10 +79,10 @@
         @endif
       </div>
       <div class="form-group">
-        <input type="password" class="form-control" placeholder="Confirm Password" name="confirm_password">
-        @if ($errors->has('confirm_password'))
+        <input type="password" class="form-control" placeholder="Confirm Password" name="password_confirmation">
+        @if ($errors->has('password_confirmation'))
             <span class="invalid-feedback" role="alert">
-                <strong>{{ $errors->first('confirm_password') }}</strong>
+                <strong>{{ $errors->first('password_confirmation') }}</strong>
             </span>
         @endif
       </div>

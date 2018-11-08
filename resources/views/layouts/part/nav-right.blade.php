@@ -4,10 +4,13 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{ asset('theme/AdminLTE/dist/img/user2-160x160.jpg')}}" class="img-circle" alt="User Image">
+          <!-- <img src="{{ asset('theme/AdminLTE/dist/img/user2-160x160.jpg')}}" class="img-circle" alt="User Image"> -->
+          <div style="font-size: 36px; color:white;">
+            <i class="fa fa-user fa-10x"></i>
+          </div>
         </div>
         <div class="pull-left info">
-          <p>User</p>
+          <p>{{Auth::user()->name}}</p>
         </div>
       </div>
 

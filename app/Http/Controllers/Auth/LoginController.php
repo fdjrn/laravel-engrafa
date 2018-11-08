@@ -27,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/dashboard';
 
     /**
      * Create a new controller instance.
@@ -39,25 +39,25 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function index(Request $request){
-        return view('login');
-    }
+    // public function index(Request $request){
+    //     return view('login');
+    // }
 
-    public function login(Request $request){
-        $email = $request->email;
-        $password = $request->password;
+    // public function login(Request $request){
+    //     $email = $request->email;
+    //     $password = $request->password;
 
-        if ($email == 'admin@gmail.com' && $password == 'admin') {
-            # code...
-            $user = array('email' => $email,
-                'password' => $password );
+    //     if ($email == 'admin@gmail.com' && $password == 'admin') {
+    //         # code...
+    //         $user = array('email' => $email,
+    //             'password' => $password );
 
-            Session::put('user',$user);
-            return view('dashboard/dashboard');
-        }else{
-            return redirect('login');
-        }
+    //         Session::put('user',$user);
+    //         return view('dashboard/dashboard');
+    //     }else{
+    //         return redirect('login');
+    //     }
 
 
-    }
+    // }
 }
