@@ -66,7 +66,7 @@
           <div class="box box-primary ">
             <div class="box-header with-border">
               <div class="form-group">
-                <label class="control-label col-sm-3">Title</label>
+                <label class="control-label col-sm-3" id="title">Title</label>
                 <div class="col-sm-9">
                   <input type="text" class="form-control" placeholder="Title"> 
                 </div>
@@ -80,6 +80,10 @@
               <button class="btn btn-primary" type="button" id="btn-next-question">
                 <i class="fa fa-plus"></i>
                 Next Question
+              </button>
+              <button class="btn btn-primary" type="button" id="btn-ganti-judul">
+                <i class="fa fa-plus"></i>
+                Ganti Judul
               </button>
             </div>
           </div>
@@ -112,7 +116,7 @@
 
 @section('page-level-scripts')
 
-<script src="{{ asset('app/survey/add-question.min.js')}}">
+<script type="text/javascript" src="{{ asset('app/survey/add-question.min.js')}}">
 </script>
 
 @stop
