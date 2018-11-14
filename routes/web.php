@@ -42,6 +42,7 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey
 	Route::get('/survey','Survey\SurveyController@index')->name('survey');
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
+	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	Route::get('/survey/choose/answer', 'Survey\SurveyController@chooseAnswer')->name('survey.choose.answer');
 });
 
