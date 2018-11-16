@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2018 at 09:32 AM
+-- Generation Time: Nov 16, 2018 at 05:29 PM
 -- Server version: 10.1.31-MariaDB
 -- PHP Version: 7.2.3
 
@@ -99,7 +99,7 @@ INSERT INTO `password_resets` (`email`, `token`, `created_at`) VALUES
 --
 
 CREATE TABLE `roles` (
-  `id` int(191) NOT NULL,
+  `id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `super_admin` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -111,12 +111,12 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `super_admin`, `created_at`, `updated_at`) VALUES
-(1, 'Super Admin', 1, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
-(2, 'Admin', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
-(3, 'Creator', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
-(4, 'Editor', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
-(5, 'Contributor', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
-(6, 'Viewer', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23');
+('1-Super Admin', 'Super Admin', 1, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
+('2-Admin', 'Admin', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
+('3-Creator', 'Creator', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
+('4-Editor', 'Editor', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
+('5-Contributor', 'Contributor', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23'),
+('6-Viewer', 'Viewer', 0, '2018-11-07 02:11:23', '2018-11-07 02:11:23');
 
 -- --------------------------------------------------------
 
@@ -167,12 +167,62 @@ CREATE TABLE `schedules` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `surveys`
+--
+
+CREATE TABLE `surveys` (
+  `id` int(10) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `expired` datetime NOT NULL,
+  `created_by` int(10) NOT NULL COMMENT 'user yang membuat team',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_members`
+--
+
+CREATE TABLE `survey_members` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL COMMENT 'foreign key untuk id user pada table users',
+  `survey` int(10) NOT NULL COMMENT 'foreign key untuk id team pada table teams',
+  `role` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_roles`
+--
+
+CREATE TABLE `survey_roles` (
+  `id` varchar(50) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created_by` int(10) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `survey_roles`
+--
+
+INSERT INTO `survey_roles` (`id`, `name`, `created_by`, `created_at`, `updated_at`) VALUES
+('1-Surveyor', 'Surveyor', NULL, '2018-11-16 16:06:01', '0000-00-00 00:00:00'),
+('2-Responden', 'Responden', NULL, '2018-11-16 16:06:18', '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tasks`
 --
 
 CREATE TABLE `tasks` (
   `id` int(10) NOT NULL,
-  `team` int(10) NOT NULL COMMENT 'id team yang menandakan kepemilikan task',
+  `survey` int(10) NOT NULL COMMENT 'id team yang menandakan kepemilikan task',
   `name` varchar(255) NOT NULL,
   `assign` int(10) NOT NULL COMMENT 'id user yang menandakan siapa yang harus mengerjakan task',
   `due_date` datetime NOT NULL COMMENT 'jatuh tempo task',
@@ -203,33 +253,6 @@ CREATE TABLE `task_participant` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `teams`
---
-
-CREATE TABLE `teams` (
-  `id` int(10) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `created_by` int(10) NOT NULL COMMENT 'user yang membuat team',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `team_members`
---
-
-CREATE TABLE `team_members` (
-  `id` int(10) NOT NULL,
-  `user` int(10) NOT NULL COMMENT 'foreign key untuk id user pada table users',
-  `team` int(10) NOT NULL COMMENT 'foreign key untuk id team pada table teams',
-  `role` varchar(50) NOT NULL COMMENT 'role yang berlaku pada team (1-Creator, 2-Editor, 3-Member)'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `users`
 --
 
@@ -240,7 +263,7 @@ CREATE TABLE `users` (
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` int(11) DEFAULT NULL,
+  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -253,7 +276,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `name`, `username`, `phone`, `role`, `email`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'aris', 'sunjaya', 'aris sunjaya', 'arissunjaya', '+6289639336906', 1, 'sunjayaaris@gmail.com', '$2y$10$.UgRbkxhYkf/9053Sczit.oxl/gVfoD7J.iYSeJjkSEqrmUmPQezC', 'rq69cfUI4NDMLaZmPr0pUVwHwvyoNQPs7FtIHBMVzcyWsCpwj9d8mv3xKRA9', '2018-11-07 02:38:13', '2018-11-07 02:38:13');
+(1, 'aris', 'sunjaya', 'aris sunjaya', 'arissunjaya', '+6289639336906', '1-Super Admin', 'sunjayaaris@gmail.com', '$2y$10$.UgRbkxhYkf/9053Sczit.oxl/gVfoD7J.iYSeJjkSEqrmUmPQezC', 'b2OFudXyw4cAy5jRMuXfZvgkKa7hVEt7gGfWMiRvLgEgeif029VL1B9DZ1b3', '2018-11-07 02:38:13', '2018-11-07 02:38:13');
 
 --
 -- Indexes for dumped tables
@@ -290,6 +313,24 @@ ALTER TABLE `schedules`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `surveys`
+--
+ALTER TABLE `surveys`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `survey_members`
+--
+ALTER TABLE `survey_members`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tasks`
 --
 ALTER TABLE `tasks`
@@ -299,18 +340,6 @@ ALTER TABLE `tasks`
 -- Indexes for table `task_participant`
 --
 ALTER TABLE `task_participant`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `teams`
---
-ALTER TABLE `teams`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `team_members`
---
-ALTER TABLE `team_members`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -349,6 +378,18 @@ ALTER TABLE `schedules`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `surveys`
+--
+ALTER TABLE `surveys`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `survey_members`
+--
+ALTER TABLE `survey_members`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
@@ -358,18 +399,6 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `task_participant`
 --
 ALTER TABLE `task_participant`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `teams`
---
-ALTER TABLE `teams`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `team_members`
---
-ALTER TABLE `team_members`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
