@@ -2,7 +2,7 @@
 
 	@if ((count($menu->children) > 0))
 		<li class="treeview">
-		  <a href="{{ $menu->url }}">
+		  <a id="{{$menu->id_url}}" href="{{$menu->url}}">
 		    <i class="fa {{$menu->icon}}"></i>
 		    <span>{{$menu->name}}</span>
 		    <span class="pull-right-container">
@@ -10,11 +10,25 @@
 	        </span>
 		  </a>
 	@else
-		<li class="">
-			<a href="{{$menu->url}}">
+		@if ($menu->id_url == "mn_create_new_team")
+		<li>
+			<a id="{{$menu->id_url}}" href="{{$menu->url}}">
 				<i class="fa {{$menu->icon}}"></i>
 				<span>{{$menu->name}}</span>
 			</a>
+		@foreach($mnsurvey as $survey)
+		<li style="background-color: #2c3b41;">
+			<a href="survey/{{$survey->id}}">
+				<span>&nbsp;&nbsp;&nbsp;</span><i class="fa fa-file-text-o"></i><span>{{$survey->name}}</span>
+			</a>
+		@endforeach
+		@else
+		<li class="">
+			<a id="{{$menu->id_url}}" href="{{$menu->url}}">
+				<i class="fa {{$menu->icon}}"></i>
+				<span>{{$menu->name}}</span>
+			</a>
+		@endif
 	@endif
 
 		@if (count($menu->children) > 0)
