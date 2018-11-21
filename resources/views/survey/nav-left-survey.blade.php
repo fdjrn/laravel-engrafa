@@ -10,35 +10,29 @@
         </h4>
       </div>
       <div class="box-body">
-        
         <ul class="list-group" data-widget="tree" style="list-style: none;">
           <li class="">
             <a href="#">
-              <i class="fa fa-list"></i> <span> List</span>
-              <span class="pull-right">
-              </span>
+              <h4><i class="fa fa-comment-o"></i>&nbsp;<span>Chat</span></h4>
             </a>
           </li>
           <li class="">
-            <a href="#new-survey" data-toggle="modal">
-              <i class="fa fa-files-o"></i> <span> New Survey</span>
-              <span class="pull-right">
-                  <i class="fa fa-plus fa-fw"></i>
-              </span>
+            <a href="{{route('survey.task')}}">
+              <h4><i class="fa fa-check-square-o"></i>&nbsp;<span>Task</span></h4>
             </a>
           </li>
           <li class="">
-            <a href="#">
-              <i class="fa fa-files-o"></i> <span> Preview & Score</span>
-              <span class="pull-right">
-              </span>
+            <a href="{{route('survey')}}">
+              <h4><i class="fa fa-files-o"></i>&nbsp;<span>Survey</span></h4>
             </a>
           </li>
         </ul>
-        
       </div>
       <!-- /.box-body -->
       <div class="box-footer text-center">
+        <h4><a href="#"><i class="fa fa-user-plus"></i>&nbsp;<span>Invite</span></a></h4>
+      </div>
+<!--       <div class="box-footer text-center">
         <a href="">
           <i class="fa fa-plus-circle fa-fw"></i>
         </a>
@@ -51,6 +45,6 @@
         <a href="">
           <i class="fa fa-upload fa-fw"></i>
         </a>
-      </div>
+      </div> -->
     </div>
   

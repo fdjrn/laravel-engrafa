@@ -1,0 +1,11 @@
+.crud-button{
+  font-size: 20px !important;
+  margin-top: -5px !important;
+  margin-bottom: -5px !important;
+}
+.crud-button > a{
+  color:#56a957 !important;
+}
+.crud-button a:hover{
+  color:#4d984e !important;
+}

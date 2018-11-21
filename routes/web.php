@@ -44,6 +44,15 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	Route::get('/survey/choose/answer', 'Survey\SurveyController@chooseAnswer')->name('survey.choose.answer');
+	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
+	Route::get('/survey/task','Survey\SurveyController@task')->name('survey.task');
+	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	Route::resource('surveyrs', 'Survey\SurveyController');
+
+	//setting
+	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
+	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
+	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
 });
 
 //DocumentViewer Library

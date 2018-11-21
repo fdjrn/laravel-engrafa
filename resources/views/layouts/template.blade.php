@@ -6,6 +6,8 @@
   <title>Tata Kelola IT</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- CSRF Token -->
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   @include('layouts.part.styles')
 
@@ -50,6 +52,7 @@
     <section class="content">
       <!-- Small boxes (Stat box) -->
       @section('body-inner-content') @show()
+      @include('modal.index')
     </section>
     <!-- /.content -->
   </div>

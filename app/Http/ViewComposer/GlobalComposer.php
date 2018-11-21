@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\RoleMenu;
 use App\Models\Menu;
+use App\Models\Survey;
+use App\Models\Role;
 
 class GlobalComposer {
 
@@ -22,6 +24,11 @@ class GlobalComposer {
             $menu = array();
             if(Auth::check()){
                 $menu = Menu::tree(Auth::user()->role);
+
+                $mnsurvey = Survey::mnsurvey();
+                $view->with('mnsurvey', $mnsurvey);
+                $data_roles = Role::data_roles();
+                $view->with('data_roles', $data_roles);
             }
             // dd($menu);
             $view->with('roleMenus',$menu);

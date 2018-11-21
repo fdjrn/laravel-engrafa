@@ -37,10 +37,61 @@
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js')}}"></script>
 <!-- FastClick -->
 <script src="{{ asset('theme/AdminLTE/bower_components/fastclick/lib/fastclick.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')}}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('theme/AdminLTE/dist/js/adminlte.min.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{ asset('theme/AdminLTE/dist/js/pages/dashboard.js')}}"></script>
+<script src="{{ asset('js/pages/main.js')}}"></script>
+<script src="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/js/bootstrap-colorselector.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}"></script>
+
+<script>
+    $('.colorselector').colorselector();
+</script>
+<script>
+    var base_url = {!! json_encode(url('/')) !!};
+    var url = $(location).attr('href');
+    var aurl = url.split("/").splice(0, 4).join("/");
+
+    // for sidebar menu entirely but not cover treeview
+    $('ul.sidebar-menu a').filter(function() {
+      if (this.href == url){
+        return true;
+      }else if(this.href+"#" == url){
+        return true;
+      }else if(this.href == aurl){
+        return true;
+      }
+    }).parent().addClass('active');
+
+    // for treeview
+    $('ul.treeview-menu a').filter(function() {
+      if (this.href == url){
+        return true;
+      }else if(this.href+"#" == url){
+        return true;
+      }
+    }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active'); 
+</script>
+
+@php
+    $js_files = Request::segment(2).'.js';
+    $js_exists = file_exists(base_path() . '/public/js/pages/' . $js_files);
+
+    $suburl1 = Request::segment(1);
+    $js_files2 = Request::segment(2).'.js';
+    $js_exists2 = file_exists(base_path() . '/public/js/pages/'.$suburl1.'/'. $js_files);
+@endphp
+
+@if (!empty($js_files) && $js_exists)
+    <script src="{{ asset ('js/pages/'.$js_files) }}"></script>
+@else
+    @if (!empty($js_files2) && $js_exists2)
+    	<script src="{{ asset ('js/pages/'.$suburl1.'/'. $js_files) }}"></script>
+    @endif
+@endif
 <!-- AdminLTE for demo purposes -->
 <!-- <script src="/theme/AdminLTE/dist/js/demo.js"></script> -->
 @section('core-plugins')

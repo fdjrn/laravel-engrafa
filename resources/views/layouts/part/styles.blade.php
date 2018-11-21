@@ -33,8 +33,6 @@
   <link rel="stylesheet" href="{{ asset('theme/AdminLTE/bower_components/font-awesome/css/font-awesome.min.css')}}">
   <!-- Ionicons -->
   <link rel="stylesheet" href="{{ asset('theme/AdminLTE/bower_components/Ionicons/css/ionicons.min.css')}}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/dist/css/AdminLTE.min.css')}}">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="{{ asset('theme/AdminLTE/dist/css/skins/_all-skins.min.css')}}">
@@ -50,6 +48,13 @@
   <link rel="stylesheet" href="{{ asset('theme/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css')}}">
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <!-- SELECT2 -->
+  <link rel="stylesheet" href="{{ asset('theme/AdminLTE/bower_components/select2/dist/css/select2.min.css')}}">
+  <link rel="stylesheet" href="{{ asset('theme/AdminLTE/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/css/bootstrap-colorselector.css')}}" />
+  <!-- Theme style -->
+  <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/dist/css/AdminLTE.min.css')}}">
+  <link rel="stylesheet" href=" {{ asset('css/main.css')}}">
 
 <!-- SMARTGOV & RESPONSIVE STYLES -->
 @section('theme-layout-styles')
