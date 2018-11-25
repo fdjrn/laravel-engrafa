@@ -42,7 +42,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('survey')}}"><i class="fa fa-files-o"></i> Survey</a></li>
+  <li><a class="active" href="{{url('/survey/'.$survey_id)}}"><i class="fa fa-files-o"></i> Survey</a></li>
 @stop
 
 
@@ -55,9 +55,9 @@
   <div class="col-md-9">
     <div class="nav-tabs-custom">
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#tab_1" data-toggle="tab">Pending Survey</a></li>
+        <li class="active"><a href="#tab_1" data-toggle="tab">List EDM</a></li>
         <li><a href="#tab_2" data-toggle="tab">Done</a></li>
-        <li class="pull-right crud-button"><a href="#" id="b_create_new_team" class="text-success"><i class="fa fa-plus-circle"></i></a></li>
+        <!-- <li class="pull-right crud-button"><a href="#" id="b_create_new_team" class="text-success"><i class="fa fa-plus-circle"></i></a></li> -->
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">
@@ -80,8 +80,6 @@
                 </th>
                 <th>Name</th>
                 <th>Type</th>
-                <th>Time</th>
-                <th>Level</th>
                 <!-- <th>Date Modified</th> -->
                 <th>Analyze</th>
                 <th>More</th>
@@ -95,22 +93,22 @@
                     <div>
                       <a href="{{ route('survey.choose.answer') }}">
                         <p>
-                          {{$survey->name}}
+                          {{$survey->process}}
                         </p>
-                        <h6>Created {{$survey->created_ats}}</h6>
+                        <!-- <h6>Created @{{@$survey->created_ats}}</h6> -->
                       </a>
                     </div>
                   </td>
-                  <!-- <td>{{$survey->updated_at}}</td> -->
-                  <td>Purpose</td>
-                  <td>1 minutes to Finish</td>
-                  <td>-</td>
+                  <!-- <td>@{{@$survey->updated_at}}</td> -->
+                  <td>{{$survey->PP}}</td>
                   <td class="text-center">
-                    <i class="fa fa-bar-chart"></i>
+                    <a href="{{$survey->id}}" class="btn btn-default btn-sm"><i class="fa fa-bar-chart"></i></a>
                   </td>
                   <td class="text-center">
-                    <i class="fa fa-trash fa-fw"></i>
-                    <i class="fa fa-edit"></i>
+                    <div class="btn-group">
+                      <a href="{{$survey->id}}" class="btn btn-danger btn-sm"><i class="fa fa-trash fa-fw"></i></a>
+                      <a href="{{$survey->id}}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
+                    </div>
                   </td>
                 </tr>
               @endforeach

@@ -40,12 +40,12 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/chat/invite','Chat\ChatController@invite');
 
 	// survey
-	Route::get('/survey','Survey\SurveyController@index')->name('survey');
+	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	Route::get('/survey/choose/answer', 'Survey\SurveyController@chooseAnswer')->name('survey.choose.answer');
 	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
-	Route::get('/survey/task','Survey\SurveyController@task')->name('survey.task');
+	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 

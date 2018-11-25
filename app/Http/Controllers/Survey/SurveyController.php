@@ -13,14 +13,32 @@ use App\User;
 class SurveyController extends Controller
 {
     //
-    public function index(Request $request){
-        // $survey = new \App\Models\Survey;
-        // $data['surveys'] = $survey->get();
+    public function index($id){
+        $data['survey_id'] = $id;
 
-        $data['surveys'] = DB::table('surveys')
-            ->select('*',DB::raw('DATE_FORMAT(created_at, "%d %b %Y, %H:%i") as created_ats'))
+        $data_survey = DB::table('surveys')
+            ->select('survey_process.*','it_goal.PP')
+            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
+            ->leftJoin('survey_process',function($join){
+                $join->on('survey_process.survey', '=','surveys.id')
+                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
+            })
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.id')
+            ->where('surveys.id',$id)
             ->get();
-    	return view('survey.survey',$data);
+
+        // $data['itgoalprocesses'] = DB::table('it_related_goal')
+        //     ->select('it_related_goal_to_process.*','it_goal.PP')
+        //     ->join('it_related_goal_to_process','it_related_goal_to_process.it_related_goal', '=','it_related_goal.id')
+        //     ->join('it_goal', 'it_goal.id', '=', 'it_related_goal.id')
+        //     ->where('it_related_goal.survey',$id)
+        //     ->get();
+        if($data_survey->first()){
+            $data['surveys'] = $data_survey;
+            return view('survey.survey',$data);
+        }else{
+            abort(404);
+        }
     }
 
     public function addQuestion(Request $request){
@@ -41,8 +59,9 @@ class SurveyController extends Controller
        echo json_encode(DB::table('users')->get());
     }
 
-    public function task()
+    public function task($id)
     {
+        $data['survey_id'] = $id;
         // $task = new \App\Models\Task;
         // $data['tasks'] = $task->get();
         $priority = array();
@@ -51,12 +70,22 @@ class SurveyController extends Controller
         $priority['3-Low'] = "!";
         $data['priorities'] = $priority;
 
-        $data['tasks'] = DB::table('tasks')
-            ->select('tasks.*','users.username',DB::raw('DATE_FORMAT(tasks.due_date, "%d %b %Y, %H:%i") as due_dates'))
-            ->join('users','users.id','=','tasks.assign')
+        $data_survey = DB::table('surveys')
+            ->select('surveys.id')
+            ->where('surveys.id',$id)
             ->get();
 
-        return view('survey.task',$data);  
+        if($data_survey->first()){
+            $data_tasks = DB::table('tasks')
+                ->select('tasks.*','users.username',DB::raw('DATE_FORMAT(tasks.due_date, "%d %b %Y, %H:%i") as due_dates'))
+                ->join('users','users.id','=','tasks.assign')
+                ->where('tasks.survey',$id)
+                ->get();
+            $data['tasks'] = $data_tasks;
+            return view('survey.task',$data);  
+        }else{
+            abort(404);
+        }
     }
 
 
@@ -77,20 +106,51 @@ class SurveyController extends Controller
 
         if($post){
             $id = $survey->id;
-            foreach ($request->get('i_n_surveyor') as $surveyor) {
-                $surveymembers = new \App\Models\SurveyMembers;
-                $surveymembers->user = $surveyor;
-                $surveymembers->survey = $id;
-                $surveymembers->role = "2-Responden";
-                $surveymembers->save();
+            if($request->get('i_n_surveyor')){
+                foreach ($request->get('i_n_surveyor') as $surveyor) {
+                    $surveymembers = new \App\Models\SurveyMembers;
+                    $surveymembers->user = $surveyor;
+                    $surveymembers->survey = $id;
+                    $surveymembers->role = "2-Responden";
+                    $surveymembers->save();
+                }                
             }
-            foreach ($request->get('i_n_client') as $surveyor) {
-                $surveymembers = new \App\Models\SurveyMembers;
-                $surveymembers->user = $surveyor;
-                $surveymembers->survey = $id;
-                $surveymembers->role = "1-Surveyor";
-                $surveymembers->save();
+            if($request->get('i_n_client')){
+                foreach ($request->get('i_n_client') as $surveyor) {
+                    $surveymembers = new \App\Models\SurveyMembers;
+                    $surveymembers->user = $surveyor;
+                    $surveymembers->survey = $id;
+                    $surveymembers->role = "1-Surveyor";
+                    $surveymembers->save();
+                }
             }
+            if($request->get('i_itgoal')){
+                foreach ($request->get('i_itgoal') as $itgoal){
+                    $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                        [   'it_goal' => $itgoal, 
+                            'survey' => $id
+                        ]
+                    );
+                    if($request->get('i_itgoal_process')){
+                        foreach($request->get('i_itgoal_process')[$itgoal] as $itgoalprocess){
+                            // $a_itgoalprocess = explode("-",$itgoalprocess);
+                            // if($a_itgoalprocess[0] == $itgoal){
+                                $survey_process = DB::table('survey_process')->insertGetId(
+                                    [   
+                                        'it_related_goal' => $id_itgoal,
+                                        'process' => $itgoalprocess,
+                                        'survey' => $id,
+                                        'target_level' => $request->get('i_itgoal_process_level')[$itgoal][$itgoalprocess],
+                                        'target_percent' => $request->get('i_itgoal_process_percent')[$itgoal][$itgoalprocess],
+                                        'status' => '1-Waiting'
+                                    ]
+                                );
+                            // }
+                        }
+                    }
+                }
+            }
+            return redirect('survey/'.$id);
         }
         // return response()->json($post);
         return redirect('survey');
@@ -98,7 +158,7 @@ class SurveyController extends Controller
 
     public function task_store(Request $request){
         $task = new \App\Models\Task;
-        $task->survey = 1;
+        $task->survey = $request->post('i_n_survey_id');
         $task->name = $request->post('i_n_name_task');
         $task->assign = $request->post('i_n_assignee');
         $task->due_date = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_due_date'))->format('Y-m-d H:i');
@@ -117,6 +177,6 @@ class SurveyController extends Controller
                 $taskparticipants->save();
             }
         }
-        return redirect('survey/task');
+        return redirect('survey/task/'.$request->post('i_n_survey_id'));
     }
 }
