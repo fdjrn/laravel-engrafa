@@ -17,7 +17,7 @@ class SurveyController extends Controller
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
-            ->select('survey_process.*','it_goal.PP')
+            ->select('surveys.created_by','survey_process.*','it_goal.PP')
             ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
             ->leftJoin('survey_process',function($join){
                 $join->on('survey_process.survey', '=','surveys.id')
@@ -26,6 +26,22 @@ class SurveyController extends Controller
             ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.id')
             ->where('surveys.id',$id)
             ->get();
+
+        $status_ownership = "";
+        if ($data_survey->first()->created_by == Auth::user()->id){
+            $status_ownership = "CREATOR";
+        }else{
+            $status_of_surveys = DB::table('survey_members')
+                ->select('role')
+                ->where([
+                    ['survey','=',$id],
+                    ['user','=',Auth::user()->id]
+                ])
+                ->get();
+            $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
+        }
+
+        $data['status_ownership'] = $status_ownership;
 
         // $data['itgoalprocesses'] = DB::table('it_related_goal')
         //     ->select('it_related_goal_to_process.*','it_goal.PP')
@@ -45,8 +61,9 @@ class SurveyController extends Controller
     	return view('survey.survey-add-question');	
     }
 
-    public function chooseAnswer(Request $request){
-    	return view('survey.survey-choose-answer');	
+    public function chooseAnswer($id, $itrelatedgoal, $process){
+        $data['survey_id'] = $id;
+    	return view('survey.survey-choose-answer', $data);	
     }
 
     public function test(Request $request){
