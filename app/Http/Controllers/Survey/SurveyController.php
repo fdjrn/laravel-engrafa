@@ -27,6 +27,10 @@ class SurveyController extends Controller
             ->where('surveys.id',$id)
             ->get();
 
+        if(!$data_survey->first()){
+            abort(404);
+        }
+
         $status_ownership = "";
         if ($data_survey->first()->created_by == Auth::user()->id){
             $status_ownership = "CREATOR";
@@ -63,6 +67,12 @@ class SurveyController extends Controller
 
     public function chooseAnswer($id, $itrelatedgoal, $process){
         $data['survey_id'] = $id;
+
+        $data['surveys'] = DB::table('surveys')
+            ->select('*')
+            ->where('surveys.id',$id)
+            ->get()->first();
+
     	return view('survey.survey-choose-answer', $data);	
     }
 
