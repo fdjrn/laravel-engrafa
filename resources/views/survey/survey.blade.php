@@ -53,6 +53,9 @@
   </div>
 
   <div class="col-md-9">
+    <div class="text-center" style="background-color: #3c8dbc; border-radius: .25em; padding:1px; margin-bottom: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.3); color:#fff;">
+      <h4><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;{{ $survey_name }}&nbsp;&nbsp;</h4>
+    </div>
     @if($status_ownership == "CREATOR" || $status_ownership == "SURVEYOR")
       @include('survey.survey-list-creator_surveyor')
     @else

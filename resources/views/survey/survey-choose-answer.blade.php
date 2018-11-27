@@ -100,7 +100,7 @@
                             <h5 style="margin-top: 0; margin-bottom: 0;">Document Support</h5>
                           </div>
                           <div class="pull-right">
-                            <button class="btn btn-default"><i class="fa fa-upload"></i></button>
+                            <a class="btn btn-default btn-upload"><i class="fa fa-upload"></i></a>
                           </div>
                         </div>
                       </div>
@@ -140,6 +140,46 @@
 @stop
 
 @section('body-modals')
+<div class="modal fade" id="m_u_file">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Working Product</h4>
+      </div>
+      <div class="modal-body">
+        <form name="form_w_product" action="{{route('survey.task.store')}}" method="post" id="form_w_product">
+          {{ csrf_field() }}
+          <div class="table-responsive">
+            <table class="table no-margin" border="0">
+              <thead>
+                <tr>
+                  <td>WP ID</td>
+                  <td>Description</td>
+                  <td>File</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>APO01</td>
+                  <td>Ilorem Ipsum Dolor Sit Amet</td>
+                  <td><input type="file" name="f_up"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
+        <button type="submit" form="form_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
 @stop
 
 @section('core-plugins')
@@ -158,6 +198,9 @@
     /* BOOTSTRAP SLIDER */
     $('.slider').slider()
   })
+  $(".btn-upload").click(function(){
+    $('#m_u_file').modal('show');
+  });
 </script>
 @stop
 

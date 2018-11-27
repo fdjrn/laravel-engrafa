@@ -17,7 +17,7 @@ class SurveyController extends Controller
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.created_by','survey_process.*','it_goal.PP')
+            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
             ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
             ->leftJoin('survey_process',function($join){
                 $join->on('survey_process.survey', '=','surveys.id')
@@ -55,6 +55,7 @@ class SurveyController extends Controller
         //     ->get();
         if($data_survey->first()){
             $data['surveys'] = $data_survey;
+            $data['survey_name'] = $data_survey->first()->name;
             return view('survey.survey',$data);
         }else{
             abort(404);
