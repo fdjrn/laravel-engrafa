@@ -38,7 +38,7 @@
                   <td><input type="checkbox"></td>
                   <td>
                     <div>
-                      <a href="{{route('survey.choose.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
+                      <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
                         <p>
                           {{$survey->process}}
                         </p>

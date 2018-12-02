@@ -33,7 +33,7 @@
                   <td><input type="checkbox"></td>
                   <td>
                     <div>
-                      <a href="{{route('survey.choose.answer',['id'=> $survey_id, 'itrelatedgoal' => $survey->it_related_goal, 'process' => $survey->process ])}}">
+                      <a href="{{route('survey.answer',['id'=> $survey_id, 'itrelatedgoal' => $survey->it_related_goal, 'process' => $survey->process ])}}">
                         <p>
                           {{$survey->process}}
                         </p>

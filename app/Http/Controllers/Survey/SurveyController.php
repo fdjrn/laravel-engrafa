@@ -86,7 +86,7 @@ class SurveyController extends Controller
                         ['survey_process.process','=',$process]
                     ])
                     ->get();
-                    
+
         if($d_surveys->first()){
             if ($d_surveys->first()->created_by != Auth::user()->id){
                 $status_of_surveys = DB::table('survey_members')
@@ -145,16 +145,31 @@ class SurveyController extends Controller
     	return view('survey.survey-choose-answer', $data);	
     }
 
+    public function postAnswer($inputans, Request $request){
+        print_r($inputans);
+
+        print_r($request->post('metcriteria'));
+
+        print_r($request->post('comment'));
+    }
+
     public function get_process_outcome_wp($id){
-        // SELECT c.* FROM `process_outcome` a
+        $input = explode(",",$id);
+        $survey_id = $input[1];
+        // SELECT c.*, d.file FROM `process_outcome` a
         // LEFT JOIN process_outcome_wp b ON b.process_outcome = a.id
         // LEFT JOIN working_product c ON c.id = b.working_product
+        // LEFT JOIN survey_working_products d ON d.working_product = c.id and d.survey = 1
         // WHERE a.id = 'EDM01-O1'
         $data = DB::table('process_outcome')
-                ->select('working_product.*')
+                ->select('working_product.*','survey_working_products.file')
                 ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
                 ->leftJoin('working_product','working_product.id','=','process_outcome_wp.working_product')
-                ->where("process_outcome.id","=",$id)->get();
+                ->leftJoin('survey_working_products',function($join) use($survey_id){
+                    $join->on('survey_working_products.working_product', '=','working_product.id')
+                         ->on('survey_working_products.survey', '=', DB::raw($survey_id));
+                })
+                ->where("process_outcome.id","=",$input[0])->get();
         
         header('Content-Type', 'application/json');
         echo json_encode([
