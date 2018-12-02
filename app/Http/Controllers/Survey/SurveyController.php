@@ -42,7 +42,11 @@ class SurveyController extends Controller
                     ['user','=',Auth::user()->id]
                 ])
                 ->get();
-            $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
+            if($status_of_surveys->first()){
+                $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
+            }else{
+                abort(404);
+            }
         }
 
         $data['status_ownership'] = $status_ownership;
@@ -66,15 +70,99 @@ class SurveyController extends Controller
     	return view('survey.survey-add-question');	
     }
 
-    public function chooseAnswer($id, $itrelatedgoal, $process){
+    public function chooseAnswer($inputans){
+        $inputan = explode("-",$inputans);
+        $id = $inputan[0];
         $data['survey_id'] = $id;
+        $it_related_goal = $inputan[1];
+        $process = $inputan[2];
+        $target_level = "";
+        $d_surveys = DB::table('surveys')
+                    ->select('surveys.name','surveys.created_by','survey_process.target_level')
+                    ->leftJoin('survey_process','survey_process.survey','=','surveys.id')
+                    ->where([
+                        ['surveys.id','=',$id],
+                        ['survey_process.it_related_goal','=',$it_related_goal],
+                        ['survey_process.process','=',$process]
+                    ])
+                    ->get();
+                    
+        if($d_surveys->first()){
+            if ($d_surveys->first()->created_by != Auth::user()->id){
+                $status_of_surveys = DB::table('survey_members')
+                    ->select('role')
+                    ->where([
+                        ['survey','=',$id],
+                        ['user','=',Auth::user()->id]
+                    ])
+                    ->get();
+                if(!$status_of_surveys->first()){
+                    abort(404);
+                }
+            }
+            $data['survey_name'] = $d_surveys->first()->name;
+            $target_level = $d_surveys->first()->target_level;
+        }else{
+            abort(404);
+        }
 
-        $data['surveys'] = DB::table('surveys')
-            ->select('*')
-            ->where('surveys.id',$id)
-            ->get()->first();
+        $levels = DB::table('process_attributes')
+            ->select('level')
+            ->groupBy('level')
+            ->where('level','<=',$target_level)
+            ->get();
+
+        $datasurvey = array();
+        foreach($levels as $index => $leveled){
+            $level = $leveled->level;
+            $dats = DB::table('surveys')
+                ->select('process_attributes.purpose','surveys.name','process_outcome.*','outcomes.description')
+                ->leftJoin('survey_process','survey_process.survey','=','surveys.id')
+                ->leftJoin('process_outcome','process_outcome.process','=','survey_process.process')
+                ->leftJoin('outcomes','outcomes.id','=','process_outcome.outcome')
+                ->leftJoin('process_attributes', 'process_attributes.id', '=','outcomes.process_attribute')
+                ->where([
+                    ['surveys.id','=',$id],
+                    ['survey_process.process','=',$process],
+                    ['survey_process.it_related_goal','=',$it_related_goal],
+                    ['process_attributes.level','=',$level]
+                ])
+                ->get();
+            if($dats->first()){
+                $datasurvey[$index]['surveys'] = $dats;
+            }
+        }
+        $data['levels'] = $datasurvey;
+
+       // SELECT a.name, c.*, d.description
+       //  FROM surveys a
+       //  LEFT JOIN survey_process b ON b.survey = a.id
+       //  LEFT JOIN process_outcome c ON c.process = b.process
+       //  LEFT JOIN outcomes d ON d.id  = c.outcome
+       //  LEFT JOIN process_attributes e ON e.id = d.process_attribute
+       //  WHERE a.id = 1 and b.process = 'EDM01'
 
     	return view('survey.survey-choose-answer', $data);	
+    }
+
+    public function get_process_outcome_wp($id){
+        // SELECT c.* FROM `process_outcome` a
+        // LEFT JOIN process_outcome_wp b ON b.process_outcome = a.id
+        // LEFT JOIN working_product c ON c.id = b.working_product
+        // WHERE a.id = 'EDM01-O1'
+        $data = DB::table('process_outcome')
+                ->select('working_product.*')
+                ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
+                ->leftJoin('working_product','working_product.id','=','process_outcome_wp.working_product')
+                ->where("process_outcome.id","=",$id)->get();
+        
+        header('Content-Type', 'application/json');
+        echo json_encode([
+            'draw' => 1,
+            'recordsTotal' => count($data),
+            'recordsFiltered' => count($data),
+            'data' => $data,
+        ]);;
     }
 
     public function test(Request $request){
