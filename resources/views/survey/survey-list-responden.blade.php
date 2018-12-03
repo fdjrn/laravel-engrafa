@@ -33,7 +33,7 @@
                   <td><input type="checkbox"></td>
                   <td>
                     <div>
-                      <a href="{{route('survey.answer',['id'=> $survey_id, 'itrelatedgoal' => $survey->it_related_goal, 'process' => $survey->process ])}}">
+                      <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
                         <p>
                           {{$survey->process}}
                         </p>
@@ -41,7 +41,13 @@
                     </div>
                   </td>
                   <td class="text-center">
-                    <a href="{{route('survey.choose.answer',['id'=> $survey_id, 'itrelatedgoal' => $survey->it_related_goal, 'process' => $survey->process ])}}" class="btn btn-info btn-sm"><i class="fa fa-play fa-fw"></i></a>
+                    @if($survey->status == '1-Waiting')
+                      <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-info btn-sm" title="Waiting"><i class="fa fa-play fa-fw"></i></a>
+                    @elseif($survey->status == '2-Process Survey')
+                      <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-warning btn-sm" title="Process"><i class="fa fa-forward fa-fw"></i></a>
+                    @elseif($survey->status == '4-Done Survey')
+                      <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Done"><i class="fa fa-check fa-fw"></i></a>
+                    @endif
                   </td>
                 </tr>
               @endforeach

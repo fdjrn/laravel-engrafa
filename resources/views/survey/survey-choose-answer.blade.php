@@ -89,7 +89,7 @@
                 </div>
                 @foreach($level['surveys'] as $idx => $survey)
                   <div class="form-group">
-                    <label for="i_n_surveyor" class="col-sm-2 control-label">{{ $idx == 0 ? 'Criteria' : ''}}</label>
+                    <label for="i_n_surveyor" class="col-sm-2 control-label">Criteria</label>
 
                     <div class="col-sm-10">
                       <div style="border: solid thin #d2d6de; padding: 6px 12px;">
@@ -122,14 +122,14 @@
                       </div>
                     </div>
                   </div>
-                @endforeach
-                <div class="form-group">
-                  <label for="comment" class="col-sm-2 control-label">Comment</label>
+                  <div class="form-group">
+                    <label for="comment" class="col-sm-2 control-label">Comment</label>
 
-                  <div class="col-sm-10">
-                    <textarea name="comment[{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
+                    <div class="col-sm-10">
+                      <textarea name="comment[{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
+                    </div>
                   </div>
-                </div>
+                @endforeach
               </div>
             </div>
           @endforeach
@@ -145,7 +145,9 @@
             </h4>
           </div>
           <div class="box-body">
-
+            @foreach($survey_members as $survey_member)
+            <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
+            @endforeach
           </div>
           <!-- /.box-body -->
           <div class="box-footer">

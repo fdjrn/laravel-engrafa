@@ -77,6 +77,14 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+        DB::table('survey_process')
+            ->where([
+                ['it_related_goal','=',$it_related_goal],
+                ['process','=',$process],
+                ['survey','=',$id],
+                ['status','=','1-Waiting']
+            ])
+            ->update(['status' => '2-Process Survey']);
         $d_surveys = DB::table('surveys')
                     ->select('surveys.name','surveys.created_by','survey_process.target_level')
                     ->leftJoin('survey_process','survey_process.survey','=','surveys.id')
@@ -89,14 +97,20 @@ class SurveyController extends Controller
 
         if($d_surveys->first()){
             if ($d_surveys->first()->created_by != Auth::user()->id){
-                $status_of_surveys = DB::table('survey_members')
-                    ->select('role')
+                $data['survey_members'] = DB::table('survey_members')
+                    ->select('survey_members.user','users.username')
+                    ->leftJoin('users','users.id','=','survey_members.user')
                     ->where([
-                        ['survey','=',$id],
-                        ['user','=',Auth::user()->id]
+                        ['survey','=',$id]
                     ])
                     ->get();
-                if(!$status_of_surveys->first()){
+                $ok = 0;
+                foreach($data['survey_members'] as $surmem){
+                    if($surmem->user == Auth::user()->id){
+                        $ok = 1;
+                    }
+                }
+                if(!$ok){
                     abort(404);
                 }
             }
@@ -146,11 +160,33 @@ class SurveyController extends Controller
     }
 
     public function postAnswer($inputans, Request $request){
-        print_r($inputans);
+        $inputan = explode("-",$inputans);
+        $survey_id = $inputan[0];
+        $it_related_goal = $inputan[1];
+        $process = $inputan[2];
 
-        print_r($request->post('metcriteria'));
-
-        print_r($request->post('comment'));
+        // print_r($request->post('metcriteria'));
+        foreach ($request->post('metcriteria') as $process_outcome => $answer){
+            echo $process_outcome." ".$answer." ".$request->post('comment')[$process_outcome];
+            DB::table('survey_process_outcomes')->insert(
+                        [   'survey' => $survey_id, 
+                            'it_related_goal' => $it_related_goal,
+                            'process_outcome' => $process_outcome,
+                            'met_criteria' => $answer,
+                            'comment' => $request->post('comment')[$process_outcome],
+                            'answered_by' => Auth::user()->id
+                        ]
+                    );
+        }
+        
+        DB::table('survey_process')
+            ->where([
+                ['it_related_goal','=',$it_related_goal],
+                ['process','=',$process],
+                ['survey','=',$survey_id]
+            ])
+            ->update(['status' => '4-Done Survey']);
+        return redirect('survey/'.$survey_id);
     }
 
     public function get_process_outcome_wp($id){
