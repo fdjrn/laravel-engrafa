@@ -243,11 +243,11 @@
 
 @section('page-level-plugins')
   <!-- fullCalendar -->
-  {{ Html::css('theme/AdminLTE/bower_components/moment/moment.js')}}
-  {{ Html::css('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js')}}"
+  {{ Html::script('theme/AdminLTE/bower_components/moment/moment.js')}}
+  {{ Html::script('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js')}}"
 
   <!-- bootstrap time picker -->
-  {{Html::css('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.js')}}"
+  {{Html::script('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.js')}}"
 
   {{ Html::script('js/pages/schedule/calendar.min.js') }}
 @stop
