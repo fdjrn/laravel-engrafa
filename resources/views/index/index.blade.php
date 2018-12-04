@@ -208,31 +208,38 @@
         </div>
 
         {{-- Right Side (File Properties)--}}
-        <div class="col-md-3">
+        <div class="col-md-3" id="file-properties">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h4><i class="fa fa-usb fa-fw"></i>Some File <span class="pull-right">
-                            <i class="fa fa-angle-double-right"></i></span></h4>
+                    <h4><i class="fa fa-usb fa-fw"></i>Some File
+                        <span class="pull-right">
+                            <i class="fa fa-angle-double-right"></i>
+                        </span>
+                    </h4>
                 </div>
-                <div class="box-body">
 
+                <div class="box-body">
+                    {{-- File Description Part --}}
                     <div class="box box-primary">
-                        <div class="box-header with-border">
+                        <div class="box-header with-border" data-toggle="collapse" data-target="#collapseOne">
                             <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#file-group" href="#collapseOne"> Description</a>
+                                <a data-toggle="collapse" data-target="#collapseOne" data-parent="#file-group"> Description</a>
                             </h4>
                         </div>
+
                         <div id="collapseOne" class="collapse in">
                             <div class="box-body">
+                                <p id="file-description">
                                 Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad
                                 squid. 3
                                 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa
                                 nesciunt laborum
+                                </p>
                             </div>
                             <div class="box-footer">
                                 <span class="pull-left">
                                     <a href="" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
-                                    <a href="" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    <a href="#" data-toggle="modal" data-target="#modal2" title="edit"><i class="fa fa-edit fa-fw"></i></a>
                                     <a href="" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
                                     <a href="" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
                                 </span>
@@ -241,9 +248,9 @@
                     </div>
 
                     <div class="box box-primary">
-                        <div class="box-header with-border">
+                        <div class="box-header with-border" data-toggle="collapse" data-target="#collapseTwo">
                             <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#file-group" href="#collapseTwo">Contributor</a>
+                                <a data-toggle="collapse" data-parent="#file-group" data-target="#collapseTwo">Contributor</a>
                             </h4>
                         </div>
                         <div id="collapseTwo" class="collapse in">
@@ -266,9 +273,9 @@
                     </div>
 
                     <div class="box box-primary">
-                        <div class="box-header with-border">
+                        <div class="box-header with-border" data-toggle="collapse" data-target="#collapseThree">
                             <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#file-group" href="#collapseThree">
+                                <a data-toggle="collapse" data-parent="#file-group" data-target="#collapseThree">
                                     Modified By
                                 </a>
                             </h4>
@@ -372,7 +379,7 @@
     </div>
 
     <!-- Upload files Bootsrap Modal -->
-    <div class="modal eng-modal fade" id="upload-files-modal" tabindex="-1" role="dialog" aria-labelledby="uploadFilesModalLabel">
+        <div class="modal eng-modal fade" id="upload-files-modal" tabindex="-1" role="dialog" aria-labelledby="uploadFilesModalLabel">
         <div class="modal-dialog eng-modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -389,24 +396,38 @@
                                 <input type="file" name="file"/>
                             </div>
                         </form>
-
-                        {{--<div class="dropzone" id="upload-file-form">
-                            {{ csrf_field() }}
-                            <div class="fallback">
-                                <input type="file" name="file"/>
-                            </div>
-                        </div>--}}
                     </div>
-
-                    <div class="modal-footer">
-                        {!! Form::button('Close', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
-                        {!! Form::submit('Upload', ['class' => 'btn btn-info','id'=>'btn-upload-files']) !!}
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    {!! Form::button('Close', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
+                    {!! Form::submit('Upload', ['class' => 'btn btn-info','id'=>'btn-upload-files']) !!}
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Create/Update Description -->
+    <!-- Modal -->
+    <div id="modal2" class="modal eng-modal fade " role="dialog">
+        <div class="modal-dialog eng-modal-dialog-centered">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><span><i class="fa fa-file "></i> File Description</span></h4>
+                </div>
+                <div class="modal-body">
+                    <textarea style="width: -moz-available; font-weight: normal;" rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    {!! Form::button('Cancel', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
+                    {!! Form::button('Save', ['class' => 'btn btn-info','id'=>'btn-file-descr']) !!}
+                </div>
+            </div>
+
+        </div>
+    </div>
 @stop
 
 @section('core-plugins')
