@@ -55,6 +55,14 @@
         @endif
       </div>
       <div class="form-group">
+        <input type="text" class="form-control" placeholder="Username" name="username" value="{{ old('username') }}">
+        @if ($errors->has('username'))
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $errors->first('username') }}</strong>
+            </span>
+        @endif
+      </div>
+      <div class="form-group">
         <input type="text" class="form-control" placeholder="Email" name="email" value="{{ old('email') }}">
         @if ($errors->has('email'))
             <span class="invalid-feedback" role="alert">

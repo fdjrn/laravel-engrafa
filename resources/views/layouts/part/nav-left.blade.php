@@ -72,10 +72,7 @@
           </a>
         </li>
         @endforeach -->
-        @each('layouts.part.partial-menu',$roleMenus,'menu','layouts.part.partial-menu-nothing')
-        <li class="header">
-        <span></span>
-        </li>
+        @each('layouts.part.partial-menu',$roleMenus,'menu','layouts.part.partial-menu','mnsurvey')
         <li class="treeview">
           <a href="{{ url('chat') }}">
             <i class="fa fa-comment"></i> <span>Chat</span>
