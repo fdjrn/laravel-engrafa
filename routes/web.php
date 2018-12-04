@@ -33,6 +33,15 @@ Route::middleware(['auth','web'])->group(function () {
 	// index & file explorer
 	Route::get('/index','Index\IndexController@index')->name('index');
 	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
+    Route::get('/index/list-all','Index\IndexController@getListAll');
+    Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');
+    Route::get('/index/list-all-previous/{id}','Index\IndexController@getListAllPrevious');
+    Route::get('/index/list-folder','Index\IndexController@getListFolder');
+    Route::get('/index/list-folder/{id}','Index\IndexController@getListFolderDetail');
+    Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
+    Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
+    Route::post('/index/upload-files','Index\IndexController@uploadFiles');
+
 	Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');
 
 	// chat
@@ -55,6 +64,11 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
 	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
+
+	//calendar
+	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
+	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
+	Route::get("/calendar/{year}/{month}",'Schedule\ScheduleController@schedules_list')->name("calendar.list");
 });
 
 //DocumentViewer Library
