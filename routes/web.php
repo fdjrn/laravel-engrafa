@@ -62,6 +62,11 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
 	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
+
+	//calendar
+	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
+	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
+	Route::get("/calendar/{year}/{month}",'Schedule\ScheduleController@schedules_list')->name("calendar.list");
 });
 
 //DocumentViewer Library
