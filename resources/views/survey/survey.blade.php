@@ -42,7 +42,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('survey')}}"><i class="fa fa-files-o"></i> Survey</a></li>
+  <li><a class="active" href="{{url('/survey/'.$survey_id)}}"><i class="fa fa-files-o"></i> Survey</a></li>
 @stop
 
 
@@ -53,74 +53,14 @@
   </div>
 
   <div class="col-md-9">
-    <div class="nav-tabs-custom">
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#tab_1" data-toggle="tab">Pending Survey</a></li>
-        <li><a href="#tab_2" data-toggle="tab">Done</a></li>
-        <li class="pull-right crud-button"><a href="#" id="b_create_new_team" class="text-success"><i class="fa fa-plus-circle"></i></a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="tab_1">
-          <!-- search form -->
-          <form action="#" method="get">
-            <div class="input-group">
-              <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                    <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                    </button>
-                  </span>
-            </div>
-          </form>
-
-          <table id="table1" class="table table-bordered table-hover" data-toggle="table" data-click-to-select="true">
-            <thead>
-              <tr>
-                <th data-field="state" data-checkbox="true" data-formatter="stateFormatter">
-                  <input type="checkbox">
-                </th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Time</th>
-                <th>Level</th>
-                <!-- <th>Date Modified</th> -->
-                <th>Analyze</th>
-                <th>More</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($surveys as $survey)
-                <tr>
-                  <td><input type="checkbox"></td>
-                  <td>
-                    <div>
-                      <a href="{{ route('survey.choose.answer') }}">
-                        <p>
-                          {{$survey->name}}
-                        </p>
-                        <h6>Created {{$survey->created_ats}}</h6>
-                      </a>
-                    </div>
-                  </td>
-                  <!-- <td>{{$survey->updated_at}}</td> -->
-                  <td>Purpose</td>
-                  <td>1 minutes to Finish</td>
-                  <td>-</td>
-                  <td class="text-center">
-                    <i class="fa fa-bar-chart"></i>
-                  </td>
-                  <td class="text-center">
-                    <i class="fa fa-trash fa-fw"></i>
-                    <i class="fa fa-edit"></i>
-                  </td>
-                </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-        <div class="tab-pane active" id="tab_2">
-        </div>
-      </div>
+    <div class="text-center" style="background-color: #3c8dbc; border-radius: .25em; padding:1px; margin-bottom: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.3); color:#fff;">
+      <h4><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;{{ $survey_name }}&nbsp;&nbsp;</h4>
     </div>
+    @if($status_ownership == "CREATOR" || $status_ownership == "SURVEYOR")
+      @include('survey.survey-list-creator_surveyor')
+    @else
+      @include('survey.survey-list-responden')
+    @endif
   </div>
   <!-- <div class="col-md-3">
     @#include('survey.nav-right-survey')

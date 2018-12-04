@@ -8,6 +8,8 @@ use App\Models\RoleMenu;
 use App\Models\Menu;
 use App\Models\Survey;
 use App\Models\Role;
+use App\Models\ItGoal;
+use App\Models\Level;
 
 class GlobalComposer {
 
@@ -29,6 +31,12 @@ class GlobalComposer {
                 $view->with('mnsurvey', $mnsurvey);
                 $data_roles = Role::data_roles();
                 $view->with('data_roles', $data_roles);
+                $dataItGoal = ItGoal::dataItGoal();
+                $view->with('dataItGoal', $dataItGoal);
+                $dataItGoalToProcess = ItGoal::dataItGoalToProcess();
+                $view->with('dataItGoalToProcess', $dataItGoalToProcess);
+                $dataLevel = Level::dataLevel();
+                $view->with('dataLevel', $dataLevel);
             }
             // dd($menu);
             $view->with('roleMenus',$menu);
