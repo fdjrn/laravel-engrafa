@@ -9,13 +9,12 @@
 
 @section('page-level-plugin-styles')
 <!-- fullCalendar -->
-  <link rel="stylesheet" href="{{asset('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.css')}}">
-  <link rel="stylesheet" href="{{asset('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.print.min.css')}}" media="print">
-</script>
+  {{Html::css('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.css')}}
+  {{Html::css('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.print.min.css')}}
 <!-- Bootstrap time Picker -->
-  <link rel="stylesheet" href="{{asset('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.css')}}">
+  {{Html::css('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.css')}}
 <!-- bootstrap datepicker -->
-  <link rel="stylesheet" href="{{asset('theme/AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}">
+  {{Html::css('theme/AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}
 @stop
 
 @section('theme-global-styles')
@@ -243,15 +242,14 @@
 @stop
 
 @section('page-level-plugins')
-<!-- fullCalendar -->
-<script src="{{ asset('theme/AdminLTE/bower_components/moment/moment.js')}}"></script>
-<script src="{{ asset('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js')}}"></script>
+  <!-- fullCalendar -->
+  {{ Html::css('theme/AdminLTE/bower_components/moment/moment.js')}}
+  {{ Html::css('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js')}}"
 
-<!-- bootstrap time picker -->
-  <script src="{{asset('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.js')}}"></script>
+  <!-- bootstrap time picker -->
+  {{Html::css('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.js')}}"
 
-<script type="text/javascript" src="{{ asset('app/Schedule/calendar.min.js')}}">
-</script>
+  {{ Html::script('js/pages/schedule/calendar.min.js') }}
 @stop
 
 @section('theme-global-scripts')
