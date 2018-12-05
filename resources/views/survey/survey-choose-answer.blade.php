@@ -133,7 +133,8 @@
               </div>
             </div>
           @endforeach
-          <div class="pull-right"><button type="submit" form="form_q_survey" class="btn btn-primary">Finish Survey</button></div>
+          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Survey</button></div>
+          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Survey</button></div>
           </form>
         @endif
       </div>
@@ -169,15 +170,15 @@
         <h4 class="modal-title">Working Product</h4>
       </div>
       <div class="modal-body">
-        <form name="form_w_product" action="{{route('survey.task.store')}}" method="post" id="form_w_product">
+        <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
           {{ csrf_field() }}
           <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
               <thead>
                 <tr>
-                  <td style="width:20%;">WP ID</td>
-                  <td style="width:60%;">Description</td>
-                  <td style="width:20%;">File</td>
+                  <td style="width:100px;">WP ID</td>
+                  <td style="width:350px;">Description</td>
+                  <td>File</td>
                 </tr>
               </thead>
               <tbody>
@@ -249,9 +250,9 @@
             {
                 data: 'file',
                 render: function(data, type, row, meta) {
-                let action = "<input type='file' style='width:100%;'>";
+                let action = "<input type='file' name='files["+row.id+"]' style='width:100%;'>";
                 if(data){
-                  action="Uploaded";
+                  action=""+row.filename+"";
                 }
                 return action;
                 }

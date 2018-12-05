@@ -53,9 +53,11 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
-	Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
-	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
+	Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
+	Route::post('/survey/answer/uploadWp/{id}','Survey\SurveyController@uploadWp')->name('survey.answer.uploadWp');
+
+	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::resource('surveyrs', 'Survey\SurveyController');
