@@ -59,39 +59,6 @@ $(document).ready(function () {
         }
     });
 
-    var myDropzone = new Dropzone('#upload-file-form', {
-        paramName: "file",
-        url: '/index/upload-files',
-        method: 'POST',
-        maxFilesize: 25,
-        maxFiles: 4,
-        parallelUploads: 4,
-        uploadMultiple: true,
-        autoProcessQueue: false,
-        //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
-        addRemoveLinks: true,
-        dictFileTooBig: 'Max file size is 25MB',
-        dictMaxFilesExceeded: 'Max files uploaded is 4',
-        success: function (file, response) {
-            getCurrentMainFolderDetail(currentFolderId);
-        }
-    });
-
-
-    $("#dt-file-exp-table-index tbody").on("change", "input[type='checkbox']", function(){
-        // If checkbox is not checked
-        if(!this.checked){
-            var el = $("#file-exp-select-all").get(0);
-            if(el && el.checked && ("indeterminate" in el)){
-                el.indeterminate = true;
-            }
-        }
-    });
-
-    $("#file-exp-select-all").on("click", function(){
-        var rows = dtMain.rows({ "search": "applied" }).nodes();
-        $('input[type="checkbox"]', rows).prop("checked", this.checked);
-    });
 
     function getCurrentMainFolderDetail(id) {
         dtMain.ajax.url("/index/list-all/"+id).load();
@@ -110,6 +77,39 @@ $(document).ready(function () {
             dtFolder.ajax.url("/index/list-folder-previous/"+ rootFolderId).load();
         }
     }
+
+    var myDropzone = new Dropzone('#upload-file-form', {
+        paramName: "file",
+        url: '/index/upload-files',
+        method: 'POST',
+        maxFilesize: 25,
+        maxFiles: 4,
+        parallelUploads: 4,
+        uploadMultiple: true,
+        autoProcessQueue: false,
+        //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
+        addRemoveLinks: true,
+        dictFileTooBig: 'Max file size is 25MB',
+        dictMaxFilesExceeded: 'Max files uploaded is 4',
+        success: function () {
+            getCurrentMainFolderDetail(currentFolderId);
+        }
+    });
+
+    $("#dt-file-exp-table-index tbody").on("change", "input[type='checkbox']", function(){
+        // If checkbox is not checked
+        if(!this.checked){
+            var el = $("#file-exp-select-all").get(0);
+            if(el && el.checked && ("indeterminate" in el)){
+                el.indeterminate = true;
+            }
+        }
+    });
+
+    $("#file-exp-select-all").on("click", function(){
+        var rows = dtMain.rows({ "search": "applied" }).nodes();
+        $('input[type="checkbox"]', rows).prop("checked", this.checked);
+    });
 
     dtMain.on("click", "tr", function () {
         var rootId = dtMain.row( this ).data().id;

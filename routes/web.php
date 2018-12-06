@@ -32,9 +32,12 @@ Route::middleware(['auth','web'])->group(function () {
 
 	// index & file explorer
     Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
-
+    Route::get('/homepage/list-all','Homepage\HomepageController@listAll')->name('homepage.listall');
+    Route::post('/homepage/create-new-folder','Homepage\HomepageController@createNewFolder');
+    Route::post('/homepage/upload-files','Homepage\HomepageController@uploadFiles');
 
     Route::get('/index','Index\IndexController@index')->name('index');
+    Route::post('/index','Index\IndexController@index')->name('index2');
 	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/list-all','Index\IndexController@getListAll');
     Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');

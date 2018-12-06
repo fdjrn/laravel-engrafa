@@ -14,20 +14,51 @@
 @stop
 
 @section('page-level-styles')
+    {{ Html::style('css/material.min.css')}}
+    {{ Html::style('css/dataTables.material.min.css') }}
+    {{ Html::style('css/dropzone.min.css') }}
+
     <style>
-        .example-modal .modal {
-            position: relative;
-            top: auto;
-            bottom: auto;
-            right: auto;
-            left: auto;
-            display: block;
-            z-index: 1;
+
+        .mdl-data-table th {
+            vertical-align: bottom;
+            text-overflow: ellipsis;
+            font-weight: inherit;
+            line-height: 24px;
+            letter-spacing: 0;
+            font-size: inherit;
+            color: inherit;
+            padding-bottom: 8px;
         }
 
-        .example-modal .modal {
-            background: transparent !important;
+        .mdl-data-table td {
+            border-top: 1px solid rgba(0,0,0,.12);
+            border-bottom: 1px solid rgba(0,0,0,.12);
+            padding-top: 12px;
+            vertical-align: middle;
+            font-weight: 400;
+            font-size: inherit;
         }
+
+        .custom-dropdown-btn > ul {
+            width: inherit;
+        }
+
+        .table-responsive tbody td{
+            font-size: inherit;
+            font-weight: normal;
+        }
+
+        #latest-folder-link {
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+        }
+
+        #frm-last-folder {
+            cursor: pointer;
+        }
+
+
     </style>
 @stop
 
@@ -82,12 +113,20 @@
                     <div class="small-box bg-red">
                         <div class="inner">
                             <h3>Dokumen</h3>
-                            <p>[Nama File Dokumen]</p>
+                            <p class="latest-file-name">
+                                {!! isset($latestFile) ? $latestFile->name : '[No Data]' !!}
+                            </p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-file-o"></i>
                         </div>
-                        <a href="#" class="small-box-footer">
+                        {{--<a href="{{ isset($latestFile) ? url($latestFile['url']) : '#' }}"
+                           class="small-box-footer latest-file-url">
+                            More Details <i class="fa fa-arrow-circle-right"></i>
+                        </a>--}}
+                        {{--<a data-toggle="modal" data-target=""></a>--}}
+                        <a href="" data-toggle="modal" id="latest-file-link"
+                           class="small-box-footer latest-file-url" >
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -98,7 +137,7 @@
                     <div class="small-box bg-purple">
                         <div class="inner">
                             <h3>Survey</h3>
-                            <p>[Nama Survey]</p>
+                            <p>[No Data]</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-copy"></i>
@@ -114,83 +153,45 @@
                     <div class="small-box bg-yellow">
                         <div class="inner">
                             <h3>Folder</h3>
-                            <p>[Nama Folder]</p>
+                            <p class="latest-folder-name">
+                                {!! isset($latestFolder) ? $latestFolder['name'] : '[No Data]' !!}
+                            </p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-folder-o"></i>
                         </div>
-                        <a href="#" class="small-box-footer">
+                        {{--@if(isset($latestFolder))
+                            <form action="{{ route('index') }}" method="POST" id="frm-last-folder" class="small-box-footer">
+                                @csrf
+                                <input type="hidden" name="folder_id" value="{{ $latestFolder['id'] }}">
+                                <a href="#"
+                                   class="small-box-footer latest-folder-url" id="latest-folder-link">
+                                    More Details <i class="fa fa-arrow-circle-right"></i>
+                                </a>
+                            </form>
+                        @else--}}
+                        <a href="{{ url('/index') }}"
+                           class="small-box-footer latest-folder-url">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
+                        {{--@endif--}}
+
                     </div>
                 </div>
             </div>
 
-            <table id="recentListTable" class="table table-bordered table-hover" data-toggle="table"
-                   data-click-to-select="true">
-                <thead>
-                <tr>
-                    <th data-field="state" data-checkbox="true" data-formatter="stateFormatter">
-                        <input type="checkbox">
-                    </th>
-                    <th>Name</th>
-                    <th>Date Modified</th>
-                    <th>Creator</th>
-                    <th>Comment</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <i class="fa fa-folder fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                    <td>Some Text</td>
-                    <td>Some Text</td>
-                    <td>
-                        <i class="fa fa-comment fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <i class="fa fa-folder fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                    <td>Some Text</td>
-                    <td>Some Text</td>
-                    <td>
-                        <i class="fa fa-comment fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                        <i class="fa fa-usb fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                    <td>Some Text</td>
-                    <td>Some Text</td>
-                    <td>
-                        <i class="fa fa-comment fa-fw"></i>
-                        <span>Some Text</span>
-                    </td>
-                </tr>
-                <tfoot>
-                <tr>
-                    <th data-field="state" data-checkbox="true" data-formatter="stateFormatter">
-                        <input type="checkbox">
-                    </th>
-                    <th>Name</th>
-                    <th>Date Modified</th>
-                    <th>Creator</th>
-                    <th>Comment</th>
-                </tr>
-                </tfoot>
-            </table>
+            <div class="table-responsive">
+                <table id="recentListTable" class="mdl-data-table" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Owner</th>
+                        <th>Last Modified</th>
+                        <th>Size</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
         <!-- /.box-body -->
         <div class="box-footer">
@@ -200,6 +201,48 @@
 @stop
 
 @section('body-modals')
+    @include('layouts.part.file-management-modal')
+
+    {{-- Image only--}}
+    <div id="view-image-modal" class="modal eng-modal fade " role="dialog">
+        <div class="modal-dialog eng-modal-dialog-centered">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><span><i class="fa fa-file "></i> View Detail</span></h4>
+                </div>
+                <div class="modal-body">
+                    @if (@isset($latestFile)){
+                        <img id="img-src" class="img-responsive" src="{{ url( $latestFile->url) }}">
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    {!! Form::button('Close', ['class' => 'btn btn-info','data-dismiss'=>'modal']) !!}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Pdf only--}}
+    {{--<div id="view-pdf-modal" class="modal eng-modal fade " role="dialog">
+        <div class="modal-dialog eng-modal-dialog-centered">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><span><i class="fa fa-file "></i> View Detail</span></h4>
+                </div>
+                <div class="modal-body">
+                    <img id="img-src" class="img-responsive" src="{{ url( $latestFile->url) }}">
+                </div>
+                <div class="modal-footer">
+                    {!! Form::button('Close', ['class' => 'btn btn-info','data-dismiss'=>'modal']) !!}
+                </div>
+            </div>
+        </div>
+    </div>--}}
+
 @stop
 
 @section('core-plugins')
@@ -212,6 +255,10 @@
 @stop
 
 @section('page-level-scripts')
+    {{ Html::script('js/jquery.dataTables.min.js') }}
+    {{ Html::script('js/dataTables.material.min.js') }}
+    {{ Html::script('js/dropzone.min.js') }}
+    {{ Html::script('js/pages/homepage/homepage.js') }}
 @stop
 
 @section('theme-layout-scripts')
