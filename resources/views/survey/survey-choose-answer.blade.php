@@ -169,9 +169,10 @@
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Working Product</h4>
       </div>
+      <input type="hidden" id="curWP">
+      <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
+        {{ csrf_field() }}
       <div class="modal-body">
-        <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
-          {{ csrf_field() }}
           <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
               <thead>
@@ -185,12 +186,12 @@
               </tbody>
             </table>
           </div>
-        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
-        <button type="submit" form="form_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
+        <button type="submit" id="i_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
       </div>
+      </form>
     </div>
     <!-- /.modal-content -->
   </div>
@@ -214,52 +215,6 @@
     /* BOOTSTRAP SLIDER */
     $('.slider').slider()
   })
-
-  function getWP(input){
-    $('#m_u_file').modal('show');
-    $('.wp-id').html(input);
-
-    var table = {
-      el: {},
-      id: '#table-wp'
-    };
-
-    table.el = $(table.id).DataTable({
-        serverSide: false,
-        "bDestroy": true,
-        searching: false, paging: false, info: false,
-        responsive: true,
-        processing: true,
-        ajax: {
-        url: base_url+'/survey/get_process_outcome_wp/'+input,
-        method: 'GET',
-        },
-        columns: [
-            {
-                data: 'id',
-                render: function(data, type, row, meta) {
-                return data;
-                }
-            },
-            {
-                data: 'process',
-                render: function(data, type, row, meta) {
-                return data;
-                }
-            },
-            {
-                data: 'file',
-                render: function(data, type, row, meta) {
-                let action = "<input type='file' name='files["+row.id+"]' style='width:100%;'>";
-                if(data){
-                  action=""+row.filename+"";
-                }
-                return action;
-                }
-            }
-        ]
-    });
-  }
 </script>
 @stop
 

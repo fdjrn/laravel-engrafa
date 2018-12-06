@@ -229,8 +229,18 @@ class SurveyController extends Controller
 
         $survey = \App\Models\Survey::where('id', $id)->first();
 
-        if(!$survey || !$request->file('files')){
-            return redirect()->back();
+        if(!$survey){
+            return json_encode([
+                'status' => 0,
+                'messages' => "Upload Files Failed, current Survey not found!"
+            ]);
+        }
+
+        if(!$request->file('files')){
+            return json_encode([
+                'status' => 0,
+                'messages' => "Upload Files Failed, files must not empty!"
+            ]);
         }
 
         // $files = [];
@@ -263,7 +273,12 @@ class SurveyController extends Controller
             }
         }
 
-        return redirect()->back();
+        // return redirect()->back();
+        
+        return json_encode([
+            'status' => 1,
+            'messages' => "Upload Files Success!"
+        ]);
     }
 
     public function test(Request $request){
