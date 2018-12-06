@@ -34,7 +34,7 @@ function getWP(input){
           {
               data: 'file',
               render: function(data, type, row, meta) {
-              let action = "<input type='file' name='files["+row.id+"]' style='width:100%;' />";
+              let action = "Document Unavailable";
               if(data){
                 action=""+row.filename+"";
               }
@@ -44,37 +44,3 @@ function getWP(input){
       ]
   });
 }
-
-$("#form_w_product").submit(function(e) {
-  e.preventDefault();
-  var form = $(this);
-  var url = form.attr('action');
-  var formData = new FormData(this);
-
-  $.ajax({
-         type: "POST",
-         url: url,
-         data: formData, // serializes the form's elements.
-         success: function(data)
-         {
-          let parse = JSON.parse(data);
-          if (parse.status > 0) {
-            getWP($('#curWP').val());
-            swal({
-              type: 'success',
-              title: 'Berhasil',
-              text: parse.messages
-            });
-          } else {
-            swal({
-              type: 'error',
-              title: 'Gagal',
-              text: parse.messages
-            });
-          }
-         },
-         cache: false,
-         contentType: false,
-         processData: false
-       });
-});

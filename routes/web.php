@@ -53,6 +53,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
+	Route::get('/survey/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
 	Route::post('/survey/answer/uploadWp/{id}','Survey\SurveyController@uploadWp')->name('survey.answer.uploadWp');
