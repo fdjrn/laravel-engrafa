@@ -27,11 +27,17 @@ Auth::routes();
 Route::middleware(['auth','web'])->group(function () {
 	// Route::get('/home', 'HomeController@index')->name('home');
 
-	// Route::get('/', 'HomeController@index');
-	Route::get('/','Dashboard\DashboardController@index');
+	Route::get('/', 'Homepage\HomepageController@index');
+	Route::get('/dashboard','Dashboard\DashboardController@index')->name('dashboard');
 
 	// index & file explorer
-	Route::get('/index','Index\IndexController@index')->name('index');
+    Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
+    Route::get('/homepage/list-all','Homepage\HomepageController@listAll')->name('homepage.listall');
+    Route::post('/homepage/create-new-folder','Homepage\HomepageController@createNewFolder');
+    Route::post('/homepage/upload-files','Homepage\HomepageController@uploadFiles');
+
+    Route::get('/index','Index\IndexController@index')->name('index');
+    Route::post('/index','Index\IndexController@index')->name('index2');
 	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/list-all','Index\IndexController@getListAll');
     Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');
@@ -42,7 +48,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
     Route::post('/index/upload-files','Index\IndexController@uploadFiles');
 
-	Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');
+	/*Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');*/
 
 	// chat
 	Route::get('/chat','Chat\ChatController@index');
