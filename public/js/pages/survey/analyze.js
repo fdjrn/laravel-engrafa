@@ -11,7 +11,6 @@ function getWP(input){
   table.el = $(table.id).DataTable({
       serverSide: false,
       "bDestroy": true,
-      searching: false, paging: false, info: false,
       responsive: true,
       processing: true,
       ajax: {
@@ -36,7 +35,8 @@ function getWP(input){
               render: function(data, type, row, meta) {
               let action = "Document Unavailable";
               if(data){
-                action=""+row.filename+"";
+                action="<a href='/survey/downloadWp/"+row.fileid+"' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
+                "&nbsp;&nbsp;&nbsp;<a href='/survey/viewWp/"+row.fileid+"'>"+row.filename+"</a>";
               }
               return action;
               }

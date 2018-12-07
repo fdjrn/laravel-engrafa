@@ -55,6 +55,7 @@
 </script>
 <script>
     var base_url = {!! json_encode(url('/')) !!};
+    var supported_type = 'application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     var url = $(location).attr('href');
     var aurl = url.split("/").splice(0, 4).join("/");
 
