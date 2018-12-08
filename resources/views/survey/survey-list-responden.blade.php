@@ -30,7 +30,7 @@
               </thead>
               <tbody>
                 @foreach($surveys as $survey)
-                 @if($survey->status != '4-Done Survey')
+                  @if((explode('-',$survey->status))[0] < "4")
                     <tr>
                       <td><input type="checkbox"></td>
                       <td>
@@ -82,12 +82,12 @@
               </thead>
               <tbody>
                 @foreach($surveys as $survey)
-                 @if($survey->status == '4-Done Survey')
+                  @if((explode('-',$survey->status))[0] >= "4")
                     <tr>
                       <td><input type="checkbox"></td>
                       <td>
                         <div>
-                          <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
+                          <a href="{{route('survey.answer.doneView',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
                             <p>
                               {{$survey->process}}
                             </p>
@@ -95,7 +95,7 @@
                         </div>
                       </td>
                       <td class="text-center">
-                          <a href="{{route('survey.answer',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Done"><i class="fa fa-check fa-fw"></i></a>
+                          <a href="{{route('survey.answer.doneView',['inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Done"><i class="fa fa-check fa-fw"></i></a>
                       </td>
                     </tr>
                   @endif

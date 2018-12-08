@@ -139,8 +139,8 @@
               </div>
             </div>
           @endforeach
-          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Survey</button></div>
-          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Survey</button></div>
+          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Analyze</button></div>
+          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Analyze</button></div>
           </form>
         @endif
       </div>

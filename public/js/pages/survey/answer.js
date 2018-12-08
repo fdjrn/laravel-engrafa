@@ -1,6 +1,7 @@
 function getWP(input){
   $('#m_u_file').modal('show');
   $('#curWP').val(input);
+  var mtype = $('#curTyp').val();
   $('#wp-title').html(input.split(",",1));
 
   var table = {
@@ -34,9 +35,13 @@ function getWP(input){
           {
               data: 'file',
               render: function(data, type, row, meta) {
-              let action = "<input type='file' name='files["+row.id+"]' style='width:100%;' />";
+              let action = "Document Unavailable";
+              if(mtype == 'answer'){
+               action = "<input type='file' name='files["+row.id+"]' style='width:100%;' accept='"+supported_type+"' />";
+              }
               if(data){
-                action=""+row.filename+"";
+                action="<a href='/survey/downloadWp/"+row.fileid+"' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
+                "&nbsp;&nbsp;&nbsp;<a href='/survey/viewWp/"+row.fileid+"'>"+row.filename+"</a>";
               }
               return action;
               }
