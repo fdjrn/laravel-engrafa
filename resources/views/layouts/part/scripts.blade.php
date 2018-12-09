@@ -52,6 +52,8 @@
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
 
 <script>
@@ -62,6 +64,8 @@
     var supported_type = 'application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     var url = $(location).attr('href');
     var aurl = url.split("/").splice(0, 4).join("/");
+    var burl = url.split("/").splice(0, 5).join("/");
+    console.log(burl);
 
     // for sidebar menu entirely but not cover treeview
     $('ul.sidebar-menu a').filter(function() {
@@ -70,6 +74,8 @@
       }else if(this.href+"#" == url){
         return true;
       }else if(this.href == aurl){
+        return true;
+      }else if(this.href == burl){
         return true;
       }
     }).parent().addClass('active');

@@ -56,21 +56,21 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// survey responden
-	Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
-	Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
+	Route::get('/survey/{id}/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
+	Route::post('/survey/{id}/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
 	Route::post('/survey/answer/uploadWp/{id}','Survey\SurveyController@uploadWp')->name('survey.answer.uploadWp');
-	Route::get('/survey/answer/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.answer.doneView');
+	Route::get('/survey/{id}/answer/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.answer.doneView');
 
 	// survey creator/surveyor
-	Route::get('/survey/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
-	Route::post('/survey/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
+	Route::get('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
+	Route::post('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
 	// survey common
 	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::get('/survey/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/survey/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
 
 	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
-	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
+	Route::get('/survey/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 

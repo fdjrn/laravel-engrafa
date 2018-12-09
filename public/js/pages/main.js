@@ -74,3 +74,38 @@ function initialize_select_user(id_element){
       }
   });
 }
+
+$("#form_n_survey").submit(function(e) {
+  e.preventDefault();
+  var form = $(this);
+  var url = form.attr('action');
+  var formData = new FormData(this);
+
+  $.ajax({
+         type: "POST",
+         url: url,
+         data: formData, // serializes the form's elements.
+         success: function(data)
+         {
+          let parse = JSON.parse(data);
+          if (parse.status > 0) {
+            swal({
+              type: 'success',
+              title: 'Berhasil',
+              text: 'Create New Survey Success'
+            });
+            location.href = base_url+parse.messages;
+          } else {
+            swal({
+              type: 'error',
+              title: 'Gagal',
+              html:true,
+              text: parse.messages
+            });
+          }
+         },
+         cache: false,
+         contentType: false,
+         processData: false
+       });
+});

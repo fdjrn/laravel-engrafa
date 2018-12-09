@@ -230,6 +230,7 @@
 @stop
 
 @section('page-level-scripts')
+<script src="{{ asset('js/pages/survey/task.js')}}"></script>
 <script>
 </script>
 @stop

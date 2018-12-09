@@ -25,7 +25,7 @@ class SurveyController extends Controller
                 $join->on('survey_process.survey', '=','surveys.id')
                      ->on('survey_process.it_related_goal', '=','it_related_goal.id');
             })
-            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.id')
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal')
             ->where('surveys.id',$id)
             ->get();
 
@@ -66,7 +66,7 @@ class SurveyController extends Controller
     	return view('survey.survey-add-question');	
     }
 
-    public function chooseAnswer($inputans){
+    public function chooseAnswer($id,$inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -173,7 +173,7 @@ class SurveyController extends Controller
     	return view('survey.survey-choose-answer', $data);	
     }
 
-    public function postAnswer($inputans, Request $request){
+    public function postAnswer($id,$inputans, Request $request){
         $inputan = explode("-",$inputans);
         $survey_id = $inputan[0];
         $it_related_goal = $inputan[1];
@@ -213,7 +213,7 @@ class SurveyController extends Controller
     }
 
 
-    public function doneView($inputans){
+    public function doneView($id, $inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -441,7 +441,7 @@ class SurveyController extends Controller
         return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
     }
 
-    public function analyze($inputans){
+    public function analyze($id,$inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -528,7 +528,7 @@ class SurveyController extends Controller
         return view('survey.survey-analyze', $data);  
     }
 
-    public function analyzePost($inputans, Request $request){
+    public function analyzePost($id,$inputans, Request $request){
         $inputan = explode("-",$inputans);
         $survey_id = $inputan[0];
         $it_related_goal = $inputan[1];
@@ -600,7 +600,7 @@ class SurveyController extends Controller
 
     public function ajax_get_list_user()
     {
-       echo json_encode(DB::table('users')->get());
+       echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
     }
 
     public function task($id)
@@ -641,6 +641,34 @@ class SurveyController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_survey' => 'required|unique:surveys,name|max:255',
+            'i_n_surveyor' => 'required',
+            'i_n_client' => 'required',
+            'i_n_survey_type' => 'required',
+            'i_n_expire' => 'required',
+            'i_itgoal' => 'required'
+            ],
+            [
+                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
+                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
+                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Surveyor</span> field is required',
+                'i_n_client.required' => '&#8226;The <span class="text-danger">Client</span> field is required',
+                'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
+                'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',
+                // 'files.*.mimes' => 'Only pdf, word (.doc|.docx), and excel(.xls|.xlsx) files are allowed',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+        $survey_type = $request->post('i_n_survey_type');
         // $sekolah->sekolah_id = $request->post('i-idsekolah');
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
@@ -655,7 +683,7 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "2-Responden";
+                    $surveymembers->role = "1-Surveyor";
                     $surveymembers->save();
                 }                
             }
@@ -664,19 +692,19 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "1-Surveyor";
+                    $surveymembers->role = "2-Responden";
                     $surveymembers->save();
                 }
             }
             if($request->get('i_itgoal')){
-                foreach ($request->get('i_itgoal') as $itgoal){
+                foreach ($request->get('i_itgoal')[$survey_type] as $itgoal){
                     $id_itgoal = DB::table('it_related_goal')->insertGetId(
                         [   'it_goal' => $itgoal, 
                             'survey' => $id
                         ]
                     );
-                    if($request->get('i_itgoal_process')){
-                        foreach($request->get('i_itgoal_process')[$itgoal] as $itgoalprocess){
+                    if($request->get('i_itgoal_process')[$survey_type]){
+                        foreach($request->get('i_itgoal_process')[$survey_type][$itgoal] as $itgoalprocess){
                             // $a_itgoalprocess = explode("-",$itgoalprocess);
                             // if($a_itgoalprocess[0] == $itgoal){
                                 $survey_process = DB::table('survey_process')->insertGetId(
@@ -684,8 +712,8 @@ class SurveyController extends Controller
                                         'it_related_goal' => $id_itgoal,
                                         'process' => $itgoalprocess,
                                         'survey' => $id,
-                                        'target_level' => $request->get('i_itgoal_process_level')[$itgoal][$itgoalprocess],
-                                        'target_percent' => $request->get('i_itgoal_process_percent')[$itgoal][$itgoalprocess],
+                                        'target_level' => $request->get('i_itgoal_process_level')[$survey_type][$itgoal][$itgoalprocess],
+                                        'target_percent' => $request->get('i_itgoal_process_percent')[$survey_type][$itgoal][$itgoalprocess],
                                         'status' => '1-Waiting'
                                     ]
                                 );
@@ -694,10 +722,17 @@ class SurveyController extends Controller
                     }
                 }
             }
-            return redirect('survey/'.$id);
+            return json_encode([
+                'status' => 1,
+                'messages' => '/survey/'.$id
+            ]);
+            // return redirect('survey/'.$id);
         }
         // return response()->json($post);
-        return redirect('survey');
+        return json_encode([
+            'status' => 0,
+            'messages' => 'Create Survey Failed'
+        ]);
     }
 
     public function task_store(Request $request){
@@ -721,6 +756,6 @@ class SurveyController extends Controller
                 $taskparticipants->save();
             }
         }
-        return redirect('survey/task/'.$request->post('i_n_survey_id'));
+        return redirect('survey/'.$request->post('i_n_survey_id').'/task/');
     }
 }
