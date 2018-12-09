@@ -598,9 +598,13 @@ class SurveyController extends Controller
         return response()->json(array('msg'=>$msg),200);
     }
 
-    public function ajax_get_list_user()
+    public function ajax_get_list_user($condition)
     {
-       echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
+        if($condition == 'no'){
+            echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
+        }else{
+            echo json_encode(DB::table('users')->get());
+        }
     }
 
     public function task($id)
@@ -736,6 +740,35 @@ class SurveyController extends Controller
     }
 
     public function task_store(Request $request){
+
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_task' => 'required|unique:tasks,name|max:255',
+            'i_n_priority' => 'required',
+            'i_n_due_date' => 'required',
+            'i_n_assignee' => 'required',
+            'i_n_participant' => 'required',
+            'i_n_detail' => 'required'
+            ],
+            [
+                'i_n_name_task.required' => '&#8226;The <span class="text-danger">New Task Name</span> field is required',
+                'i_n_name_task.unique' => '&#8226;The <span class="text-danger">Task Name</span> already exists',
+                'i_n_priority.required' => '&#8226;The <span class="text-danger">Task Priority</span> field is required',
+                'i_n_due_date.required' => '&#8226;The <span class="text-danger">Task Due Date</span> field is required',
+                'i_n_assignee.required' => '&#8226;The <span class="text-danger">Task Assignee</span> field is required',
+                'i_n_participant.required' => '&#8226;The <span class="text-danger">Task Participants</span> field is required',
+                'i_n_detail.required' => '&#8226;The <span class="text-danger">Task Detail</span> field is required',
+                // 'files.*.mimes' => 'Only pdf, word (.doc|.docx), and excel(.xls|.xlsx) files are allowed',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
         $task = new \App\Models\Task;
         $task->survey = $request->post('i_n_survey_id');
         $task->name = $request->post('i_n_name_task');
@@ -756,6 +789,10 @@ class SurveyController extends Controller
                 $taskparticipants->save();
             }
         }
-        return redirect('survey/'.$request->post('i_n_survey_id').'/task/');
+        // return redirect('survey/'.$request->post('i_n_survey_id').'/task/');
+        return json_encode([
+            'status' => 1,
+            'messages' => '/survey/'.$request->post('i_n_survey_id').'/task/'
+        ]);
     }
 }
