@@ -600,7 +600,7 @@ class SurveyController extends Controller
 
     public function ajax_get_list_user()
     {
-       echo json_encode(DB::table('users')->get());
+       echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
     }
 
     public function task($id)
@@ -655,7 +655,7 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "2-Responden";
+                    $surveymembers->role = "1-Surveyor";
                     $surveymembers->save();
                 }                
             }
@@ -664,7 +664,7 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "1-Surveyor";
+                    $surveymembers->role = "2-Responden";
                     $surveymembers->save();
                 }
             }
