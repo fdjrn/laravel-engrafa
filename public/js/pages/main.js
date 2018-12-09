@@ -55,7 +55,7 @@ $(document).ready(function(){
 function initialize_select_user(id_element){
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user',
+      url: base_url+'/survey/ajax_get_list_user/no',
       // data: {
       //     'anakunit': idUnit
       // },

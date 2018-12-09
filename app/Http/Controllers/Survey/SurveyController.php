@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Survey;
 
 use App\Http\Controllers\Controller;
-use App\User;
-use App\Models\Files;
+use Auth;
+use Carbon\Carbon; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Auth;
-use Carbon\Carbon; 
+
+use App\User;
+use App\Models\Files;
+use App\Models\SurveyProcessOutcomes;
+use App\Models\Rating;
+
 
 class SurveyController extends Controller
 {
@@ -60,10 +64,6 @@ class SurveyController extends Controller
         }else{
             abort(404);
         }
-    }
-
-    public function addQuestion(Request $request){
-    	return view('survey.survey-add-question');	
     }
 
     public function chooseAnswer($id,$inputans){
@@ -162,14 +162,6 @@ class SurveyController extends Controller
         }
         $data['levels'] = $datasurvey;
 
-       // SELECT a.name, c.*, d.description
-       //  FROM surveys a
-       //  LEFT JOIN survey_process b ON b.survey = a.id
-       //  LEFT JOIN process_outcome c ON c.process = b.process
-       //  LEFT JOIN outcomes d ON d.id  = c.outcome
-       //  LEFT JOIN process_attributes e ON e.id = d.process_attribute
-       //  WHERE a.id = 1 and b.process = 'EDM01'
-
     	return view('survey.survey-choose-answer', $data);	
     }
 
@@ -184,7 +176,6 @@ class SurveyController extends Controller
         if($typesubmit == 'finish'){
             $status = '4-Done Survey';
 
-            // print_r($request->post('metcriteria'));
             foreach ($request->post('metcriteria') as $process_outcome => $answer){
                 echo $process_outcome." ".$answer." ".$request->post('comment')[$process_outcome];
                 DB::table('survey_process_outcomes')->insert(
@@ -296,12 +287,7 @@ class SurveyController extends Controller
     public function get_process_outcome_wp($id){
         $input = explode(",",$id);
         $survey_id = $input[1];
-        // SELECT c.*, d.file, e.name, e.url FROM `process_outcome` a
-        // LEFT JOIN process_outcome_wp b ON b.process_outcome = a.id
-        // LEFT JOIN working_product c ON c.id = b.working_product
-        // LEFT JOIN survey_working_products d ON d.working_product = c.id and d.survey = 1
-        // LEFT JOIN files e ON e.id = d.file
-        // WHERE a.id = 'EDM01-O1'
+
         $data = DB::table('process_outcome')
                 ->select('working_product.*','survey_working_products.file',DB::raw('files.name as filename'),DB::raw('files.url as fileurl'),DB::raw('files.id as fileid'))
                 ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
@@ -323,9 +309,7 @@ class SurveyController extends Controller
     }
 
     public function uploadWp($id,Request $request){
-        // $validatedData = $this->validate($request, [
-        //     'files.*' => 'required|mimes:pdf,doc,docx,xls,xlsx'
-        // ]);
+
         $validator = Validator::make(
             $request->all(), [
             'files.*' => 'required|mimes:pdf,doc,docx,xls,xlsx'
@@ -423,8 +407,6 @@ class SurveyController extends Controller
             }
         }
 
-        // return redirect()->back();
-        
         return json_encode([
             'status' => 1,
             'messages' => "Upload Files Success!"
@@ -536,32 +518,42 @@ class SurveyController extends Controller
         $typesubmit = $request->post('btnsubmit');
         
         $status = "";
+
+        $percent_level = 0;
+        $count_level = 0;
+        $level_tercapai = 0;
+        $percent_tercapai = 0;
+
         if($typesubmit == 'finish'){
             $status = '7-Done';
-
-            // print_r($request->post('metcriteria'));
-            foreach ($request->post('metcriteria') as $process_outcome => $answer){
-                // echo $process_outcome." ".$answer." ".$request->post('comment')[$process_outcome];
-
-                    $datas = DB::table('process_outcome')
-                            ->select('working_product.*','survey_working_products.file',DB::raw('files.name as filename'),DB::raw('files.url as fileurl'),DB::raw('files.id as fileid'))
-                            ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
-                            ->leftJoin('working_product','working_product.id','=','process_outcome_wp.working_product')
-                            ->leftJoin('survey_working_products',function($join) use($survey_id){
-                                $join->on('survey_working_products.working_product', '=','working_product.id')
-                                     ->on('survey_working_products.survey', '=', DB::raw($survey_id));
-                            })
-                            ->leftJoin('files','files.id','=','survey_working_products.file')
-                            ->where("process_outcome.id","=",$process_outcome)->get();
-                    
-                    $available = 0;                 
-                    foreach($datas as $index => $data){
-                        if($data->file){
-                            $available++;
+            foreach ($request->post('metcriteria') as $level => $process_outcomes){
+                $total_process = 0;
+                $total_percent = 0;
+                foreach($process_outcomes as $process_outcome => $answer){
+                    $total_process++;
+                    $percent = 0;
+                    if($request->post('acceptance')[$level][$process_outcome] == 'agree'){
+                        $datas = DB::table('process_outcome')
+                                ->select('working_product.*','survey_working_products.file',DB::raw('files.name as filename'),DB::raw('files.url as fileurl'),DB::raw('files.id as fileid'))
+                                ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
+                                ->leftJoin('working_product','working_product.id','=','process_outcome_wp.working_product')
+                                ->leftJoin('survey_working_products',function($join) use($survey_id){
+                                    $join->on('survey_working_products.working_product', '=','working_product.id')
+                                         ->on('survey_working_products.survey', '=', DB::raw($survey_id));
+                                })
+                                ->leftJoin('files','files.id','=','survey_working_products.file')
+                                ->where("process_outcome.id","=",$process_outcome)->get();
+                        
+                        $available = 0;                 
+                        foreach($datas as $index => $data){
+                            if($data->file){
+                                $available++;
+                            }
                         }
+                        
+                        $percent = round($available/$datas->count()*100);
                     }
-                    
-                    $percent = round($available/$datas->count()*100);
+                    $total_percent += $percent;
                     
                     DB::table('survey_process_outcomes')
                         ->where([
@@ -571,13 +563,23 @@ class SurveyController extends Controller
                         ])
                         ->update(
                             [   
-                                'note' => $request->post('note')[$process_outcome],
-                                'acceptance' => $request->post('acceptance')[$process_outcome],
+                                'note' => $request->post('note')[$level][$process_outcome],
+                                'acceptance' => $request->post('acceptance')[$level][$process_outcome],
                                 'percent' => $percent,
                                 'recomended_by' => Auth::user()->id
                             ]
                         );
+                }
+
+                $percent_level += round($total_percent/$total_process);
+                $count_level++;
+
+                if (round($total_percent/$total_process) >= 85){
+                    $level_tercapai = $level;
+                }
             }
+
+            $percent_tercapai = round($percent_level/$count_level);
         }else{
             $status = '6-On Save Analyze';
         }
@@ -588,26 +590,28 @@ class SurveyController extends Controller
                 ['process','=',$process],
                 ['survey','=',$survey_id]
             ])
-            ->update(['status' => $status]);
+            ->update([
+                'status' => $status,
+                'level' => $level_tercapai,
+                'percent' => $percent_tercapai
+            ]);
 
         return redirect('survey/'.$survey_id);
     }
 
-    public function test(Request $request){
-        $msg = $request->text;
-        return response()->json(array('msg'=>$msg),200);
-    }
-
-    public function ajax_get_list_user()
+    public function ajax_get_list_user($condition)
     {
-       echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
+        if($condition == 'no'){
+            echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
+        }else{
+            echo json_encode(DB::table('users')->get());
+        }
     }
 
     public function task($id)
     {
         $data['survey_id'] = $id;
-        // $task = new \App\Models\Task;
-        // $data['tasks'] = $task->get();
+
         $priority = array();
         $priority['1-High'] = "!!!";
         $priority['2-Medium'] = "!!";
@@ -658,7 +662,6 @@ class SurveyController extends Controller
                 'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
                 'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
                 'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',
-                // 'files.*.mimes' => 'Only pdf, word (.doc|.docx), and excel(.xls|.xlsx) files are allowed',
             ]
         );
 
@@ -669,7 +672,6 @@ class SurveyController extends Controller
             ]);
         }
         $survey_type = $request->post('i_n_survey_type');
-        // $sekolah->sekolah_id = $request->post('i-idsekolah');
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
         $survey->expired = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_expire'))->format('Y-m-d H:i');
@@ -705,8 +707,6 @@ class SurveyController extends Controller
                     );
                     if($request->get('i_itgoal_process')[$survey_type]){
                         foreach($request->get('i_itgoal_process')[$survey_type][$itgoal] as $itgoalprocess){
-                            // $a_itgoalprocess = explode("-",$itgoalprocess);
-                            // if($a_itgoalprocess[0] == $itgoal){
                                 $survey_process = DB::table('survey_process')->insertGetId(
                                     [   
                                         'it_related_goal' => $id_itgoal,
@@ -717,7 +717,6 @@ class SurveyController extends Controller
                                         'status' => '1-Waiting'
                                     ]
                                 );
-                            // }
                         }
                     }
                 }
@@ -726,9 +725,8 @@ class SurveyController extends Controller
                 'status' => 1,
                 'messages' => '/survey/'.$id
             ]);
-            // return redirect('survey/'.$id);
         }
-        // return response()->json($post);
+
         return json_encode([
             'status' => 0,
             'messages' => 'Create Survey Failed'
@@ -736,6 +734,34 @@ class SurveyController extends Controller
     }
 
     public function task_store(Request $request){
+
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_task' => 'required|unique:tasks,name|max:255',
+            'i_n_priority' => 'required',
+            'i_n_due_date' => 'required',
+            'i_n_assignee' => 'required',
+            'i_n_participant' => 'required',
+            'i_n_detail' => 'required'
+            ],
+            [
+                'i_n_name_task.required' => '&#8226;The <span class="text-danger">New Task Name</span> field is required',
+                'i_n_name_task.unique' => '&#8226;The <span class="text-danger">Task Name</span> already exists',
+                'i_n_priority.required' => '&#8226;The <span class="text-danger">Task Priority</span> field is required',
+                'i_n_due_date.required' => '&#8226;The <span class="text-danger">Task Due Date</span> field is required',
+                'i_n_assignee.required' => '&#8226;The <span class="text-danger">Task Assignee</span> field is required',
+                'i_n_participant.required' => '&#8226;The <span class="text-danger">Task Participants</span> field is required',
+                'i_n_detail.required' => '&#8226;The <span class="text-danger">Task Detail</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
         $task = new \App\Models\Task;
         $task->survey = $request->post('i_n_survey_id');
         $task->name = $request->post('i_n_name_task');
@@ -756,6 +782,124 @@ class SurveyController extends Controller
                 $taskparticipants->save();
             }
         }
-        return redirect('survey/'.$request->post('i_n_survey_id').'/task/');
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/survey/'.$request->post('i_n_survey_id').'/task/'
+        ]);
+    }
+
+    //AGGREGATION
+    public function getData(Request $request){
+        $message = "success";
+        $status = "success";
+
+        try {
+            $surveyProcess = DB::table("surveys")
+                ->leftJoin('survey_process','surveys.id','survey_process.survey')
+                ->where('surveys.id',$request->surveyid)
+                ->get();
+
+            $surveyProcessOutcomes = SurveyProcessOutcomes::
+                select('process_outcome.process','survey_process_outcomes.it_related_goal')
+                ->leftJoin('process_outcome','process_outcome.id','survey_process_outcomes.process_outcome')
+                ->leftJoin('outcomes','outcomes.id','process_outcome.outcome')
+                ->leftJoin('process_attributes','outcomes.process_attribute','process_attributes.id')
+                ->where('survey_process_outcomes.survey',$request->surveyid)
+                ->groupBy('process_outcome.process','survey_process_outcomes.it_related_goal')
+                ->get();
+
+            $SurveyProcessOutcomes2 = $this->populateDetail($surveyProcessOutcomes, $request->surveyid);
+
+            return response()->json([
+                'status' => $status,
+                'message' => $message,
+                'surveyProcess'  => $surveyProcess,
+                'surveyProcessOutcomes' => $SurveyProcessOutcomes2
+            ]);
+        } catch (\HttpException $e) {
+            $status = "failed";
+            $message = $e->getMessage();
+            return response()->json([
+                'status' => $status,
+                'message' => $message,
+                'surveyProcess'  => null,
+                'surveyProcessOutcomes' => null
+            ]);         
+        }
+    }
+
+    function populateDetail($surveyProcessOutcomess, $surveyid){
+        $surveyProcessOutcomes = array();
+        foreach ($surveyProcessOutcomess as $value) {
+            $surveyProcessOutcome = new surveyProcessOutcomes;
+            $percent = 0;
+            $name = "";
+            $surveyProcessOutcome->process = $value->process;
+            $surveyProcessOutcome->it_related_goal = $value->it_related_goal;
+            for ($i=1; $i <= 5; $i++) { 
+                # code...
+                $a = SurveyProcessOutcomes::
+                select('process_outcome.process','survey_process_outcomes.it_related_goal',DB::raw('avg(survey_process_outcomes.percent) as percent'))
+                ->leftJoin('process_outcome','process_outcome.id','survey_process_outcomes.process_outcome')
+                ->leftJoin('outcomes','outcomes.id','process_outcome.outcome')
+                ->leftJoin('process_attributes','outcomes.process_attribute','process_attributes.id')
+                ->where('survey_process_outcomes.survey',$surveyid)
+                ->where('process_outcome.process',$value->process)
+                ->where('survey_process_outcomes.it_related_goal',$value->it_related_goal)
+                ->where('survey_process_outcomes.acceptance','agree')
+                ->where('process_attributes.level',$i)
+                ->groupBy('process_outcome.process','survey_process_outcomes.it_related_goal')
+                ->first();
+
+                if(is_null($a)){
+                    $percent = 0;
+                }else{
+                    $percent = $a->percent;
+                    $rating = Rating::
+                        select('name')
+                        ->where("bottom","<=",$a->percent)
+                        ->where("top",">=",$a->percent)
+                        ->first();
+                    if(is_null($rating)){
+                        $name = "-";
+                    }else{
+                        $name = substr($rating->name, 0,1);
+                    }
+                }
+                // $name = $rating->name;
+
+                switch ($i) {
+                    case 1:
+                        $surveyProcessOutcome->percentLevel1 = $percent;
+                        $surveyProcessOutcome->ratingLevel1 = $name;
+                        break;
+                    case 2:
+                        $surveyProcessOutcome->percentLevel2 = $percent;
+                        $surveyProcessOutcome->ratingLevel2 = $name;
+                        break;
+                    case 3:
+                        $surveyProcessOutcome->percentLevel3 = $percent;
+                        $surveyProcessOutcome->ratingLevel3 = $name;
+                        break;
+                    case 4:
+                        $surveyProcessOutcome->percentLevel4 = $percent;
+                        $surveyProcessOutcome->ratingLevel4 = $name;
+                        break;
+                    case 5:
+                        $surveyProcessOutcome->percentLevel5 = $percent;
+                        $surveyProcessOutcome->ratingLevel5 = $name;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
+
+            $surveyProcessOutcomes[] = $surveyProcessOutcome;
+
+        }
+
+        return $surveyProcessOutcomes;
     }
 }

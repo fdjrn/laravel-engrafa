@@ -192,7 +192,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="i_n_assignee">Assigned</label>
+                <label for="i_n_assignee">Assignee</label>
                   <select id="i_n_assignee" name="i_n_assignee" class="form-control select2" data-placeholder="Assign To" style="width: 100%;">
                   </select>
               </div>
@@ -202,7 +202,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="i_n_due_date">Detail</label>
+                <label for="i_n_detail">Detail</label>
                 <textarea name="i_n_detail" style="width:100%; resize: vertical;"></textarea>
               </div>
             </div>

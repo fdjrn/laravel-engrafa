@@ -53,8 +53,6 @@ Route::middleware(['auth','web'])->group(function () {
 
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
-	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
-	Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// survey responden
 	Route::get('/survey/{id}/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
 	Route::post('/survey/{id}/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
@@ -64,12 +62,15 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
+	// survey agregation
+	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
+	Route::get("/survey/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");
 	// survey common
 	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::get('/survey/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/survey/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
 
-	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
+	Route::get('/survey/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::resource('surveyrs', 'Survey\SurveyController');

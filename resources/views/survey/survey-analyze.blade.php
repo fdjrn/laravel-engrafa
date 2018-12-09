@@ -102,13 +102,13 @@
                         <div class="row" style="margin-top: 4px;">
                           <div class="col-sm-3">
                             <div>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked> {{ucfirst($survey->met_criteria)}}
+                              <input type="radio" name="metcriteria[{{$index}}][{{$survey->id}}]" value="{{$survey->met_criteria}}" checked> {{ucfirst($survey->met_criteria)}}
                             </div>
                           </div>
                           <div class="col-sm-9">
                             <div class="pull-left" style="margin-left: 10px; margin-right: 20px; margin-top: 3px;">
-                              <input type="radio" name="acceptance[{{$survey->id}}]" value="agree" checked> Agree<br>
-                              <input type="radio" name="acceptance[{{$survey->id}}]" value="disagree"> Disagree
+                              <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="agree" checked> Agree<br>
+                              <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="disagree"> Disagree
                             </div>
                             <div class="clearfix" style="border: solid thin #d2d6de; padding: 10px 12px; padding-bottom: 4px;">
                               <div class="pull-left">
@@ -132,7 +132,7 @@
                     <label for="note" class="col-sm-2 control-label">Note</label>
 
                     <div class="col-sm-10">
-                      <textarea name="note[{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
+                      <textarea name="note[{{$index}}][{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
                     </div>
                   </div>
                 @endforeach
