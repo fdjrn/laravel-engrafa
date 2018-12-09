@@ -59,7 +59,7 @@
           </table>
         </div>
         <div class="tab-pane" id="tab_2">
-          Aggregation
+          @include('survey.survey-aggregation')
         </div>
         <div class="tab-pane" id="tab_3">
         </div>

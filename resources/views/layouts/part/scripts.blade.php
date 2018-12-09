@@ -65,7 +65,6 @@
     var url = $(location).attr('href');
     var aurl = url.split("/").splice(0, 4).join("/");
     var burl = url.split("/").splice(0, 5).join("/");
-    console.log(burl);
 
     // for sidebar menu entirely but not cover treeview
     $('ul.sidebar-menu a').filter(function() {
