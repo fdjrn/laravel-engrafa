@@ -28,6 +28,12 @@
     .example-modal .modal {
       background: transparent !important;
     }
+    a.adisabled {
+      cursor: default;
+    }
+    span.status_survey{
+      cursor: pointer;
+    }
   </style>
 @stop
 
