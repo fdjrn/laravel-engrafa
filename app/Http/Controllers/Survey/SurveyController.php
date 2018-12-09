@@ -66,7 +66,7 @@ class SurveyController extends Controller
     	return view('survey.survey-add-question');	
     }
 
-    public function chooseAnswer($inputans){
+    public function chooseAnswer($id,$inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -173,7 +173,7 @@ class SurveyController extends Controller
     	return view('survey.survey-choose-answer', $data);	
     }
 
-    public function postAnswer($inputans, Request $request){
+    public function postAnswer($id,$inputans, Request $request){
         $inputan = explode("-",$inputans);
         $survey_id = $inputan[0];
         $it_related_goal = $inputan[1];
@@ -213,7 +213,7 @@ class SurveyController extends Controller
     }
 
 
-    public function doneView($inputans){
+    public function doneView($id, $inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -441,7 +441,7 @@ class SurveyController extends Controller
         return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
     }
 
-    public function analyze($inputans){
+    public function analyze($id,$inputans){
         $inputan = explode("-",$inputans);
         $id = $inputan[0];
         $data['survey_id'] = $id;
@@ -528,7 +528,7 @@ class SurveyController extends Controller
         return view('survey.survey-analyze', $data);  
     }
 
-    public function analyzePost($inputans, Request $request){
+    public function analyzePost($id,$inputans, Request $request){
         $inputan = explode("-",$inputans);
         $survey_id = $inputan[0];
         $it_related_goal = $inputan[1];
@@ -756,6 +756,6 @@ class SurveyController extends Controller
                 $taskparticipants->save();
             }
         }
-        return redirect('survey/task/'.$request->post('i_n_survey_id'));
+        return redirect('survey/'.$request->post('i_n_survey_id').'/task/');
     }
 }

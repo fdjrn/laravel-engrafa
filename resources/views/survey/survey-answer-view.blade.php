@@ -214,6 +214,7 @@
 @stop
 
 @section('page-level-scripts')
+<script src="{{ asset('js/pages/survey/answer.js')}}"></script>
 <script src="/theme/AdminLTE/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
   $(function () {
