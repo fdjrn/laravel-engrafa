@@ -25,7 +25,7 @@ class SurveyController extends Controller
                 $join->on('survey_process.survey', '=','surveys.id')
                      ->on('survey_process.it_related_goal', '=','it_related_goal.id');
             })
-            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.id')
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal')
             ->where('surveys.id',$id)
             ->get();
 
