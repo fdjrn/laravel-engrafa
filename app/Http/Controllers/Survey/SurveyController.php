@@ -641,6 +641,34 @@ class SurveyController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_survey' => 'required|unique:surveys,name|max:255',
+            'i_n_surveyor' => 'required',
+            'i_n_client' => 'required',
+            'i_n_survey_type' => 'required',
+            'i_n_expire' => 'required',
+            'i_itgoal' => 'required'
+            ],
+            [
+                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
+                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
+                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Surveyor</span> field is required',
+                'i_n_client.required' => '&#8226;The <span class="text-danger">Client</span> field is required',
+                'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
+                'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',
+                // 'files.*.mimes' => 'Only pdf, word (.doc|.docx), and excel(.xls|.xlsx) files are allowed',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+        $survey_type = $request->post('i_n_survey_type');
         // $sekolah->sekolah_id = $request->post('i-idsekolah');
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
@@ -669,14 +697,14 @@ class SurveyController extends Controller
                 }
             }
             if($request->get('i_itgoal')){
-                foreach ($request->get('i_itgoal') as $itgoal){
+                foreach ($request->get('i_itgoal')[$survey_type] as $itgoal){
                     $id_itgoal = DB::table('it_related_goal')->insertGetId(
                         [   'it_goal' => $itgoal, 
                             'survey' => $id
                         ]
                     );
-                    if($request->get('i_itgoal_process')){
-                        foreach($request->get('i_itgoal_process')[$itgoal] as $itgoalprocess){
+                    if($request->get('i_itgoal_process')[$survey_type]){
+                        foreach($request->get('i_itgoal_process')[$survey_type][$itgoal] as $itgoalprocess){
                             // $a_itgoalprocess = explode("-",$itgoalprocess);
                             // if($a_itgoalprocess[0] == $itgoal){
                                 $survey_process = DB::table('survey_process')->insertGetId(
@@ -684,8 +712,8 @@ class SurveyController extends Controller
                                         'it_related_goal' => $id_itgoal,
                                         'process' => $itgoalprocess,
                                         'survey' => $id,
-                                        'target_level' => $request->get('i_itgoal_process_level')[$itgoal][$itgoalprocess],
-                                        'target_percent' => $request->get('i_itgoal_process_percent')[$itgoal][$itgoalprocess],
+                                        'target_level' => $request->get('i_itgoal_process_level')[$survey_type][$itgoal][$itgoalprocess],
+                                        'target_percent' => $request->get('i_itgoal_process_percent')[$survey_type][$itgoal][$itgoalprocess],
                                         'status' => '1-Waiting'
                                     ]
                                 );
@@ -694,10 +722,17 @@ class SurveyController extends Controller
                     }
                 }
             }
-            return redirect('survey/'.$id);
+            return json_encode([
+                'status' => 1,
+                'messages' => '/survey/'.$id
+            ]);
+            // return redirect('survey/'.$id);
         }
         // return response()->json($post);
-        return redirect('survey');
+        return json_encode([
+            'status' => 0,
+            'messages' => 'Create Survey Failed'
+        ]);
     }
 
     public function task_store(Request $request){

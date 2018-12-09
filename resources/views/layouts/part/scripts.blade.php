@@ -48,6 +48,8 @@
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
 
 <script>
