@@ -28,7 +28,10 @@ Route::middleware(['auth','web'])->group(function () {
 	// Route::get('/home', 'HomeController@index')->name('home');
 
 	// Route::get('/', 'HomeController@index');
+
+	// dashboard
 	Route::get('/','Dashboard\DashboardController@index');
+	Route::post('/','Dashboard\DashboardController@store')->name('dashboard.post');
 
 	// index & file explorer
 	Route::get('/index','Index\IndexController@index')->name('index');

@@ -1,7 +1,6 @@
 <!-- BEGIN GLOBAL MANDATORY STYLES -->
 
 <!-- iTAX FONT ICON -->
-
 @section('global-mandatory-styles')
 @show()
 <!-- END GLOBAL MANDATORY STYLES -->

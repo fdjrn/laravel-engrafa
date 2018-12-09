@@ -16,14 +16,18 @@
 </script>
 <!-- Bootstrap 3.3.7 -->
 <script src="{{ asset('theme/AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js')}}"></script>
+
 <!-- Morris.js charts -->
 <script src="{{ asset('theme/AdminLTE/bower_components/raphael/raphael.min.js')}}"></script>
-<script src="{{ asset('theme/AdminLTE/bower_components/morris.js/morris.min.js')}}"></script>
+{{-- <script src="{{ asset('theme/AdminLTE/bower_components/morris.js/morris.min.js')}}"></script> --}}
+
 <!-- Sparkline -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js')}}"></script>
+
 <!-- jvectormap -->
-<script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js')}}"></script>
-<script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-world-mill-en.js')}}"></script>
+{{-- <script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js')}}"></script> --}}
+{{-- <script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-world-mill-en.js')}}"></script> --}}
+
 <!-- jQuery Knob Chart -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-knob/dist/jquery.knob.min.js')}}"></script>
 <!-- daterangepicker -->
@@ -42,7 +46,7 @@
 <!-- AdminLTE App -->
 <script src="{{ asset('theme/AdminLTE/dist/js/adminlte.min.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{ asset('theme/AdminLTE/dist/js/pages/dashboard.js')}}"></script>
+{{-- <script src="{{ asset('theme/AdminLTE/dist/js/pages/dashboard.js')}}"></script> --}}
 <script src="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/js/bootstrap-colorselector.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
