@@ -524,6 +524,8 @@ class SurveyController extends Controller
         $level_tercapai = 0;
         $percent_tercapai = 0;
 
+        $tercapai = array();
+
         if($typesubmit == 'finish'){
             $status = '7-Done';
             foreach ($request->post('metcriteria') as $level => $process_outcomes){
@@ -575,7 +577,11 @@ class SurveyController extends Controller
                 $count_level++;
 
                 if (round($total_percent/$total_process) >= 85){
-                    $level_tercapai = $level;
+                    if(!array_key_exists("finish",$tercapai)){
+                        $level_tercapai = $level;
+                    }
+                }else{
+                    $tercapai['finish'] = $level_tercapai;
                 }
             }
 
@@ -592,7 +598,7 @@ class SurveyController extends Controller
             ])
             ->update([
                 'status' => $status,
-                'level' => $level_tercapai,
+                'level' => array_key_exists("finish",$tercapai) ? $tercapai['finish'] : $level_tercapai,
                 'percent' => $percent_tercapai
             ]);
 
