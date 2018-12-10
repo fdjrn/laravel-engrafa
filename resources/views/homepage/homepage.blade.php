@@ -160,7 +160,7 @@
                         <div class="icon">
                             <i class="fa fa-folder-o"></i>
                         </div>
-                        {{--@if(isset($latestFolder))
+                        @if(isset($latestFolder))
                             <form action="{{ route('index') }}" method="POST" id="frm-last-folder" class="small-box-footer">
                                 @csrf
                                 <input type="hidden" name="folder_id" value="{{ $latestFolder['id'] }}">
@@ -169,12 +169,12 @@
                                     More Details <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </form>
-                        @else--}}
+                        @else
                         <a href="{{ url('/index') }}"
                            class="small-box-footer latest-folder-url">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
-                        {{--@endif--}}
+                        @endif
 
                     </div>
                 </div>
