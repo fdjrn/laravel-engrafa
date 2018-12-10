@@ -49,13 +49,26 @@
 
 @section('body-inner-content')
 
+      <!-- bagian untuk menampilkan message lemparan dari controller -->
+      @if (session('message'))
+      <div id="success-msg">
+          <div class="alert @if (session('success') == true) alert-success @else alert-danger @endif alert-dismissible fade in" role="alert">
+              <button type="button" class="close" data-dismiss="alert" >
+                  <span aria-hidden="true">×</span>
+              </button>
+              <strong>{{ session('message') }}.</strong>
+          </div>
+      </div>
+      @endif
+      <!-- end message -->
+
       <div class="row">
         <div class="col-md-12">
           <!-- Custom Tabs -->
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
               @foreach ($dashboards as $item)
-                <li class="dropdown btn-group">
+                <li class="dropdown btn-group @if ($item == reset($dashboards)) active @endif">
                   <a class="btn" href="#tab_{{ $item->id }}" data-toggle="tab">{{ $item->name }}</a>
                   <a data-toggle="dropdown" class="btn dropdown-toggle">
                     <span class="caret"></span>
@@ -66,318 +79,118 @@
                   </ul>
                 </li>
               @endforeach
-
+              
                 <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
               </ul>
             <div class="tab-content">
-                    <div class="tab-pane container-fluid active" id="tab_1">
-                        <div class="row">
-                          <!-- Default box -->
-                            <div class="box">
-                              <div class="box-header">
-                                <h3 class="box-title"></h3>
-  
-                                <div class="box-tools pull-right">
-                                  <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Full Screen">
-                                    <i class="fa fa-arrows-alt"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="PDF">
-                                    <i class="fa fa-file-pdf-o"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                          title="Share">
-                                    <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Print">
-                                    <i class="fa fa-print"></i></button>
-                                </div>
-                              </div>
-                              <div class="box-body">
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik Compare</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                        {{-- Grafik Here --}}
-                                        <canvas id="grafik-compare" width="400" height="400"></canvas>
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">SURVEY_1</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      <canvas id="grafik-1" width="400" height="400"></canvas>
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">SURVEY_2</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      <canvas id="grafik-2" width="400" height="400"></canvas>
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                          </div>
-                              <!-- /.box-body -->
-                            </div>
-                            <!-- /.box -->
-                        </div>
-                        <!-- /.row -->
-                    </div>
 
-                    <div class="tab-pane container-fluid" id="tab_2">
-                        <div class="row">
-                          <!-- Default box -->
-                            <div class="box">
-                              <div class="box-header">
-                                <h3 class="box-title"></h3>
-  
-                                <div class="box-tools pull-right">
-                                  <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Full Screen">
-                                    <i class="fa fa-arrows-alt"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="PDF">
-                                    <i class="fa fa-file-pdf-o"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                          title="Share">
-                                    <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Print">
-                                    <i class="fa fa-print"></i></button>
-                                </div>
-                              </div>
-                              <div class="box-body">
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik Compare</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                        {{-- Grafik Here --}}
-                                        {{-- <canvas id="grafik-compare" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik 1</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      {{-- <canvas id="grafik-1" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik 2</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      {{-- <canvas id="grafik-2" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                          </div>
-                              <!-- /.box-body -->
-                            </div>
-                            <!-- /.box -->
-                        </div>
-                        <!-- /.row -->
-                    </div>
+            <!-- foreach untuk grafiknya -->
+            @foreach ($dashboards as $item)
+              <div class="tab-pane container-fluid @if ($item == reset($dashboards)) active @endif" id="tab_{{ $item->id }}">
+                  <div class="row">
+                    <!-- Default box -->
+                      <div class="box">
+                        <div class="box-header">
+                          <h3 class="box-title">Dashboard {{ $item->name }}</h3>
 
-                    <div class="tab-pane container-fluid" id="tab_3">
-                        <div class="row">
-                          <!-- Default box -->
-                            <div class="box">
-                              <div class="box-header">
-                                <h3 class="box-title"></h3>
-  
+                          <div class="box-tools pull-right">
+                            <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
+                                    title="Full Scree n">
+                              <i class="fa fa-arrows-alt"></i></button>
+                              <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
+                                    title="PDF">
+                              <i class="fa fa-file-pdf-o"></i></button>
+                              <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                                    title="Share">
+                              <i class="fa fa-share"></i></button>
+                              <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
+                                    title="Print">
+                              <i class="fa fa-print"></i></button>
+                          </div>
+                        </div>
+                        <div class="box-body">
+                          <div class="col-md-4 align-self-center">
+                            <!-- Default box -->
+                            <div class="box box-primary">
+                              <div class="box-header with-border">
+                                <h3 class="box-title">Grafik Compare</h3>
+
                                 <div class="box-tools pull-right">
-                                  <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Full Screen">
-                                    <i class="fa fa-arrows-alt"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="PDF">
-                                    <i class="fa fa-file-pdf-o"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
                                           title="Share">
                                     <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                          title="Print">
-                                    <i class="fa fa-print"></i></button>
+                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
+                                          title="Edit">
+                                    <i class="fa fa-gear"></i></button>
                                 </div>
                               </div>
                               <div class="box-body">
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik Compare</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                        {{-- Grafik Here --}}
-                                        {{-- <canvas id="grafik-compare" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik 1</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      {{-- <canvas id="grafik-1" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                                <div class="col-md-4 align-self-center">
-                                  <!-- Default box -->
-                                  <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                      <h3 class="box-title">Grafik 2</h3>
-  
-                                      <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                                title="Share">
-                                          <i class="fa fa-share"></i></button>
-                                          <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                                title="Edit">
-                                          <i class="fa fa-gear"></i></button>
-                                      </div>
-                                    </div>
-                                    <div class="box-body">
-                                      {{-- Grafik Here --}}
-                                      {{-- <canvas id="grafik-2" width="400" height="400"></canvas> --}}
-                                    </div>
-                                    <!-- /.box-body -->
-                                  </div>
-                                  <!-- /.box -->
-                                </div>
-                                <!-- /.col-->
-                          </div>
+                                  {{-- Grafik Here --}}
+                                  <canvas id="grafik-compare" width="400" height="400"></canvas>
+                              </div>
                               <!-- /.box-body -->
                             </div>
                             <!-- /.box -->
-                        </div>
-                        <!-- /.row -->
+                          </div>
+                          <!-- /.col-->
+                          <div class="col-md-4 align-self-center">
+                            <!-- Default box -->
+                            <div class="box box-primary">
+                              <div class="box-header with-border">
+                                <h3 class="box-title">Grafik 1</h3>
+
+                                <div class="box-tools pull-right">
+                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                                          title="Share">
+                                    <i class="fa fa-share"></i></button>
+                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
+                                          title="Edit">
+                                    <i class="fa fa-gear"></i></button>
+                                </div>
+                              </div>
+                              <div class="box-body">
+                                {{-- Grafik Here --}}
+                                <canvas id="grafik-1" width="400" height="400"></canvas>
+                              </div>
+                              <!-- /.box-body -->
+                            </div>
+                            <!-- /.box -->
+                          </div>
+                          <!-- /.col-->
+                          <div class="col-md-4 align-self-center">
+                            <!-- Default box -->
+                            <div class="box box-primary">
+                              <div class="box-header with-border">
+                                <h3 class="box-title">Grafik 2</h3>
+
+                                <div class="box-tools pull-right">
+                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                                          title="Share">
+                                    <i class="fa fa-share"></i></button>
+                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
+                                          title="Edit">
+                                    <i class="fa fa-gear"></i></button>
+                                </div>
+                              </div>
+                              <div class="box-body">
+                                {{-- Grafik Here --}}
+                                <canvas id="grafik-2" width="400" height="400"></canvas>
+                              </div>
+                              <!-- /.box-body -->
+                            </div>
+                            <!-- /.box -->
+                          </div>
+                          <!-- /.col-->
                     </div>
+                        <!-- /.box-body -->
+                      </div>
+                      <!-- /.box -->
+                  </div>
+                  <!-- /.row -->
+              </div>
+            @endforeach
+            <!-- end foreach untuk grafik -->
+              
             </div>
             <!-- /.tab-content -->
           </div>
@@ -408,13 +221,13 @@
           </div>
           <!-- select -->
           <div class="form-group">
-            <label class="control-label col-sm-3">Choose 1</label>
+            <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
-              <select class="form-control">
-                <option>survey 1</option>
-                <option>survey 2</option>
-                <option>survey 3</option>
-              </select>
+                <select class="form-control">
+                    @foreach ($surveys as $item)
+                      <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
+                    @endforeach
+                </select>
             </div>
           </div>
 
@@ -436,11 +249,11 @@
         <div class="modal-body">
 
           <div class="row">
-            <div class="col-md-6 align-self-center">
+            <div class="col-md-4 align-self-center">
               <!-- Default box -->
               <div class="box box-primary">
                 <div class="box-header with-border">
-                  <h3 class="box-title">Grafik Batang</h3>
+                  <h3 class="box-title">Grafik 6</h3>
 
                   <div class="box-tools pull-right">
                   </div>
@@ -454,17 +267,35 @@
             </div>
             <!-- /.col-->
 
-            <div class="col-md-6 align-self-center">
+            <div class="col-md-4 align-self-center">
               <!-- Default box -->
               <div class="box box-primary">
                 <div class="box-header with-border">
-                  <h3 class="box-title">Grafik Radar</h3>
+                  <h3 class="box-title">Grafik 6</h3>
 
                   <div class="box-tools pull-right">
                   </div>
                 </div>
                 <div class="box-body">
-                    <canvas id="chart"></canvas>
+                  Grafik Here2
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+            <!-- /.col-->
+
+            <div class="col-md-4 align-self-center">
+              <!-- Default box -->
+              <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Grafik 6</h3>
+
+                  <div class="box-tools pull-right">
+                  </div>
+                </div>
+                <div class="box-body">
+                  Grafik Here
                 </div>
                 <!-- /.box-body -->
               </div>
@@ -523,53 +354,42 @@
 <div class="modal fade" id="modal-choose-chart" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form class="form-horizontal">
+      <form action="{{ route('dashboard.post') }}" method="post" autocomplete="off">
         <div class="modal-header">
             <div class="form-group">
               <label for="inputEmail3" class="col-sm-3 control-label">Survey</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="survet" placeholder="Survey">
+                <input type="text" class="form-control" id="survey" placeholder="Survey">
               </div>
             </div>
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="col-md-6 align-self-center">
-              <!-- Default box -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <input type="radio" name="grafik"/>
-                  <h3 class="box-title">Grafik Batang</h3>
-
-                  <div class="box-tools pull-right">
+            @foreach ($chart_type as $item)
+              <div class="col-md-6 align-self-center">
+                <!-- Default box -->
+                <div class="box box-primary">
+                  <div class="box-header with-border">
+                    <input type="radio" name="grafik"/>
+                    <h3 class="box-title">Grafik {{ $item->name }}</h3>
+                    <div class="box-tools pull-right">
+                    </div>
                   </div>
+                  @if ($item->chart_type == "1-Batang")
+                    <div class="box-body styled-1">
+                        <canvas id="grafik-batang" width="400" height="400"></canvas>
+                    </div>
+                  @elseif ($item->chart_type == "2-Spider")
+                    <div class="box-body styled-1">
+                        <canvas id="grafik-radar" width="400" height="400"></canvas>
+                    </div>
+                  @endif
                 </div>
-                <div class="box-body styled-1">
-                    <canvas id="grafik-batang" width="400" height="400"></canvas>
-                </div>
-                <!-- /.box-body -->
+                <!-- /.box -->
               </div>
-              <!-- /.box -->
-            </div>
-            <!-- /.col-->
+              <!-- /.col-->
+            @endforeach
 
-            <div class="col-md-6 align-self-center">
-              <!-- Default box -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <input type='radio' name="grafik"/>
-                  <h3 class="box-title">Grafik Radar</h3>
-                  <div class="box-tools pull-right">
-                  </div>
-                </div>
-                <div class="box-body styled-1">
-                    <canvas id="grafik-radar" width="400" height="400"></canvas>
-                </div>
-                <!-- /.box-body -->
-              </div>
-              <!-- /.box -->
-            </div>
-            <!-- /.col-->
           </div>
         </div>
         <div class="modal-footer justify-content-between">
@@ -594,12 +414,12 @@
 
           <!-- select -->
           <div class="form-group">
-            <label class="control-label col-sm-3">Choose 1</label>
+            <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
               <select class="form-control">
-                <option>survey 1</option>
-                <option>survey 2</option>
-                <option>survey 3</option>
+                @foreach ($surveys as $item)
+                  <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
+                @endforeach
               </select>
             </div>
           </div>
@@ -617,18 +437,19 @@
           </div>
           <fieldset>
             <div class="form-group">
-              <label class="control-label col-sm-3">Choose 1</label>
+              <label class="control-label col-sm-3">Pilih Survey</label>
               <div class="col-sm-9">
                 <select class="form-control">
-                  <option>survey 1</option>
-                  <option>survey 2</option>
-                  <option>survey 3</option>
+                    @foreach ($surveys as $item)
+                      <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
+                    @endforeach
                 </select>
               </div>
             </div>
           <fieldset>
         </div>
         <div class="modal-footer justify-content-between">
+          {{ Form::token() }}
           <button type="submit" class="btn btn-primary pull-right">Done</button>
         </div>
       </form>
@@ -642,22 +463,20 @@
   <div class="modal fade" id="modal-insert-dashboard" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form class="form-horizontal">
-          <div class="modal-header">
-            <form method="POST" action="{{ route('dashboard.post') }}">
-              @csrf
-              <div class="form-group">
-                <label for="name-dashboard" class="col-sm-3 control-label">Nama Dashboard</label>
-                <div class="col-sm-9">
-                  {{ Form::text('name_dashboard', 'test' , ['class'=>'form-control', 'id'=>'name-dashboard']) }}
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="submit" class="btn btn-primary pull-right">Save</button>
-                </div>
+        <div class="modal-header">
+          <form action="{{ route('dashboard.post') }}" method="post" autocomplete="off">
+            <div class="form-group">
+              <label for="name-dashboard" class="col-sm-3 control-label">Nama Dashboard</label>
+              <div class="col-sm-9">
+                {{ Form::text('name', '' , ['class'=>'form-control', 'id'=>'name-dashboard', 'required'=>'required']) }}
+              
+              <div class="modal-footer justify-content-between">
+                {{ Form::token() }}
+                <button type="submit" class="btn btn-primary pull-right">Save</button>
               </div>
-            </form>
-          </div>
-        </form>
+            </div>
+          </form>
+        </div>
       </div>
       <!-- /.modal-content -->
     </div>
@@ -677,15 +496,15 @@
 @stop
 
 @section('page-level-scripts')
+  
   <script>
   var marksCanvas = document.getElementById("grafik-compare");
-
   var marksData = {
-    labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
+    labels: @php echo json_encode($labels) @endphp,
     datasets: [{
       label: "Survey 1",
       backgroundColor: "rgba(200,0,0,0.5)",
-      data: [65, 75, 70, 80, 60, 80]
+      data: @php echo json_encode($level) @endphp
     },{ label: "Survey 2",
       backgroundColor: "rgba(200, 209, 29, 0.5)",
       data: [30, 30, 78, 48, 69, 89]
@@ -860,13 +679,13 @@
   var marksCanvas2 = document.getElementById("grafik-radar");
 
   var marksData2 = {
-    labels: ["English", "Maths", "Physics", "Chemistry", "Biology", "History"],
+    labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
     datasets: [{
-      label: "Target Dicapai",
+      label: "Level",
       backgroundColor: "rgba(200,0,0,0.5)",
       data: [65, 75, 70, 80, 60, 80]
     }, {
-      label: "Target Survey",
+      label: "Target Level",
       backgroundColor: "rgba(0,0,200,0.5)",
       data: [54, 65, 60, 70, 70, 75]
     }]
@@ -880,31 +699,33 @@
 
   {{-- Alert Delete Dashboard --}}
   @foreach ($dashboards as $item)
-  <script>
-    $(document).ready(function(){
-      $("#delete-dashboard-{{ $item->id }}").click(function(){
-        Swal({
-          title: 'Are you sure you want to delete the {{ $item->name }}?',
-          text: "You won't be able to revert this!",
-          type: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-          if (result.value) {
-            Swal(
-              'Deleted!',
-              'Your {{ $item->name }} has been deleted.',
-              'success'
-            )
-          }
-        })
+    <script>
+      $(document).ready(function(){
+        $("#delete-dashboard-{{ $item->id }}").click(function(){
+          Swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.value) {
+              Swal(
+                'Deleted!',
+                'Your file has been deleted.',
+                'success'
+              )
+            }
+          })
+        });
       });
-    });
-  </script>
+      
+    </script>
   @endforeach
 
+  @foreach ($dashboards as $item)
   {{-- Fullscreen Dashboard --}}
   <script>
     $('#fullscreen').click(function() {
@@ -918,6 +739,7 @@
         });
     });
   </script>
+  @endforeach
 
   {{-- Show hide comparison --}}
   <script>

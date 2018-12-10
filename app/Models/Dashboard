@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Dashboard extends Model
+{
+    protected $table = 'dashboard';
+
+    protected $fillable = [
+        'folder_root',
+        'file_root',
+        'name',
+        'url',
+        'is_file',
+        'version',
+        'size',
+        'description',
+        'comment',
+        'created_by'
+    ];
+
+}
