@@ -17,12 +17,12 @@
             </a>
           </li>
           <li class="">
-            <a href="{{route('survey.task')}}">
+            <a href="{{route('survey.task',['id'=> $survey_id])}}">
               <h4><i class="fa fa-check-square-o"></i>&nbsp;<span>Task</span></h4>
             </a>
           </li>
           <li class="">
-            <a href="{{route('survey')}}">
+            <a href="{{route('survey',['id'=> $survey_id])}}">
               <h4><i class="fa fa-files-o"></i>&nbsp;<span>Survey</span></h4>
             </a>
           </li>

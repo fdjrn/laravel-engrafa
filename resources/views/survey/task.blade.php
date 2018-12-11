@@ -56,7 +56,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('survey')}}"><i class="fa fa-check-square-o"></i> Task</a></li>
+  <li><a class="active" href="{{route('survey.task',['id' => $survey_id])}}"><i class="fa fa-check-square-o"></i> Task</a></li>
 @stop
 
 
@@ -158,6 +158,7 @@
             <div class="col-lg-12">
               <div class="form-group">
                   <div class='input-group'>
+                    <input type="hidden" name="i_n_survey_id" value="{{$survey_id}}">
                     <input type="text" id="i_n_name_task" name="i_n_name_task" class="form-control" placeholder="New Task Name">
                       <span class="input-group-addon">
                         <select name="i_n_color" class="colorselector">
@@ -191,8 +192,8 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="i_n_assignee">Assigned</label>
-                  <select id="i_n_assignee" name="i_n_assignee" class="form-control select2" data-placeholder="Add Participants" style="width: 100%;">
+                <label for="i_n_assignee">Assignee</label>
+                  <select id="i_n_assignee" name="i_n_assignee" class="form-control select2" data-placeholder="Assign To" style="width: 100%;">
                   </select>
               </div>
               <div class="form-group">
@@ -201,7 +202,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label for="i_n_due_date">Detail</label>
+                <label for="i_n_detail">Detail</label>
                 <textarea name="i_n_detail" style="width:100%; resize: vertical;"></textarea>
               </div>
             </div>
@@ -229,6 +230,7 @@
 @stop
 
 @section('page-level-scripts')
+<script src="{{ asset('js/pages/survey/task.js')}}"></script>
 <script>
 </script>
 @stop

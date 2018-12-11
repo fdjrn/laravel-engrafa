@@ -1,7 +1,6 @@
 <!-- BEGIN GLOBAL MANDATORY STYLES -->
 
 <!-- iTAX FONT ICON -->
-
 @section('global-mandatory-styles')
 @show()
 <!-- END GLOBAL MANDATORY STYLES -->
@@ -54,6 +53,8 @@
   <link rel="stylesheet" type="text/css" href="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/css/bootstrap-colorselector.css')}}" />
   <!-- Theme style -->
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/dist/css/AdminLTE.min.css')}}">
+  <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css')}}">
+  <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.css')}}">
   <link rel="stylesheet" href=" {{ asset('css/main.css')}}">
 
 <!-- SMARTGOV & RESPONSIVE STYLES -->

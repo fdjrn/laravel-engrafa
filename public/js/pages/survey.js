@@ -1,12 +1,11 @@
 $(document).ready(function(){
   $("#b_create_new_task").click(function(){
     $('#m_new_task').modal('show');
+    initialize_select_user("#i_n_assignee");
+    initialize_select_user("#i_n_participant");
   });
   
   $('#i_n_due_date').datetimepicker({});
-  
-  initialize_user_task("#i_n_assignee");
-  initialize_user_task("#i_n_participant");
   
   $('[data-toggle="tooltip"]').tooltip();
 });
@@ -106,10 +105,10 @@ $('.pieChart').each(function (index, element) {
 
 });
 
-function initialize_user_task(id_element){
+function initialize_select_user(id_element){
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user/yes',
+      url: base_url+'/survey/ajax_get_list_user',
       // data: {
       //     'anakunit': idUnit
       // },
@@ -128,38 +127,3 @@ function initialize_user_task(id_element){
       }
   });
 }
-
-$("#form_n_task").submit(function(e) {
-  e.preventDefault();
-  var form = $(this);
-  var url = form.attr('action');
-  var formData = new FormData(this);
-
-  $.ajax({
-         type: "POST",
-         url: url,
-         data: formData, // serializes the form's elements.
-         success: function(data)
-         {
-          let parse = JSON.parse(data);
-          if (parse.status > 0) {
-            swal({
-              type: 'success',
-              title: 'Berhasil',
-              text: 'Create New Task Success'
-            });
-            location.href = base_url+parse.messages;
-          } else {
-            swal({
-              type: 'error',
-              title: 'Gagal',
-              html:true,
-              text: parse.messages
-            });
-          }
-         },
-         cache: false,
-         contentType: false,
-         processData: false
-       });
-});
