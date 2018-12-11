@@ -224,6 +224,198 @@ class SurveyController extends Controller
     public function ajax_get_list_user()
     {
        echo json_encode(DB::table('users')->get());
+       return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
+    }
+
+    public function analyze($id,$inputans){
+        $inputan = explode("-",$inputans);
+        $id = $inputan[0];
+        $data['survey_id'] = $id;
+        $it_related_goal = $inputan[1];
+        $process = $inputan[2];
+        $target_level = "";
+        DB::table('survey_process')
+            ->where([
+                ['it_related_goal','=',$it_related_goal],
+                ['process','=',$process],
+                ['survey','=',$id],
+                ['status','=','4-Done Survey']
+            ])
+            ->update(['status' => '5-Analyze']);
+        $d_surveys = DB::table('surveys')
+                    ->select('surveys.name','surveys.created_by','survey_process.target_level')
+                    ->leftJoin('survey_process','survey_process.survey','=','surveys.id')
+                    ->where([
+                        ['surveys.id','=',$id],
+                        ['survey_process.it_related_goal','=',$it_related_goal],
+                        ['survey_process.process','=',$process]
+                    ])
+                    ->get();
+
+        if($d_surveys->first()){
+            $data['survey_members'] = DB::table('survey_members')
+                ->select('survey_members.user','survey_members.role','users.username')
+                ->leftJoin('users','users.id','=','survey_members.user')
+                ->where([
+                    ['survey','=',$id]
+                ])
+                ->get();
+            $ok = 0;
+            foreach($data['survey_members'] as $surmem){
+                if($surmem->user == Auth::user()->id){
+                    $ok = 1;
+                }
+            }
+            if ($d_surveys->first()->created_by != Auth::user()->id){
+                if(!$ok){
+                    abort(404);
+                }
+            }
+            $data['survey_name'] = $d_surveys->first()->name;
+            $target_level = $d_surveys->first()->target_level;
+        }else{
+            abort(404);
+        }
+
+
+        $levels = DB::table('process_attributes')
+            ->select('level')
+            ->groupBy('level')
+            ->where('level','<=',$target_level)
+            ->get();
+
+        $datasurvey = array();
+        foreach($levels as $index => $leveled){
+            $level = $leveled->level;
+            $dats = DB::table('surveys')
+                ->select('process_attributes.purpose','surveys.name','process_outcome.*','outcomes.description', 'survey_process_outcomes.met_criteria','survey_process_outcomes.comment')
+                ->leftJoin('survey_process','survey_process.survey','=','surveys.id')
+                ->leftJoin('process_outcome','process_outcome.process','=','survey_process.process')
+                ->leftJoin('outcomes','outcomes.id','=','process_outcome.outcome')
+                ->leftJoin('process_attributes', 'process_attributes.id', '=','outcomes.process_attribute')
+                ->leftJoin('survey_process_outcomes',function($join) use($id, $it_related_goal){
+                    $join->on('survey_process_outcomes.process_outcome','=','process_outcome.id')
+                         ->on('survey_process_outcomes.survey', '=',DB::raw($id))
+                         ->on('survey_process_outcomes.it_related_goal', '=', DB::raw($it_related_goal));
+                })
+                ->where([
+                    ['surveys.id','=',$id],
+                    ['survey_process.process','=',$process],
+                    ['survey_process.it_related_goal','=',$it_related_goal],
+                    ['process_attributes.level','=',$level]
+                ])
+                ->get();
+            if($dats->first()){
+                $datasurvey[$index]['surveys'] = $dats;
+            }
+        }
+        $data['levels'] = $datasurvey;
+
+        return view('survey.survey-analyze', $data);  
+    }
+
+    public function analyzePost($id,$inputans, Request $request){
+        $inputan = explode("-",$inputans);
+        $survey_id = $inputan[0];
+        $it_related_goal = $inputan[1];
+        $process = $inputan[2];
+        $typesubmit = $request->post('btnsubmit');
+        
+        $status = "";
+
+        $percent_level = 0;
+        $count_level = 0;
+        $level_tercapai = 0;
+        $percent_tercapai = 0;
+
+        $tercapai = array();
+
+        if($typesubmit == 'finish'){
+            $status = '7-Done';
+            foreach ($request->post('metcriteria') as $level => $process_outcomes){
+                $total_process = 0;
+                $total_percent = 0;
+                foreach($process_outcomes as $process_outcome => $answer){
+                    $total_process++;
+                    $percent = 0;
+                    if($request->post('acceptance')[$level][$process_outcome] == 'agree'){
+                        $datas = DB::table('process_outcome')
+                                ->select('working_product.*','survey_working_products.file',DB::raw('files.name as filename'),DB::raw('files.url as fileurl'),DB::raw('files.id as fileid'))
+                                ->leftJoin('process_outcome_wp','process_outcome_wp.process_outcome','=','process_outcome.id')
+                                ->leftJoin('working_product','working_product.id','=','process_outcome_wp.working_product')
+                                ->leftJoin('survey_working_products',function($join) use($survey_id){
+                                    $join->on('survey_working_products.working_product', '=','working_product.id')
+                                         ->on('survey_working_products.survey', '=', DB::raw($survey_id));
+                                })
+                                ->leftJoin('files','files.id','=','survey_working_products.file')
+                                ->where("process_outcome.id","=",$process_outcome)->get();
+                        
+                        $available = 0;                 
+                        foreach($datas as $index => $data){
+                            if($data->file){
+                                $available++;
+                            }
+                        }
+                        
+                        $percent = round($available/$datas->count()*100);
+                    }
+                    $total_percent += $percent;
+                    
+                    DB::table('survey_process_outcomes')
+                        ->where([
+                            ['survey','=',$survey_id],
+                            ['it_related_goal','=',$it_related_goal],
+                            ['process_outcome','=',$process_outcome]
+                        ])
+                        ->update(
+                            [   
+                                'note' => $request->post('note')[$level][$process_outcome],
+                                'acceptance' => $request->post('acceptance')[$level][$process_outcome],
+                                'percent' => $percent,
+                                'recomended_by' => Auth::user()->id
+                            ]
+                        );
+                }
+
+                $percent_level += round($total_percent/$total_process);
+                $count_level++;
+
+                if (round($total_percent/$total_process) >= 85){
+                    if(!array_key_exists("finish",$tercapai)){
+                        $level_tercapai = $level;
+                    }
+                }else{
+                    $tercapai['finish'] = $level_tercapai;
+                }
+            }
+
+            $percent_tercapai = round($percent_level/$count_level);
+        }else{
+            $status = '6-On Save Analyze';
+        }
+
+        DB::table('survey_process')
+            ->where([
+                ['it_related_goal','=',$it_related_goal],
+                ['process','=',$process],
+                ['survey','=',$survey_id]
+            ])
+            ->update([
+                'status' => $status,
+                'level' => array_key_exists("finish",$tercapai) ? $tercapai['finish'] : $level_tercapai,
+                'percent' => $percent_tercapai
+            ]);
+
+        return redirect('survey/'.$survey_id);
+    }
+
+    public function ajax_get_list_user($condition)
+    {
+        if($condition == 'no'){
+            echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
+        }else{
+            echo json_encode(DB::table('users')->get());
+        }
     }
 
     public function task($id)
