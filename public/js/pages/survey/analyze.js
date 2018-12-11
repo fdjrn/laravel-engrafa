@@ -35,12 +35,33 @@ function getWP(input){
               render: function(data, type, row, meta) {
               let action = "Document Unavailable";
               if(data){
-                action="<a href='/survey/downloadWp/"+row.fileid+"' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
-                "&nbsp;&nbsp;&nbsp;<a href='/survey/viewWp/"+row.fileid+"'>"+row.filename+"</a>";
+                action="<a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
+                "&nbsp;&nbsp;&nbsp;<a onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>";
               }
               return action;
               }
           }
       ]
+  });
+}
+
+function doWp(fileid,doAction){
+  // let doAction = $(this).attr('data-do-action');
+  console.log(doAction);
+  $.ajax({
+      type: "GET",
+      url: base_url+'/survey/'+doAction+'/'+fileid,
+      success: function(data)
+      {
+        if (data == 1) {
+            swal({
+              type: 'error',
+              title: 'Gagal',
+              text: 'File not found!'
+            });
+        }else{
+            window.location.href = '/survey/'+doAction+'/'+fileid;
+        }
+      }
   });
 }

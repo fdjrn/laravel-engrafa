@@ -299,7 +299,6 @@ class SurveyController extends Controller
                 ->leftJoin('files','files.id','=','survey_working_products.file')
                 ->where("process_outcome.id","=",$input[0])->get();
         
-        header('Content-Type', 'application/json');
         echo json_encode([
             'draw' => 1,
             'recordsTotal' => count($data),
@@ -415,12 +414,22 @@ class SurveyController extends Controller
 
     public function viewWp(Files $file)
     {
-        return Storage::response(str_replace('/storage/index/', '', $file->url));
+        $exists = Storage::disk('public')->has(str_replace('/storage/index/', '', $file->url));
+        if($exists){
+            return Storage::response(str_replace('/storage/index/', '', $file->url));
+        }else{
+            return 1;
+        }
     }
 
     public function downloadWp(Files $file)
     {
-        return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
+        $exists = Storage::disk('public')->has(str_replace('/storage/index/', '', $file->url));
+        if($exists){
+            return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
+        }else{
+            return 1;
+        }
     }
 
     public function analyze($id,$inputans){
