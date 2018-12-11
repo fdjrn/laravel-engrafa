@@ -36,6 +36,8 @@
 @stop
 
 @section('custom-scripts')
+<!-- provide the csrf token -->
+<meta name="csrf-token" content="{{ csrf_token() }}" />
 @stop
 
 @section('page-header') 
@@ -74,24 +76,28 @@
                     <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart">Add To Dashboard</a></li>
+                    <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart" data-idDashboard="{{ $item->id }}">Add To Dashboard</a></li>
                     <li><a id="delete-dashboard-{{ $item->id }}">Delete Dashboard</a></li>
                   </ul>
                 </li>
               @endforeach
-              
                 <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
               </ul>
             <div class="tab-content">
 
             <!-- foreach untuk grafiknya -->
+            @if (empty($dashboards))
+              <div class="text-center">
+                (empty dashboard)
+              </div>
+            @else
             @foreach ($dashboards as $item)
               <div class="tab-pane container-fluid @if ($item == reset($dashboards)) active @endif" id="tab_{{ $item->id }}">
                   <div class="row">
                     <!-- Default box -->
                       <div class="box">
                         <div class="box-header">
-                          <h3 class="box-title">Dashboard {{ $item->name }}</h3>
+                          <h3 class="box-title">{{ $item->name }}</h3>
 
                           <div class="box-tools pull-right">
                             <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
@@ -189,6 +195,7 @@
                   <!-- /.row -->
               </div>
             @endforeach
+            @endif
             <!-- end foreach untuk grafik -->
               
             </div>
@@ -324,7 +331,7 @@
 <div class="modal fade" id="modal-share" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form role="form" class="form-horizontal">
+      {{-- <form role="form" class="form-horizontal"> --}}
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
@@ -335,15 +342,17 @@
               Share To
             </label>
             <div class="col-sm-9">
-              <textarea class="form-control" rows="3" placeholder="Enter ..."></textarea>
+                <select id="share_to" name="share_to[]" class="form-control select2" multiple data-placeholder="Tambah Users"
+                        style="width: 100%;">
+                </select>
             </div>
           </div>
         
       </div>
       <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-primary">Share</button>
+        <button type="button" class="btn btn-primary" id="ajaxSubmit">Share</button>
       </div>
-      </form>
+      {{-- </form> --}}
     </div>
     <!-- /.modal-content -->
   </div>
@@ -354,23 +363,27 @@
 <div class="modal fade" id="modal-choose-chart" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="{{ route('dashboard.post') }}" method="post" autocomplete="off">
+      <form action="{{ route('dashboard.post.chart') }}" method="post" autocomplete="off" class="form-horizontal">
         <div class="modal-header">
             <div class="form-group">
               <label for="inputEmail3" class="col-sm-3 control-label">Survey</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="survey" placeholder="Survey">
+                <input type="hidden" class="form-control" id="id_dashboard" name="id_dashboard">
+                <input type="text" class="form-control" id="survey" placeholder="Survey" name="name">
               </div>
             </div>
         </div>
         <div class="modal-body">
           <div class="row">
+          @if (empty($chart_type))
+            <div class="col-md-12 align-self-center text-center">Data Chart Kosong</div>
+          @else
             @foreach ($chart_type as $item)
               <div class="col-md-6 align-self-center">
                 <!-- Default box -->
                 <div class="box box-primary">
                   <div class="box-header with-border">
-                    <input type="radio" name="grafik"/>
+                    <input type="radio" name="chart" value="{{ $item->chart_type }}"/>
                     <h3 class="box-title">Grafik {{ $item->name }}</h3>
                     <div class="box-tools pull-right">
                     </div>
@@ -389,13 +402,13 @@
               </div>
               <!-- /.col-->
             @endforeach
-
+          @endif
           </div>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-choose-survey">Next</button>
         </div>
-      </form>
+      <!-- </form> -->
     </div>
     <!-- /.modal-content -->
   </div>
@@ -409,16 +422,17 @@
       <div class="modal-header">
         <h4 class="modal-title">Choose Survey</h4>
       </div>
-      <form class="form-horizontal">
-        <div class="modal-body">
 
+      <div class="form-horizontal">
+
+        <div class="modal-body">
           <!-- select -->
           <div class="form-group">
             <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
-              <select class="form-control">
+              <select class="form-control" name="survey">
                 @foreach ($surveys as $item)
-                  <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
+                  <option value="{{ $item->id }}">{{ $item->name }}</option>
                 @endforeach
               </select>
             </div>
@@ -435,26 +449,31 @@
               </div>
             </div>
           </div>
-          <fieldset>
-            <div class="form-group">
-              <label class="control-label col-sm-3">Pilih Survey</label>
-              <div class="col-sm-9">
-                <select class="form-control">
-                    @foreach ($surveys as $item)
-                      <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-              </div>
+
+          <fieldset style="display:none">
+          <div class="form-group">
+            <label class="control-label col-sm-3">Pilih Survey</label>
+            <div class="col-sm-9">
+              <select class="form-control" name="survey2">
+                  @foreach ($surveys as $item)
+                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                  @endforeach
+              </select>
             </div>
-          <fieldset>
+          </div>
+          </fieldset>
+          
         </div>
+
         <div class="modal-footer justify-content-between">
           {{ Form::token() }}
           <button type="submit" class="btn btn-primary pull-right">Done</button>
         </div>
+
+      </div> <!-- /div class form-horizontal-->
+
       </form>
-      </div>
-    <!-- /.modal-content -->
+    </div><!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog -->
 </div>
@@ -496,7 +515,16 @@
 @stop
 
 @section('page-level-scripts')
-  
+  <script>
+    $('#modal-choose-chart').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('#id_dashboard').val(idDashboard)
+    })
+  </script>
   <script>
   var marksCanvas = document.getElementById("grafik-compare");
   var marksData = {
@@ -700,6 +728,7 @@
   {{-- Alert Delete Dashboard --}}
   @foreach ($dashboards as $item)
     <script>
+      var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
       $(document).ready(function(){
         $("#delete-dashboard-{{ $item->id }}").click(function(){
           Swal({
@@ -712,11 +741,28 @@
             confirmButtonText: 'Yes, delete it!'
           }).then((result) => {
             if (result.value) {
-              Swal(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-              )
+              $.ajax({
+                type: "POST",
+                url: base_url+'/ajax_delele_dashboard',
+                data: { _token: CSRF_TOKEN, 'dashboard_id': {{ $item->id }} },
+                dataType: "JSON",
+                success: function (response) {
+                  if(response==1){
+                      Swal(
+                      'Deleted!',
+                      'Dashboard has been deleted Successfully!',
+                      'success'
+                    )
+                    window.location.href = base_url;
+                  } else {
+                      Swal(
+                        'Failed!',
+                        'Dashboard failed to delete!',
+                        'error'
+                    )
+                  }
+                }
+              });
             }
           })
         });
@@ -739,6 +785,32 @@
         });
     });
   </script>
+
+<script>
+    var userid = [];
+    jQuery(document).ready(function(){
+      jQuery('#ajaxSubmit').click(function(e){
+          e.preventDefault();
+          
+          $.each($("#share_to option:selected"), function(){            
+            userid.push($(this).val());
+          });
+          // console.log(userid);
+          var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+          jQuery.ajax({
+            url: base_url+'/ajax_share_to',
+            method: 'post',
+            data: { "_token" : CSRF_TOKEN,
+                    'userid': $('#share_to').val()
+            },
+            success: function(result){
+                jQuery('.alert').show();
+                jQuery('.alert').html(result.success);
+            }
+          });
+        });
+      });
+  </script>
   @endforeach
 
   {{-- Show hide comparison --}}
@@ -759,6 +831,33 @@
         });
       });
   </script>
+
+      {{-- Select Users --}}
+      <script>
+      $(document).ready(function(){
+        initialize_select_user("#share_to");
+      });
+    
+      function initialize_select_user(id_element){ 
+          $.ajax({
+              type: 'GET',
+              url: base_url+'/ajax_get_list_user',
+              success: function (data) {
+                  // the next thing you want to do 
+                  var $v_select = $(id_element);
+                  var item = JSON.parse(data);
+                  $v_select.empty();
+                  $v_select.append("<option value=''></option>");
+                  $.each(item, function(index,valuee) {        
+                      $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+                  });
+    
+                  //manually trigger a change event for the contry so that the change handler will get triggered
+                  $v_select.change();
+              }
+          });
+        }
+      </script>
 @stop
 
 @section('theme-layout-scripts')

@@ -32,7 +32,11 @@ Route::middleware(['auth','web'])->group(function () {
 	// dashboard
 	Route::get('/','Dashboard\DashboardController@index')->name('dashboard');
 	Route::post('/','Dashboard\DashboardController@store')->name('dashboard.post');
-	// Route::post('/','Dashboard\DashboardController@storecharts')->name('dashboard.post.charts');
+	Route::post('/addChart','Dashboard\DashboardController@storeCharts')->name('dashboard.post.chart');
+
+	Route::get('/ajax_get_list_user', 'Dashboard\DashboardController@ajax_get_list_user');
+	Route::post('/ajax_delele_dashboard', 'Dashboard\DashboardController@ajax_delele_dashboard');
+	Route::any('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
 
 	// index & file explorer
 	Route::get('/index','Index\IndexController@index')->name('index');

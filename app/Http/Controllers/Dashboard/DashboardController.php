@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 // insert models
 use App\Models\Dashboard;
 use App\Models\Dashboard_users;
+use App\Models\Dashboard_charts;
+use App\Models\Dashboard_survey;
 
 use Auth;
 
@@ -60,7 +62,7 @@ class DashboardController extends Controller
         // dd($arrayProcess);
         
         $data['dashboards']    = $name_dashboard->toArray();
-        $data['surveys']       = $list_survey->toArray();
+        $data['surveys']       = $list_survey;
         $data['chart_type']    = $list_chart_type->toArray();
 
         $data['labels']        = $arrayProcess;
@@ -93,33 +95,60 @@ class DashboardController extends Controller
         }
     }
 
-    public function storecharts(Request $request)
+    public function storeCharts(Request $request)
     {
         $input = $request->all();
+        
+        $input_dashboard_chart = [
+            'dashboard' => $input['id_dashboard'],
+            'name' => $input['name'],
+            'chart_type' => $input['chart']
+        ];
+
         $userid = Auth::user()->id;
 
-        $charts = Dashboard_charts::create($input);
-        if($charts) {
-            return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil ditambahkan']);
+        $charts = Dashboard_charts::create($input_dashboard_chart);
+        if ($charts) {
+            $input_dashboard_survey = [
+                'survey' => $input['survey'],
+                'chart' => $charts->id // get last insert id from charts 
+            ];
+            
+            $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+            if ($dashboard_survey) {
+                return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil ditambahkan']);
+            } else {
+                return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Dashboard Survey']);
+            }
         } else {
-            return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Charts gagal di tambahkan']);
+            return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Survey']);
         }
     }
 
-    public function postStaff (StaffRequest $request)
+    public function ajax_get_list_user()
     {
-        $input = $request->all();
-        $input['status_staff'] = "active";
-        if(!$input['id']) {
-            $staff = Staff::create($input);
-
-            return redirect()->route('admin.staff.data')->with(['message'=>'Staff sudah ditambahkan']);
-        } else {
-            $staff = Staff::find($input['id']);
-            $staff->update($input);
-
-            return redirect()->route('admin.staff.data')->with(['message'=>'Staff sudah diupdate']);
-        }
+       echo json_encode(DB::table('users')->get());
     }
 
+    public function ajax_delele_dashboard(Request $request)
+    {
+        $userid = Auth::user()->id;
+
+        $delete_dashboard = DB::table('dashboards')->where('id', '=', $request->dashboard_id)->delete();
+        $delete_dashboard_users = DB::table('dashboard_users')->where('dashboard', '=', $request->dashboard_id)->delete();
+
+        if ($delete_dashboard && $delete_dashboard_users) {
+            $response = 1;
+        } else {
+            $response = 0;
+        }
+
+        return response()->json($response);
+    }
+
+    public function ajax_share_to(Request $request) {
+        $userid = Auth::user()->id;
+
+        echo json_encode($request->userid);
+    }
 }
