@@ -15,7 +15,7 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <div class='input-group'>
-                    <input type="text" id="i_n_name_survey" name="i_n_name_survey" class="form-control" placeholder="New Survey Name" >
+                    <input type="text" id="i_n_name_survey" name="i_n_name_survey" class="form-control" placeholder="New Survey Name">
                       <span class="input-group-addon">
                         <select class="colorselector">
                           <option value="A0522D" data-color="#A0522D">sienna</option>
@@ -37,7 +37,7 @@
 
                 <div class="col-sm-8">
                   <select id="i_n_surveyor" name="i_n_surveyor[]" class="form-control select2" multiple data-placeholder="Add Surveyor"
-                          style="width: 100%;" >
+                          style="width: 100%;">
                   </select>
                 </div>
               </div>
@@ -48,7 +48,7 @@
 
                 <div class="col-sm-8">
                   <select id="i_n_client" name="i_n_client[]" class="form-control select2" multiple data-placeholder="Add Client"
-                          style="width: 100%;" >
+                          style="width: 100%;">
                   </select>
                 </div>
               </div>
@@ -59,7 +59,7 @@
 
                 <div class="col-sm-3">
                   <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Survey Type"
-                          style="width: 100%;" >
+                          style="width: 100%;">
                     <option value=""></option>
                     <option value="1-Purpose">Purpose</option>
                     <option value="2-Pain">Pain Point</option>
@@ -72,16 +72,16 @@
                         @if($datait->pp == '1-Purpose')
                           <div class="list-itgoal-purpose">
                             <label style="display:block">
-                              <input name="i_itgoal[1-Purpose][]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox" >
+                              <input name="i_itgoal[]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox">
                               <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
                             </label>
                             @foreach($dataItGoalToProcess as $dataitprocess)
                               @if($dataitprocess->it_goal == $datait->id)
                               <div class="form-group">
                                 <label class="col-sm-4 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
-                                <input type="hidden" name="i_itgoal_process[1-Purpose][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
+                                <input type="hidden" name="i_itgoal_process[{{$datait->id}}][]" value="{{$dataitprocess->process}}">
                                 <div class="col-sm-5" style="padding-left: 2px; padding-right: 2px;">
-                                  <select name="i_itgoal_process_level[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
+                                  <select name="i_itgoal_process_level[{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
                                     @foreach($dataLevel as $key => $level)
                                     <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
                                     @endforeach
@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
+                                      <input name="i_itgoal_process_percent[{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
                                       <span class="input-group-addon">%</span>
                                   </div>
                                 </div>
@@ -101,16 +101,16 @@
                         @if($datait->pp == '2-Pain')
                           <div class="list-itgoal-pain">
                             <label style="display:block">
-                              <input name="i_itgoal[2-Pain][]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox">
+                              <input name="i_itgoal[]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox">
                               <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
                             </label>
                             @foreach($dataItGoalToProcess as $dataitprocess)
                               @if($dataitprocess->it_goal == $datait->id)
                               <div class="form-group">
                                 <label class="col-sm-4 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
-                                <input type="hidden" name="i_itgoal_process[2-Pain][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
+                                <input type="hidden" name="i_itgoal_process[{{$datait->id}}][]" value="{{$dataitprocess->process}}">
                                 <div class="col-sm-5" style="padding-left: 2px; padding-right: 2px;">
-                                  <select name="i_itgoal_process_level[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
+                                  <select name="i_itgoal_process_level[{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
                                     @foreach($dataLevel as $key => $level)
                                     <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
                                     @endforeach
@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
+                                      <input name="i_itgoal_process_percent[{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
                                       <span class="input-group-addon">%</span>
                                   </div>
                                 </div>
