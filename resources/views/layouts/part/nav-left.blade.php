@@ -18,31 +18,40 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
 
       <ul class="sidebar-menu" data-widget="tree">        
-        <li class="treeview" data-toggle="control-sidebar">  
+        <li class="treeview">  
             <a href="#control-sidebar-notification-tab" data-toggle="tab">
+              <div data-toggle="control-sidebar">
                 <i class="fa fa-bell"></i>
+                <span>&nbsp;</span>
                 <span>Notifications</span>
                 <span class="pull-right-container">
                   <small class="label pull-right bg-green">5</small>
                 </span>
+              </div>
             </a>
         </li>
-        <li data-toggle="control-sidebar">
+        <li>
           <a href="#control-sidebar-recent-tab" data-toggle="tab">
-            <i class="fa fa-clock-o"></i> 
-            <span>Recent</span>
-            <span class="pull-right-container">
-              <small class="label pull-right bg-green">5</small>
-            </span>
+            <div data-toggle="control-sidebar">
+              <i class="fa fa-clock-o"></i> 
+              <span>&nbsp;</span>
+              <span>Recent</span>
+              <span class="pull-right-container">
+                <small class="label pull-right bg-green">5</small>
+              </span>
+          </div>
           </a>
         </li>
-        <li class="treeview" data-toggle="control-sidebar">
+        <li class="treeview">
           <a href="#control-sidebar-bookmark-tab" data-toggle="tab">
-            <i class="fa fa-bookmark"></i>
-            <span>Bookmark</span>
-            <span class="pull-right-container">
-              <small class="label pull-right bg-green">2</small>
-            </span>
+            <div data-toggle="control-sidebar">
+              <i class="fa fa-bookmark"></i>
+              <span>&nbsp;</span>
+              <span>Bookmark</span>
+              <span class="pull-right-container">
+                <small class="label pull-right bg-green">2</small>
+              </span>
+            </div> 
           </a>
         </li>
         <!-- search form -->

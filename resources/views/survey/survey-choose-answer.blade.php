@@ -133,8 +133,7 @@
               </div>
             </div>
           @endforeach
-          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Survey</button></div>
-          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Survey</button></div>
+          <div class="pull-right"><button type="submit" form="form_q_survey" class="btn btn-primary">Finish Survey</button></div>
           </form>
         @endif
       </div>
@@ -167,32 +166,30 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+        <h4 class="modal-title">Working Product</h4>
       </div>
-      <input type="hidden" id="curWP">
-      <input type="hidden" id="curTyp" value="answer">
-      <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
-        {{ csrf_field() }}
       <div class="modal-body">
+        <form name="form_w_product" action="{{route('survey.task.store')}}" method="post" id="form_w_product">
+          {{ csrf_field() }}
           <div class="table-responsive">
             <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
               <thead>
                 <tr>
-                  <td style="width:100px;">WP ID</td>
-                  <td style="width:350px;">Description</td>
-                  <td>File</td>
+                  <td style="width:20%;">WP ID</td>
+                  <td style="width:60%;">Description</td>
+                  <td style="width:20%;">File</td>
                 </tr>
               </thead>
               <tbody>
               </tbody>
             </table>
           </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
-        <button type="submit" id="i_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
+        <button type="submit" form="form_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
       </div>
-      </form>
     </div>
     <!-- /.modal-content -->
   </div>
@@ -210,13 +207,58 @@
 @stop
 
 @section('page-level-scripts')
-<script src="{{ asset('js/pages/survey/answer.js')}}"></script>
 <script src="/theme/AdminLTE/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
   $(function () {
     /* BOOTSTRAP SLIDER */
     $('.slider').slider()
   })
+
+  function getWP(input){
+    $('#m_u_file').modal('show');
+    $('.wp-id').html(input);
+
+    var table = {
+      el: {},
+      id: '#table-wp'
+    };
+
+    table.el = $(table.id).DataTable({
+        serverSide: false,
+        "bDestroy": true,
+        searching: false, paging: false, info: false,
+        responsive: true,
+        processing: true,
+        ajax: {
+        url: base_url+'/survey/get_process_outcome_wp/'+input,
+        method: 'GET',
+        },
+        columns: [
+            {
+                data: 'id',
+                render: function(data, type, row, meta) {
+                return data;
+                }
+            },
+            {
+                data: 'process',
+                render: function(data, type, row, meta) {
+                return data;
+                }
+            },
+            {
+                data: 'file',
+                render: function(data, type, row, meta) {
+                let action = "<input type='file' style='width:100%;'>";
+                if(data){
+                  action="Uploaded";
+                }
+                return action;
+                }
+            }
+        ]
+    });
+  }
 </script>
 @stop
 
