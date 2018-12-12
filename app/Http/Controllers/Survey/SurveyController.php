@@ -207,7 +207,6 @@ class SurveyController extends Controller
                 })
                 ->where("process_outcome.id","=",$input[0])->get();
         
-        header('Content-Type', 'application/json');
         echo json_encode([
             'draw' => 1,
             'recordsTotal' => count($data),
@@ -216,15 +215,130 @@ class SurveyController extends Controller
         ]);;
     }
 
-    public function test(Request $request){
-        $msg = $request->text;
-        return response()->json(array('msg'=>$msg),200);
+
+    public function uploadWp($id,Request $request){
+
+        $validator = Validator::make(
+            $request->all(), [
+            'files.*' => 'required|mimes:pdf,doc,docx,xls,xlsx'
+            ],[
+                'files.*.required' => 'Upload Files Failed, files must not empty!',
+                'files.*.mimes' => 'Only pdf, word (.doc|.docx), and excel(.xls|.xlsx) files are allowed',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => $validator->errors()->first()
+            ]);
+        }
+
+        $survey = \App\Models\Survey::where('id', $id)->first();
+
+        if(!$survey){
+            return json_encode([
+                'status' => 0,
+                'messages' => "Upload Files Failed, current Survey not found!"
+            ]);
+        }
+
+        if(!$request->file('files')){
+            return json_encode([
+                'status' => 0,
+                'messages' => "Upload Files Failed, files must not empty!"
+            ]);
+        }
+
+        $root_path = "/storage/index/survey/";
+
+        $root = Files::where('url',$root_path)->first();
+        $root_id = "";
+        if (!$root) {
+            Storage::makeDirectory('survey');
+            $folder = new Files();
+            $folder->folder_root = 0;
+            $folder->name = 'survey';
+            $folder->url= $root_path;
+            $folder->is_file = 0;
+            $folder->created_by = Auth::user()->id;
+            $folder->save();
+            $root_id = $folder->id;
+        }else{
+            $root_id = $root->id;
+        }
+
+        $survey_path = $root_path.$survey->name.'/';
+        $survey_files = Files::where('url',$survey_path)->first();
+        $survey_files_id = "";
+        if (!$survey_files) {
+            Storage::makeDirectory('survey/'.$survey->name.'/');
+            $folder = new Files();
+            $folder->folder_root = $root_id;
+            $folder->name = $survey->name;
+            $folder->url= $survey_path;
+            $folder->is_file = 0;
+            $folder->created_by = Auth::user()->id;
+            $folder->save();
+            $survey_files_id = $folder->id;
+        }else{
+            $survey_files_id = $survey_files->id;
+        }
+
+        if($survey_files_id){
+            foreach ($request->file('files') as $wpid => $file) {
+                if ($file->isValid()) {
+
+                    $path = $file->store('survey/'.$survey->name);
+
+                    $files = [
+                        'folder_root' => $survey_files_id,
+                        'name' => $file->getClientOriginalName(),
+                        'url' => "/storage/index/".$path,
+                        'is_file' => 1,
+                        'version' => 1,
+                        'size' => $file->getClientSize(),
+                        'created_by' => Auth::user()->id,
+                        'created_at' => $now = Carbon::now()->format('Y-m-d H:i:s'),
+                        'updated_at' => $now,
+                    ];
+
+                    $fileid = Files::insertGetId($files);
+
+                    DB::table('survey_working_products')->insert(
+                        [   'survey' => $id, 
+                            'working_product' => $wpid,
+                            'file' => $fileid
+                        ]
+                    );
+                }
+            }
+        }
+
+        return json_encode([
+            'status' => 1,
+            'messages' => "Upload Files Success!"
+        ]);
+    }
+
+    public function viewWp(Files $file)
+    {
+        $exists = Storage::disk('public')->has(str_replace('/storage/index/', '', $file->url));
+        if($exists){
+            return Storage::response(str_replace('/storage/index/', '', $file->url));
+        }else{
+            return 1;
+        }
     }
 
     public function ajax_get_list_user()
     {
-       echo json_encode(DB::table('users')->get());
-       return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
+        $exists = Storage::disk('public')->has(str_replace('/storage/index/', '', $file->url));
+        if($exists){
+            return Storage::download(str_replace('/storage/index/', '', $file->url), $file->name);
+        }else{
+            return 1;
+        }
     }
 
     public function analyze($id,$inputans){
