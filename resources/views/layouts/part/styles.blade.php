@@ -54,6 +54,7 @@
   <!-- Theme style -->
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/dist/css/AdminLTE.min.css')}}">
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css')}}">
+  <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.css')}}">
   <link rel="stylesheet" href=" {{ asset('css/main.css')}}">
 
 <!-- SMARTGOV & RESPONSIVE STYLES -->
