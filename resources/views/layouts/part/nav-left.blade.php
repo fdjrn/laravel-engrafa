@@ -18,52 +18,43 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
 
       <ul class="sidebar-menu" data-widget="tree">        
-        <li class="treeview">  
+        <li class="treeview" data-toggle="control-sidebar">  
             <a href="#control-sidebar-notification-tab" data-toggle="tab">
-              <div data-toggle="control-sidebar">
                 <i class="fa fa-bell"></i>
-                <span>&nbsp;</span>
                 <span>Notifications</span>
                 <span class="pull-right-container">
                   <small class="label pull-right bg-green">5</small>
                 </span>
-              </div>
             </a>
         </li>
-        <li>
+        <li data-toggle="control-sidebar">
           <a href="#control-sidebar-recent-tab" data-toggle="tab">
-            <div data-toggle="control-sidebar">
-              <i class="fa fa-clock-o"></i> 
-              <span>&nbsp;</span>
-              <span>Recent</span>
-              <span class="pull-right-container">
-                <small class="label pull-right bg-green">5</small>
-              </span>
-          </div>
+            <i class="fa fa-clock-o"></i> 
+            <span>Recent</span>
+            <span class="pull-right-container">
+              <small class="label pull-right bg-green">5</small>
+            </span>
           </a>
         </li>
-        <li class="treeview">
+        <li class="treeview" data-toggle="control-sidebar">
           <a href="#control-sidebar-bookmark-tab" data-toggle="tab">
-            <div data-toggle="control-sidebar">
-              <i class="fa fa-bookmark"></i>
-              <span>&nbsp;</span>
-              <span>Bookmark</span>
-              <span class="pull-right-container">
-                <small class="label pull-right bg-green">2</small>
-              </span>
-            </div> 
+            <i class="fa fa-bookmark"></i>
+            <span>Bookmark</span>
+            <span class="pull-right-container">
+              <small class="label pull-right bg-green">2</small>
+            </span>
           </a>
         </li>
         <!-- search form -->
-	      <form action="#" method="get" class="sidebar-form">
-	        <div class="input-group">
-	          <input type="text" name="q" class="form-control" placeholder="Search...">
-	          <span class="input-group-btn">
-	                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-	                </button>
-	              </span>
-	        </div>
-	      </form>
+        <form action="#" method="get" class="sidebar-form">
+          <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                  </button>
+                </span>
+          </div>
+        </form>
         <!-- @foreach($roleMenus as $menu)
         <li class="treeview">
           <a href="{{ $menu->url }}">
@@ -101,7 +92,7 @@
           </a>
         </li>
         <li class="header">
-    		<span>Setting</span>
+        <span>Setting</span>
         </li>
         <li class="treeview">
           <a href="#">
