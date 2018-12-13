@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Files;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -33,12 +34,8 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
-        // masih belm nge-refer ke si folder yg terakhir
-        /*$root_folder_id = $request->get('folder_id');
-        if ($root_folder_id != null){
-           $this->getListDetail($root_folder_id);
-        }*/
-        return view('index.index');
+        $folderIdReq = !is_null($request->get('folder_id')) ? $request->get('folder_id') : "0";
+        return view('index.index')->with('folderID', $folderIdReq);
     }
 
     /**
@@ -46,31 +43,17 @@ class IndexController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function getListAll()
+    public function getListAll($id)
     {
-        $data = $this->getListByFolderRootId(0);
-        $root_folder_name = $this->getFolderNameById(0);
-
-        return DataTables::of($data)
-            ->addColumn('checkbox', function ($d) {
-                return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($d)) . '">';
-            })
-            ->with('mainRootFolderName', $root_folder_name)
-            ->with('mainRootFolderId', 0)
-            ->make(true);
-    }
-
-    public function getListDetail($root_folder_id)
-    {
-        $data = $this->getListByFolderRootId($root_folder_id);
-        $root_folder_name = $this->getFolderNameById($root_folder_id);
+        $data = $this->getListByFolderRootId($id);
+        $root_folder_name = $this->getFolderNameById($id);
 
         return DataTables::of($data)
             ->addColumn('checkbox', function ($dt) {
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($dt)) . '">';
             })
             ->with('mainRootFolderName', $root_folder_name)
-            ->with('mainRootFolderId', $root_folder_id)
+            ->with('mainRootFolderId', $id)
             ->make(true);
     }
 
@@ -103,7 +86,7 @@ class IndexController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function getListFolder()
+    /*public function getListFolder()
     {
         $folders = $this->getListFolderByRootId(0);
         $rootFolderName = $this->getFolderNameById(0);
@@ -112,7 +95,7 @@ class IndexController extends Controller
             ->with('rootFolderName', $rootFolderName)
             ->with('rootFolderId', 0)
             ->make(true);
-    }
+    }*/
 
     /**
      * Route for get list folder detail on main grid
@@ -120,7 +103,7 @@ class IndexController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function getListFolderDetail($id)
+    public function getListAllFolder($id)
     {
         $folders = $this->getListFolderByRootId($id);
         $rootFolderName = $this->getFolderNameById($id);

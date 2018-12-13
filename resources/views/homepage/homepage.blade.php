@@ -137,12 +137,15 @@
                     <div class="small-box bg-purple">
                         <div class="inner">
                             <h3>Survey</h3>
-                            <p>[No Data]</p>
+                            {{--<p>[No Data]</p>--}}
+                            <p class="latest-survey-name">
+                                {!! isset($latestSurvey) ? $latestSurvey['name'] : '[No Data]' !!}
+                            </p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-copy"></i>
                         </div>
-                        <a href="#" class="small-box-footer">
+                        <a href="{{ url('/') }}" class="small-box-footer">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>

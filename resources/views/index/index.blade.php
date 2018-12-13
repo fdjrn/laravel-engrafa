@@ -11,7 +11,6 @@
     {{ Html::style('css/material.min.css')}}
     {{ Html::style('css/dataTables.material.min.css') }}
     {{ Html::style('css/dropzone.min.css') }}
-    {{--{{ Html::style('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.css') }}--}}
 @stop
 
 @section('theme-global-styles')
@@ -90,6 +89,7 @@
 
 
 @section('body-inner-content')
+    <input name="f_id" type="hidden" value="{!! $folderID !!}">
     <div class="row">
 
         {{-- Left Side --}}

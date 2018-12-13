@@ -1,14 +1,25 @@
 Dropzone.autoDiscover = false;
+
 $(document).ready(function () {
     var rootFolderId = 0;
     var rootFolderName = "";
     var currentFolderId = 0;
     var closeModalInterval;
 
+    var f_id = $('input:hidden[name = f_id]').val();
+    var dtFolderAjaxUrl = (f_id !=="" ? "/index/list-folder/" + f_id : "/index/list-folder");
+
     var dtMain = $("#dt-file-exp-table-index").DataTable({
         processing: true,
         serverSide: true,
-        ajax: "/index/list-all",
+        ajax:  {
+            url: "/index/list-all/" + f_id,
+            error: function (xhr, status, err) {
+                if (err === 'Unauthorized'){
+                    window.location.href='/login';
+                }
+            }
+        },
         columns: [
             {data: "checkbox", name: "file-exp-checkbox", orderable: false, searchable: false},
             {
@@ -38,13 +49,15 @@ $(document).ready(function () {
         }
     });
 
+
+
     var dtFolder = $("#dt-list-folder-table-index").DataTable({
         processing: true,
         serverSide: true,
         "bPaginate":false,
         "bInfo":false,
         "dom": "<fl<t>ip>",
-        ajax: "/index/list-folder",
+        ajax: dtFolderAjaxUrl,
         columns: [{
                 data: "name",
                 "fnCreatedCell": function (nTd, sData) {
@@ -58,7 +71,6 @@ $(document).ready(function () {
             $(api.column(0).header()).html($.fn.dataTable.render.text().display(json.rootFolderName));
         }
     });
-
 
     function getCurrentMainFolderDetail(id) {
         dtMain.ajax.url("/index/list-all/"+id).load();
@@ -111,14 +123,14 @@ $(document).ready(function () {
         $('input[type="checkbox"]', rows).prop("checked", this.checked);
     });
 
-    dtMain.on("click", "tr", function () {
+    dtMain.on("dblclick", "tr", function () {
         var rootId = dtMain.row( this ).data().id;
         if (dtMain.row( this ).data().is_file === 0) {
             getCurrentMainFolderDetail(rootId);
         }
     });
 
-    dtFolder.on("click","tr", function () {
+    dtFolder.on("dblclick","tr", function () {
         if (dtFolder.row(this).index() >= 0) {
             var currentId = dtFolder.row(this).data().id;
             getCurrentFolderDetail(currentId);
