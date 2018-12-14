@@ -11,17 +11,29 @@
 		  </a>
 	@else
 		@if ($menu->id_url == "mn_create_new_team")
-		<li>
-			<a id="{{$menu->id_url}}" href="{{$menu->url}}">
-				<i class="fa {{$menu->icon}}"></i>
-				<span>{{$menu->name}}</span>
-			</a>
-		@foreach($mnsurvey as $survey)
-		<li style="background-color: #2c3b41;">
-			<a href="survey/{{$survey->id}}">
-				<span>&nbsp;&nbsp;&nbsp;</span><i class="fa fa-file-text-o"></i><span>{{$survey->name}}</span>
-			</a>
-		@endforeach
+			<li>
+				<a id="{{$menu->id_url}}" href="{{$menu->url}}">
+					<i class="fa {{$menu->icon}}"></i>
+					<span>{{$menu->name}}</span>
+				</a>
+			@foreach($mnsurvey as $survey)
+			<li style="background-color: #2c3b41;">
+				<a href="/survey/{{$survey->id}}">
+					<span>&nbsp;&nbsp;&nbsp;</span><i class="fa fa-file-text-o"></i><span>{{$survey->name}}</span>
+				</a>
+			@endforeach
+		@elseif ($menu->id_url == "mn_survey")
+			<li>
+				<a id="{{$menu->id_url}}" href="{{$menu->url}}">
+					<i class="fa {{$menu->icon}}"></i>
+					<span>{{$menu->name}}</span>
+				</a>
+			@foreach($mnsurvey as $survey)
+			<li style="background-color: #2c3b41;">
+				<a href="/survey/{{$survey->id}}">
+					<span>&nbsp;&nbsp;&nbsp;</span><i class="fa fa-file-text-o"></i><span>{{$survey->name}}</span>
+				</a>
+			@endforeach
 		@else
 		<li class="">
 			<a id="{{$menu->id_url}}" href="{{$menu->url}}">
