@@ -32,4 +32,35 @@ class Survey extends Model
         return $mnsurvey;
 
 	}
+
+    public static function get_status_ownership($survey_id){
+        $data_survey = DB::table('surveys')
+            ->select('created_by')
+            ->where('id',$survey_id)
+            ->get();
+
+        if(!$data_survey->first()){
+            abort(404);
+        }
+
+        $status_ownership = "";
+        if ($data_survey->first()->created_by == Auth::user()->id){
+            $status_ownership = "CREATOR";
+        }else{
+            $status_of_surveys = DB::table('survey_members')
+                ->select('role')
+                ->where([
+                    ['survey','=',$survey_id],
+                    ['user','=',Auth::user()->id]
+                ])
+                ->get();
+            if($status_of_surveys->first()){
+                $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
+            }else{
+                abort(404);
+            }
+        }
+
+        return $status_ownership;
+    }
 }

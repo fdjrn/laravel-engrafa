@@ -4,9 +4,6 @@
         <h4>
           <i class="fa fa-files-o fa-fw"></i>
           Survey
-          <span class="pull-right">
-            <i class="fa fa-sort-amount-asc"></i>
-          </span>
         </h4>
       </div>
       <div class="box-body">
@@ -29,9 +26,11 @@
         </ul>
       </div>
       <!-- /.box-body -->
-      <div class="box-footer text-center">
-        <h4><a href="#"><i class="fa fa-user-plus"></i>&nbsp;<span>Invite</span></a></h4>
-      </div>
+      @if($status_ownership != 'RESPONDEN')
+        <div class="box-footer text-center">
+          <h4><a id="o_invite_user" href="#"><i class="fa fa-user-plus"></i>&nbsp;<span>Invite</span></a></h4>
+        </div>
+      @endif
 <!--       <div class="box-footer text-center">
         <a href="">
           <i class="fa fa-plus-circle fa-fw"></i>
