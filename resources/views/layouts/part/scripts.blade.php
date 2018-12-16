@@ -54,6 +54,7 @@
 <script src="{{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
 
 <script>
