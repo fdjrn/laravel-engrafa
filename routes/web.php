@@ -74,6 +74,8 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
+	Route::get('/survey/{id}/analyze/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.analyze.doneView');
+	Route::post('/survey/{id}/invite', 'Survey\SurveyController@invite')->name('survey.invite');
 	// survey agregation
 	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
 	Route::get("/survey/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");
@@ -91,6 +93,8 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
 	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
+	Route::get('/setting/users/{id}', 'Setting\SettingController@get_user_by_id');
+	Route::post('/setting/users/edit_user','Setting\SettingController@edit_user')->name('setting.edit_user');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");

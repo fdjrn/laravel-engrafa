@@ -14,6 +14,7 @@ use App\User;
 use App\Models\Files;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
+use App\Models\Survey;
 
 
 class SurveyController extends Controller
@@ -23,47 +24,47 @@ class SurveyController extends Controller
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
-            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
-            ->leftJoin('survey_process',function($join){
-                $join->on('survey_process.survey', '=','surveys.id')
-                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
-            })
-            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal')
-            ->where('surveys.id',$id)
+            ->select('created_by')
+            ->where('id',$id)
             ->get();
 
         if(!$data_survey->first()){
             abort(404);
         }
 
-        $status_ownership = "";
-        if ($data_survey->first()->created_by == Auth::user()->id){
-            $status_ownership = "CREATOR";
-        }else{
-            $status_of_surveys = DB::table('survey_members')
-                ->select('role')
-                ->where([
-                    ['survey','=',$id],
-                    ['user','=',Auth::user()->id]
-                ])
+        $data['status_ownership'] = Survey::get_status_ownership($id);
+
+        $query_survey = DB::table('surveys')
+            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
+            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
+            ->leftJoin('survey_process',function($join){
+                $join->on('survey_process.survey', '=','surveys.id')
+                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
+            })
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal');
+
+
+        $data['survey_name'] = (clone $query_survey)
+            ->where('surveys.id',$id)
+            ->get()->first()->name;
+
+        if($data['status_ownership'] == 'RESPONDEN'){
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 4")
                 ->get();
-            if($status_of_surveys->first()){
-                $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
-            }else{
-                abort(404);
-            }
-        }
-
-        $data['status_ownership'] = $status_ownership;
-
-        if($data_survey->first()){
-            $data['surveys'] = $data_survey;
-            $data['survey_name'] = $data_survey->first()->name;
-            return view('survey.survey',$data);
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) > 3")
+                ->get();
         }else{
-            abort(404);
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 7")
+                ->get();
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) = 7")
+                ->get();
         }
+        
+        return view('survey.survey',$data);
     }
 
     public function chooseAnswer($id,$inputans){
@@ -618,14 +619,19 @@ class SurveyController extends Controller
     {
         if($condition == 'no'){
             echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
-        }else{
+        }elseif($condition == 'yes'){
             echo json_encode(DB::table('users')->get());
+        }else{
+            $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
+            echo json_encode($users);
         }
     }
 
     public function task($id)
     {
         $data['survey_id'] = $id;
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
 
         $priority = array();
         $priority['1-High'] = "!!!";
@@ -745,6 +751,49 @@ class SurveyController extends Controller
         return json_encode([
             'status' => 0,
             'messages' => 'Create Survey Failed'
+        ]);
+    }
+
+    public function invite($id, Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+                'inv_responden' => 'required_without:inv_surveyor',
+            ],
+            [
+                'inv_responden.required_without' => '&#8226;The <span class="text-danger">Responden or Surveyor</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        if($request->get('inv_responden')){
+            foreach ($request->get('inv_surveyor') as $surveyor) {
+                $surveymembers = new \App\Models\SurveyMembers;
+                $surveymembers->user = $surveyor;
+                $surveymembers->survey = $id;
+                $surveymembers->role = "1-Surveyor";
+                $surveymembers->save();
+            } 
+        }               
+
+        if($request->get('inv_surveyor')){
+            foreach ($request->get('inv_responden') as $responden) {
+                $surveymembers = new \App\Models\SurveyMembers;
+                $surveymembers->user = $responden;
+                $surveymembers->survey = $id;
+                $surveymembers->role = "2-Responden";
+                $surveymembers->save();
+            }
+        }
+        
+        return json_encode([
+            'status' => 1,
+            'messages' => '/survey/'.$id
         ]);
     }
 
