@@ -80,6 +80,28 @@
       }
     }).parent().addClass('active');
 
+    var menu_status = false;
+    $('ul.inside-submenu a').filter(function() {
+      if (this.href == url){
+        console.log("url y "+url);
+        menu_status = true;
+        return true;
+      }else if(this.href+"#" == url){
+        console.log("url# y "+url);
+        menu_status = true;
+        return true;
+      }else if(this.href == aurl){
+        console.log("aurl y "+aurl);
+        menu_status = true;
+        return true;
+      }else if(this.href == burl){
+        if(menu_status == false){
+          console.log("burl y "+burl);
+          return true;
+        }
+      }
+    }).parent().addClass('active');
+
     // for treeview
     $('ul.treeview-menu a').filter(function() {
       if (this.href == url){

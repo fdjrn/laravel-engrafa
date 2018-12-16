@@ -9,3 +9,41 @@
 .crud-button a:hover{
   color:#4d984e !important;
 }
+
+.inside-sidemenu{
+}
+.inside-sidemenu > .box{
+  background-color: #3c8dbc;
+  border-top: none;
+}
+.inside-sidemenu > .box > .box-body {
+  margin:0px;
+  padding: 0px;
+}
+.inside-sidemenu > .box > .box-body > ul {
+}
+.inside-sidemenu > .box > .box-body > ul > li:first-child {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.inside-sidemenu > .box > .box-body > ul > li:last-child {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.inside-sidemenu > .box > .box-body > ul > li {
+  margin:0px;
+  padding: 0px;
+}
+.inside-sidemenu > .box > .box-body > ul > li.active{
+  background-color: #307096;
+}
+.inside-sidemenu > .box > .box-body > ul > li:hover{
+  background-color: #307096;
+}
+.inside-sidemenu > .box > .box-body > ul > li > a{
+  color:#fff;
+}
+.inside-sidemenu > .box > .box-body > ul > li > a > h4{
+  margin:0px;
+  padding: 10px;
+}

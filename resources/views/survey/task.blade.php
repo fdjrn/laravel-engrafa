@@ -231,6 +231,7 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/pages/survey/task.js')}}"></script>
+{{ Html::script('js/pages/survey.js')}}
 <script>
 </script>
 @stop
