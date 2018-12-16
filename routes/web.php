@@ -74,6 +74,7 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
+	Route::get('/survey/{id}/analyze/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.analyze.doneView');
 	// survey agregation
 	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
 	Route::get("/survey/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");

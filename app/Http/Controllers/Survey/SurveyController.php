@@ -23,14 +23,8 @@ class SurveyController extends Controller
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
-            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
-            ->leftJoin('survey_process',function($join){
-                $join->on('survey_process.survey', '=','surveys.id')
-                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
-            })
-            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal')
-            ->where('surveys.id',$id)
+            ->select('created_by')
+            ->where('id',$id)
             ->get();
 
         if(!$data_survey->first()){
@@ -57,13 +51,37 @@ class SurveyController extends Controller
 
         $data['status_ownership'] = $status_ownership;
 
-        if($data_survey->first()){
-            $data['surveys'] = $data_survey;
-            $data['survey_name'] = $data_survey->first()->name;
-            return view('survey.survey',$data);
+        $query_survey = DB::table('surveys')
+            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
+            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
+            ->leftJoin('survey_process',function($join){
+                $join->on('survey_process.survey', '=','surveys.id')
+                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
+            })
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal');
+
+
+        $data['survey_name'] = (clone $query_survey)
+            ->where('surveys.id',$id)
+            ->get()->first()->name;
+
+        if($status_ownership == 'RESPONDEN'){
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 4")
+                ->get();
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) > 3")
+                ->get();
         }else{
-            abort(404);
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 7")
+                ->get();
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) = 7")
+                ->get();
         }
+        
+        return view('survey.survey',$data);
     }
 
     public function chooseAnswer($id,$inputans){

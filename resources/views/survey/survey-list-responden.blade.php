@@ -7,32 +7,18 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">
-          <!-- search form -->
-          <!-- <form action="#" method="get">
-            <div class="input-group">
-              <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>      -->  
           <div class="table-responsive">   
-            <table id="table1" class="table table-bordered table-hover no-margin" data-toggle="table" data-click-to-select="true">
+            <table id="table_edm" class="table table-bordered table-hover no-margin" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
-                  <th data-field="state" data-checkbox="true" data-formatter="stateFormatter">
-                    <input type="checkbox">
-                  </th>
                   <th>Name</th>
                   <th>Start</th>
                 </tr>
               </thead>
               <tbody>
-                @foreach($surveys as $survey)
-                  @if((explode('-',$survey->status))[0] < "4")
+                @if($surveys->first())
+                  @foreach($surveys as $survey)
                     <tr>
-                      <td><input type="checkbox"></td>
                       <td>
                         <div>
                           <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
@@ -52,39 +38,29 @@
                         @endif
                       </td>
                     </tr>
-                  @endif
-                @endforeach
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="2" class="text-center">No Pending Survey Available</td>
+                  </tr>
+                @endif
               </tbody>
             </table>
           </div>
         </div>
         <div class="tab-pane" id="tab_2">
-          <!-- search form -->
-          <!-- <form action="#" method="get">
-            <div class="input-group">
-              <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>  -->    
           <div class="table-responsive">        
-            <table id="table1" class="table table-bordered table-hover" data-toggle="table" data-click-to-select="true">
+            <table id="table_done" class="table table-bordered table-hover" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
-                  <th data-field="state" data-checkbox="true" data-formatter="stateFormatter">
-                    <input type="checkbox">
-                  </th>
                   <th>Name</th>
                   <th>Start</th>
                 </tr>
               </thead>
               <tbody>
-                @foreach($surveys as $survey)
-                  @if((explode('-',$survey->status))[0] >= "4")
+                @if($surveys_done->first())
+                  @foreach($surveys_done as $survey)
                     <tr>
-                      <td><input type="checkbox"></td>
                       <td>
                         <div>
                           <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
@@ -98,8 +74,12 @@
                           <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Done"><i class="fa fa-check fa-fw"></i></a>
                       </td>
                     </tr>
-                  @endif
-                @endforeach
+                  @endforeach
+                @else
+                  <tr>
+                    <td colspan="2" class="text-center">No Done Survey Available</td>
+                  </tr>
+                @endif
               </tbody>
             </table>
           </div>
