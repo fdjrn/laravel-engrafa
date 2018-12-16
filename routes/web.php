@@ -91,6 +91,8 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
 	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
+	Route::get('/setting/users/{id}', 'Setting\SettingController@get_user_by_id');
+	Route::post('/setting/users/edit_user','Setting\SettingController@edit_user')->name('setting.edit_user');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
