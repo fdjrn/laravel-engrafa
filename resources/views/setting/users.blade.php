@@ -125,14 +125,14 @@
             </div>
             <div class="left-content" style="padding-left: 20px; padding-right: 15px; padding-top: 8px; padding-bottom: 8px;">
                 <div class="left-content-row">
-                  <div class="left-content-cell">
+                  <div class="left-content-cell" style="width: 50%;">
                     <select class="select2">
                       @foreach($data_roles as $role)
                       <option value="{{$role->id}}" {{ $role->id === Auth::user()->role ? 'selected' : '' }}>{{$role->name}}</option>
                       @endforeach
                     </select>
                   </div>
-                  <div class="left-content-cell">
+                  <div class="left-content-cell text-right">
                     <i class="fa fa-key"></i>
                   </div>
                 </div>
@@ -143,7 +143,7 @@
                     <h4>Teams</h4>
                     @if($teams)
                       @foreach($teams as $team)
-                        <button type="button" class="btn bg-olive btn-flat margin">{{$team->name}}</button>
+                        <a href="{{url('/survey/'.$team->id)}}" class="btn bg-olive btn-flat margin">{{$team->name}}</a>
                       @endforeach
                     @endif
                   </div>
@@ -169,7 +169,7 @@
                 <li class="no-margin text-center">
                   <a href="#tab_2" data-toggle="tab">
                     <p>Guest</p>
-                    <span>0 users</span>
+                    <span>{{$total_guests}} users</span>
                   </a>
                 </li>
               </ul>
@@ -197,7 +197,26 @@
                   @endif
                 </div>
                 <div class="tab-pane" id="tab_2">
-                  <p class="no_available">No Guest Available</p>
+                  @if($users)
+                    @foreach($guests as $guest)
+                      <div class="left-content">
+                        <div class="left-content-row">
+                          <div class="left-content-cell" style="vertical-align: middle; text-align: center; width:55px; padding-left: 4px;">
+                            <h1 class="users-image"><i class="fa fa-user"></i></h1>
+                          </div>
+                          <div class="left-content-cell">
+                            <div class="users-name">{{$guest->first_name." ".$guest->last_name}}</div>
+                            <div style=""><span>{{$guest->email}}</span></div>
+                          </div>
+                          <div class="left-content-cell" style="text-align: right; padding-right: 5px;">
+                            <a href="#"><i class="fa fa-pencil"></i></a>
+                          </div>
+                        </div>
+                      </div>
+                    @endforeach
+                  @else
+                    <p class="no_available">No Guests Available</p>
+                  @endif
                 </div>
               </div>
             </div>
