@@ -82,6 +82,11 @@
     }
     .no_available{
       text-align: center; padding: 5px;
+      line-height: 30px;
+      height: 30px;
+    }
+    #tab-content{
+       padding:0; max-height: 308px; overflow-y: auto;
     }
   </style>
 @stop
@@ -177,9 +182,9 @@
                   </a>
                 </li>
               </ul>
-              <div class="tab-content" style="padding:0;">
+              <div class="tab-content" id="tab-content">
                 <div class="tab-pane active" id="tab_1">
-                  @if($users)
+                  @if($users->first())
                     @foreach($users as $user)
                       <div class="left-content">
                         <div class="left-content-row">
@@ -203,7 +208,7 @@
                   @endif
                 </div>
                 <div class="tab-pane" id="tab_2">
-                  @if($users)
+                  @if($guests->first())
                     @foreach($guests as $guest)
                       <div class="left-content">
                         <div class="left-content-row">
