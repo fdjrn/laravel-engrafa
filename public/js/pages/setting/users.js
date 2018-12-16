@@ -20,11 +20,11 @@ function cleanModal(){
 function openModals(type,userId){
 	cleanModal();
 	if(type == 'create'){
-      	$('form').attr('action','');
+      	$('#form_n_user').attr('action','');
   		$('.modal-title').html('<i class="fa fa-user-plus"></i>&nbsp;Create New User');
 		$('#m_new_user').modal('show');
 	}else if(type == 'edit'){
-      	$('form').attr('action','users/edit_user');
+      	$('#form_n_user').attr('action','users/edit_user');
 		$("#password").hide();
 		$("#password_confirmation").hide();
   		$('.modal-title').html('<i class="fa fa-edit"></i>&nbsp;Edit Existing User');
