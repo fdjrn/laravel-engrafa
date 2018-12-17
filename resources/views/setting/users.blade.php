@@ -167,7 +167,7 @@
             @endif
           </div>
           <div class="col-md-7">
-            <div class="nav-tabs-custom">
+            <div class="nav-tabs-custom nav-tabs-customized">
               <ul class="nav nav-tabs">
                 <li class="active no-margin text-center">
                   <a href="#tab_1" data-toggle="tab">

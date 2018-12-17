@@ -664,6 +664,28 @@ class SurveyController extends Controller
         }
     }
 
+    public function get_task_by_id($id,$task_id){
+        $tasks = DB::table('tasks')
+                ->select("*",DB::raw('DATE_FORMAT(tasks.due_date, "%m/%d/%Y %l:%i %p") as due_dates'))
+                ->where([
+                    ['id','=',$task_id],
+                    ['survey','=',$id]
+                ])
+                ->get()
+                ->first();
+
+        $task_participant = DB::table('task_participant')
+                ->select('team_member')
+                ->where([
+                    ['task','=',$task_id]
+                ])
+                ->get();
+        return response()->json([
+            'tasks' => json_encode($tasks),
+            'task_participant' => json_encode($task_participant)
+        ]);
+    }
+
 
     /**
      * Store a newly created resource in storage.

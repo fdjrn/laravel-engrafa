@@ -1,7 +1,4 @@
 $(document).ready(function(){
-  $("#b_create_new_task").click(function(){
-    $('#m_new_task').modal('show');
-  });
   
   $('#i_n_due_date').datetimepicker({});
   
@@ -10,6 +7,45 @@ $(document).ready(function(){
   
   $('[data-toggle="tooltip"]').tooltip();
 });
+
+function cleanModal(){
+  $('#i_n_name_task').val(null);
+  $('#i_n_due_date').val(null)
+  $('#i_n_assignee').val(null).trigger('change');
+  $('#i_n_participant').val([]).trigger('change');
+  $('#i_n_detail').val(null);
+  $('#i_n_color').val('CD5C5C').trigger('change');
+  $('#i_n_priority').val('3-Low').trigger('change');
+}
+
+function openModals(type,taskId){
+  cleanModal();
+  var survey_id = $('#i_n_survey_id').val();
+  if(type == 'create'){
+    $('#m_new_task').modal('show');
+  }else{
+    $('#m_new_task').modal('show');
+    $.ajax({
+      url:
+        base_url + '/survey/'+survey_id+'/task/'+taskId,
+        method: 'get',
+      success: function(response) {
+        let parse = JSON.parse(response.tasks);
+        let participants = JSON.parse(response.task_participant);
+        $('#i_n_name_task').val(parse.name);
+        $('#i_n_due_date').val(parse.due_dates)
+        $('#i_n_assignee').val(parse.assign).trigger('change');
+        $('#i_n_color').val(parse.color).trigger('change');
+        $('#i_n_priority').val(parse.priority).trigger('change');
+        for (val in participants){
+          var member = participants[val].team_member;
+          $("#i_n_participant option[value="+member+"]").prop("selected",true).trigger("change")
+        }
+        $('#i_n_detail').val(parse.detail);
+      }
+    });
+  }
+}
 
 Chart.pluginService.register({
   beforeDraw: function (chart) {

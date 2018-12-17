@@ -87,6 +87,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	Route::get('/survey/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 
 	//setting
