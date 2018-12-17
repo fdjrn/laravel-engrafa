@@ -75,6 +75,8 @@ class SurveyController extends Controller
         $process = $inputan[2];
         $target_level = "";
 
+        $data['status_ownership'] = Survey::get_status_ownership($id);
+
         $status = DB::table('survey_process')
                     ->select('survey_process.status')
                     ->where([
@@ -212,6 +214,8 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
 
         $d_surveys = DB::table('surveys')
                     ->select('surveys.name','surveys.created_by','survey_process.target_level')
@@ -440,6 +444,7 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+        $data['status_ownership'] = Survey::get_status_ownership($id);
         DB::table('survey_process')
             ->where([
                 ['it_related_goal','=',$it_related_goal],
@@ -526,6 +531,8 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $typesubmit = $request->post('btnsubmit');
+        
+        $data['status_ownership'] = Survey::get_status_ownership($survey_id);
         
         $status = "";
 

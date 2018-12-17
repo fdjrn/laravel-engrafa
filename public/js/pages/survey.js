@@ -16,9 +16,10 @@ $(document).ready(function(){
   });
     initialize_inv_user("#inv_responden");
     initialize_inv_user("#inv_surveyor");
-  $("#o_invite_user").click(function(){
-    $('#m_invite_user').modal('show');
-  });
+});
+
+$("#o_invite_user").click(function(){
+  $('#m_invite_user').modal('show');
 });
 
 function initialize_inv_user(id_element){

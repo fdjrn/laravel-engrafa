@@ -172,36 +172,37 @@
 @stop
 
 @section('body-modals')
-<div class="modal fade" id="m_u_file">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
-      </div>
-      <input type="hidden" id="curWP">
-      <input type="hidden" id="curTyp" value="view">
-      <div class="modal-body">
-        <div class="table-responsive">
-          <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
-            <thead>
-              <tr>
-                <td style="width:100px;">WP ID</td>
-                <td style="width:350px;">Description</td>
-                <td>File</td>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+  <div class="modal fade" id="m_u_file">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+        </div>
+        <input type="hidden" id="curWP">
+        <input type="hidden" id="curTyp" value="view">
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
+              <thead>
+                <tr>
+                  <td style="width:100px;">WP ID</td>
+                  <td style="width:350px;">Description</td>
+                  <td>File</td>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
+    <!-- /.modal-dialog -->
   </div>
-  <!-- /.modal-dialog -->
-</div>
+  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
@@ -215,6 +216,7 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/pages/survey/answer.js')}}"></script>
+{{ Html::script('js/pages/survey.js')}}
 <script src="/theme/AdminLTE/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
   $(function () {

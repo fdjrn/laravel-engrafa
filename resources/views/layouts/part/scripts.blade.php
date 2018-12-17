@@ -80,6 +80,29 @@
       }
     }).parent().addClass('active');
 
+    var menu_status = false;
+    $('ul.inside-submenu a').filter(function() {
+      if (this.href == url){
+        menu_status = true;
+        return true;
+      }else if(this.href+"#" == url && menu_status == false){
+        menu_status = true;
+        return true;
+      }
+    }).parent().addClass('active');
+
+    if(menu_status == false){
+      $('ul.inside-submenu a').filter(function() {
+        if(this.href == aurl && menu_status == false){
+            menu_status = true;
+            return true;
+        }else if(this.href == burl && menu_status == false){
+            menu_status = true;
+            return true;
+        }
+      }).parent().addClass('active');
+    }
+
     // for treeview
     $('ul.treeview-menu a').filter(function() {
       if (this.href == url){
