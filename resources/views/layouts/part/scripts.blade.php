@@ -83,24 +83,25 @@
     var menu_status = false;
     $('ul.inside-submenu a').filter(function() {
       if (this.href == url){
-        console.log("url y "+url);
         menu_status = true;
         return true;
-      }else if(this.href+"#" == url){
-        console.log("url# y "+url);
+      }else if(this.href+"#" == url && menu_status == false){
         menu_status = true;
         return true;
-      }else if(this.href == aurl){
-        console.log("aurl y "+aurl);
-        menu_status = true;
-        return true;
-      }else if(this.href == burl){
-        if(menu_status == false){
-          console.log("burl y "+burl);
-          return true;
-        }
       }
     }).parent().addClass('active');
+
+    if(menu_status == false){
+      $('ul.inside-submenu a').filter(function() {
+        if(this.href == aurl && menu_status == false){
+            menu_status = true;
+            return true;
+        }else if(this.href == burl && menu_status == false){
+            menu_status = true;
+            return true;
+        }
+      }).parent().addClass('active');
+    }
 
     // for treeview
     $('ul.treeview-menu a').filter(function() {

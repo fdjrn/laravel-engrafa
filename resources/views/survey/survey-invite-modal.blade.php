@@ -6,7 +6,7 @@
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Invite User</h4>
+            <h4 class="modal-title"><i class="fa fa-user-plus"></i>&nbsp;Invite User</h4>
         </div>
         <div class="modal-body">
           <form name="form_i_user" id="form_i_user" method="POST" action="{{route('survey.invite',['id' => $survey_id])}}">

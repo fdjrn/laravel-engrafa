@@ -8,7 +8,7 @@
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">
           <div class="table-responsive">   
-            <table id="table_edm" class="table table-bordered table-hover no-margin" data-toggle="table" data-click-to-select="true">
+            <table id="table_edm" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -50,7 +50,7 @@
         </div>
         <div class="tab-pane" id="tab_2">
           <div class="table-responsive">        
-            <table id="table_done" class="table table-bordered table-hover" data-toggle="table" data-click-to-select="true">
+            <table id="table_done" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
                   <th>Name</th>

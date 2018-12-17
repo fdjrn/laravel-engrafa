@@ -26,7 +26,7 @@
           @if($status_ownership != 'RESPONDEN')
           <li class="">
             <a id="o_invite_user">
-              <h4><i class="fa fa-user-plus"></i>&nbsp;<span>Invite</span></h4>
+              <h4><i class="fa fa-user-plus"></i>&nbsp;&nbsp;<span>Invite</span></h4>
             </a>
           </li>
           @endif
