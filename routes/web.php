@@ -37,7 +37,8 @@ Route::middleware(['auth','web'])->group(function () {
 
 	Route::get('/ajax_get_list_user', 'Dashboard\DashboardController@ajax_get_list_user');
 	Route::post('/ajax_delele_dashboard', 'Dashboard\DashboardController@ajax_delele_dashboard');
-	Route::any('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
+	Route::post('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
+	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard'); 
 
 	// index & file explorer
     Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
