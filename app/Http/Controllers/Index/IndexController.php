@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Index;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bookmark;
 use App\Models\Files;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -39,6 +39,7 @@ class IndexController extends Controller
     }
 
     /**
+     * Get list all files and folder based on folder root id
      *
      * @return mixed
      * @throws \Exception
@@ -52,6 +53,25 @@ class IndexController extends Controller
             ->addColumn('checkbox', function ($dt) {
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($dt)) . '">';
             })
+            ->addColumn('action', function ($f) {
+                return'
+                <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light">
+                    <i class="fa fa-bookmark fa-2x"></i>
+                </a>
+                <div class="btn-group">
+                    <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">View</a></li>
+                        <li><a href="#">Download</a></li>
+                        <li><a href="#">Upload New Version</a></li>
+                        <li><a href="#">See File Version</a></li>
+                    </ul>
+                </div>
+                ';
+            })
+
             ->with('mainRootFolderName', $root_folder_name)
             ->with('mainRootFolderId', $id)
             ->make(true);
@@ -73,29 +93,27 @@ class IndexController extends Controller
 
         return DataTables::of($data)
             ->addColumn('checkbox', function ($list) {
-                return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';
+                return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';})
+            ->addColumn('action', function ($f) {
+                return'
+                <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>
+                <div class="btn-group">
+                    <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">View</a></li>
+                        <li><a href="#">Download</a></li>
+                        <li><a href="#">Upload New Version</a></li>
+                        <li><a href="#">See File Version</a></li>
+                    </ul>
+                </div>
+                ';
             })
             ->with('mainRootFolderName', $root_folder_name)
             ->with('mainRootFolderId', $root['folder_root'])
             ->make(true);
     }
-
-
-    /**
-     * Get list main grid/table at first init
-     * @return mixed
-     * @throws \Exception
-     */
-    /*public function getListFolder()
-    {
-        $folders = $this->getListFolderByRootId(0);
-        $rootFolderName = $this->getFolderNameById(0);
-
-        return DataTables::of($folders)
-            ->with('rootFolderName', $rootFolderName)
-            ->with('rootFolderId', 0)
-            ->make(true);
-    }*/
 
     /**
      * Route for get list folder detail on main grid
@@ -105,7 +123,9 @@ class IndexController extends Controller
      */
     public function getListAllFolder($id)
     {
+        // get all folder by id
         $folders = $this->getListFolderByRootId($id);
+
         $rootFolderName = $this->getFolderNameById($id);
 
         return DataTables::of($folders)
@@ -139,7 +159,6 @@ class IndexController extends Controller
     {
 
     }
-
 
     /**
      * @param Request $request
@@ -185,6 +204,12 @@ class IndexController extends Controller
         return response()->json(['errors' => $validator->errors(), 'inputs' => $folder_name, 'root folder id' => $id]);
     }
 
+    /**
+     * Upload files to current folder id
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function uploadFiles(Request $request)
     {
         $folderId = $request->get('folderId');
@@ -230,6 +255,79 @@ class IndexController extends Controller
 
         return response()->json([
             'success' => true
+        ]);
+    }
+
+    /**
+     * Bookmark file/folder on main grid
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bookmarkFile($id) {
+        $bookmark = Bookmark::with('files')
+            ->where('file', $id)
+            ->where('created_by', auth()->id())
+            ->first();
+
+        if ($bookmark !== null && $bookmark->count() > 0) {
+            return response()->json([
+                "success" => false,
+                "message" => "Already Bookmarked",
+                "data" => $bookmark->files
+            ],500);
+        } else {
+            $new_bookmark = Bookmark::create([
+                'file' => $id,
+                'user' => auth()->id(),
+                'created_by' => auth()->id()
+            ]);
+
+            if ($new_bookmark)
+                $files = Files::find($new_bookmark->file);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Success Bookmarked!",
+                "data" => $files
+            ]);
+        }
+    }
+
+    /**
+     * Get Files by ID;
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function getFilesById($id)
+    {
+        $files = Files::findOrFail($id);
+        return $files;
+    }
+
+    /**
+     * Update record in table Files
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateFilesById(Request $request, $id) {
+        $type = $request->get('fieldName');
+        $files = Files::findOrFail($id);
+
+        if($type === 'comment')
+            $files->comment = $request->get('filecomment');
+        else
+            $files->description = $request->get('filecomment');
+
+        $files->save();
+
+        return response()->json([
+            "data" => $files,
+            "tipe" => $type,
+            "message" => ($type === 'comment' ? 'Comment' : 'Description') . ' Added/Updated Successfully'
         ]);
     }
 

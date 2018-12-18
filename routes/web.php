@@ -57,6 +57,10 @@ Route::middleware(['auth','web'])->group(function () {
     Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
     Route::post('/index/upload-files','Index\IndexController@uploadFiles');
 
+    Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
+    Route::get('/index/get-file/{id}','Index\IndexController@getFilesById');
+    Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
+
     /*Route::get('/index/list-all','Index\IndexController@getListAll');*/
     /*Route::get('/index/list-folder','Index\IndexController@getListFolder');*/
 	/*Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');*/

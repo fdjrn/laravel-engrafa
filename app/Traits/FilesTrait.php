@@ -9,6 +9,7 @@
 namespace App\Traits;
 
 use App\Models\Files;
+use Illuminate\Support\Facades\DB;
 
 trait FilesTrait
 {
@@ -46,19 +47,56 @@ trait FilesTrait
 
     public function getListFolderByRootId($id)
     {
-        return Files::where('files.folder_root', $id)
+        $folder =  Files::where('files.folder_root', $id)
             ->where('files.is_file', '=', 0)
             ->select('files.id', 'files.name', 'files.folder_root')
             ->orderBy('name', 'ASC')
             ->get();
+
+        // count child folder
+        $folderCount = Files::select(DB::raw("folder_root, count(folder_root) AS folder_count"))
+            ->where('is_file','=',0)
+            ->where('folder_root','>',0)
+            ->groupBy('folder_root')
+            ->get();
+
+        // add child folder count to each folders
+        $folder = $folder->map(function ($folder) use ($folderCount, $id){
+            $fcount = $folderCount->where('folder_root',$folder->id)->first();
+
+            $folder->child_count = $fcount ? $fcount->folder_count : 0;
+
+            return $folder;
+        });
+
+        return $folder;
+
     }
 
     public function getListFolderById($id)
     {
-        return Files::where('files.is_file', '=', 0)
+        $folder =  Files::where('files.is_file', '=', 0)
             ->whereRaw('folder_root = (SELECT folder_root FROM files WHERE id = ' . $id . ')')
             ->orderBy('name', 'ASC')
             ->get();
+
+        // count child folder
+        $folderCount = Files::select(DB::raw("folder_root, count(folder_root) AS folder_count"))
+            ->where('is_file','=',0)
+            ->where('folder_root','>',0)
+            ->groupBy('folder_root')
+            ->get();
+
+        // add child folder count to each folders
+        $folder = $folder->map(function ($folder) use ($folderCount, $id){
+            $fcount = $folderCount->where('folder_root',$folder->id)->first();
+
+            $folder->child_count = $fcount ? $fcount->folder_count : 0;
+
+            return $folder;
+        });
+
+        return $folder;
     }
 
     /**

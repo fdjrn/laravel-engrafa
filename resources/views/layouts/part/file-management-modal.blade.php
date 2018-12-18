@@ -72,3 +72,38 @@
         </div>
     </div>
 </div>
+
+<!-- File Comment Modal -->
+<div class="modal eng-modal fade" id="comment-modals" tabindex="-1" role="dialog" aria-labelledby="createFolderModalLabel">
+    <div class="modal-dialog eng-modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&nbsp;</span>
+                </button>
+                <h4 id="modal-caption" class="modal-title"></h4>
+            </div>
+            {{ Form::open(['id'=>'comments-form','method' => 'POST']) }}
+            @csrf
+            <div class="modal-body">
+                <input type="hidden" id="fileCommentId" name="fileCommentId">
+                <input type="hidden" id="fieldName" name="fieldName">
+                {!! Form::label('file-name-modal','',['class'=>'control-label', 'id'=>'file-name-modal']) !!}
+                <hr/>
+                <div class="form-group has-feedback">
+                    {!! Form::label('label-file-comments','Comments: ',['class'=>'control-label', 'for'=>'filecomment', 'id'=>'label-file-comments']) !!}
+                    <textarea id="filecomment" name="filecomment" class="file-comment" style="width: -moz-available; font-weight: normal;" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {!! Form::button('Close', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
+                {!! Form::button('Save', ['class' => 'btn btn-info','id'=>'btn-save-comment']) !!}
+            </div>
+            {{ Form::close() }}
+        </div>
+    </div>
+</div>
+
+
+{{--
+--}}
