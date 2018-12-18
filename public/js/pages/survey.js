@@ -24,26 +24,28 @@ $("#o_invite_user").click(function(){
 
 function initialize_inv_user(id_element){
   var s_id = $("#s_id").val();
-  $.ajax({
-      type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user/'+s_id,
-      // data: {
-      //     'anakunit': idUnit
-      // },
-      success: function (data) {
-          // the next thing you want to do 
-          var $v_select = $(id_element);
-          var item = JSON.parse(data);
-          $v_select.empty();
-          $v_select.append("<option value=''></option>");
-          $.each(item, function(index,valuee) {        
-              $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
-          });
+  if(s_id){
+    $.ajax({
+        type: 'GET',
+        url: base_url+'/survey/ajax_get_list_user/'+s_id,
+        // data: {
+        //     'anakunit': idUnit
+        // },
+        success: function (data) {
+            // the next thing you want to do 
+            var $v_select = $(id_element);
+            var item = JSON.parse(data);
+            $v_select.empty();
+            $v_select.append("<option value=''></option>");
+            $.each(item, function(index,valuee) {        
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+            });
 
-          //manually trigger a change event for the contry so that the change handler will get triggered
-          $v_select.change();
-      }
-  });
+            //manually trigger a change event for the contry so that the change handler will get triggered
+            $v_select.change();
+        }
+    });
+  }
 }
 
 $("#form_i_user").submit(function(e) {

@@ -11,9 +11,11 @@ $(document).ready(function(){
     initialize_select_user("#i_n_client");
   });
 
-    $('.select2').select2({
-        width: '100%',
-        placeholder: "Pilih Dari List",
+    $('.select2').each(function () {
+        $(this).select2({
+          placeholder: "Pilih Dari List",
+          dropdownParent: $(this).parent()
+        });
     });
     $('#i_n_expire').datetimepicker({});
 

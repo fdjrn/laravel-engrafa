@@ -116,7 +116,7 @@
                       </td>
                       <td style="vertical-align: middle; width:70%;">
                         <div class="row">
-                          <div class="col-lg-12"><a href="#"><h4>{{$task->name}}</h4></a></div>
+                          <div class="col-lg-12"><a href="#" onClick="openModals('view','{{$task->id}}')"><h4>{{$task->name}}</h4></a></div>
                           <div class="col-lg-12"><p><i class="fa fa-calendar-check-o"></i>&nbsp;&nbsp;{{$task->due_dates}}</p></div>
                           <div class="col-lg-12"><p><i class="fa fa-user"></i>&nbsp;&nbsp;{{$task->username}}</p></div>
                         </div>
@@ -149,15 +149,16 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Create New Task</h4>
+        <h4 class="modal-title" id="m_title_task">Create New Task</h4>
       </div>
       <div class="modal-body">
-        <form name="form_n_task" action="{{route('survey.task.store')}}" method="post" id="form_n_task">
+        <form name="form_n_task" action="" method="post" id="form_n_task">
           {{ csrf_field() }}
           <div class="row">
             <div class="col-lg-12">
               <div class="form-group">
                   <div class='input-group'>
+                    <input type="hidden" id="i_type_modal" name="i_type_modal" value="create">
                     <input type="hidden" id="i_n_survey_id" name="i_n_survey_id" value="{{$survey_id}}">
                     <input type="text" id="i_n_name_task" name="i_n_name_task" class="form-control" placeholder="New Task Name">
                       <span class="input-group-addon">
@@ -207,11 +208,20 @@
                 <label for="i_n_detail">Detail</label>
                 <textarea id="i_n_detail" name="i_n_detail" style="width:100%; resize: vertical;"></textarea>
               </div>
+              <div class="form-group" id="i_n_progress_gr">
+                <label for="i_n_progress">Progress</label>
+                  <select id="i_n_progress" name="i_n_progress" class="form-control select2" data-placeholder="Progress" style="width: 100%;">
+                    <option value=""></option>
+                    @for($i=0;$i <= 100;$i+=5)
+                      <option value="{{$i}}">{{$i}}%</option>
+                    @endfor
+                  </select>
+              </div>
             </div>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="m_footer_task">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
         <button type="submit" form="form_n_task" class="btn btn-primary"><i class="fa fa-check"></i></button>
       </div>
@@ -220,6 +230,7 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
+  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
