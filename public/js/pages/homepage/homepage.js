@@ -7,7 +7,14 @@ $(document).ready(function () {
     var dtList = $("#recentListTable").DataTable({
         processing: true,
         serverSide: true,
-        ajax: "/homepage/list-all",
+        ajax: {
+            url: "/homepage/list-all",
+            error: function (xhr, status, err) {
+                if (err === 'Unauthorized') {
+                    window.location.href = '/login';
+                }
+            }
+        },
         order: [[2,"desc"]],
         columns: [
             {
@@ -88,7 +95,6 @@ $(document).ready(function () {
                     dtList.ajax.url('/homepage/list-all').load();
                     $('.latest-folder-name').html(data.result.name);
                     latestFolderId = data.result.id;
-                    //$('.latest-folder-url').attr("href", window.location.origin + "/index?id="+ data.result.id);
                 }
             }
         });

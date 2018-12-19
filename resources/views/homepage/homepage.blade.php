@@ -137,12 +137,15 @@
                     <div class="small-box bg-purple">
                         <div class="inner">
                             <h3>Survey</h3>
-                            <p>[No Data]</p>
+                            {{--<p>[No Data]</p>--}}
+                            <p class="latest-survey-name">
+                                {!! isset($latestSurvey) ? $latestSurvey['name'] : '[No Data]' !!}
+                            </p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-copy"></i>
                         </div>
-                        <a href="#" class="small-box-footer">
+                        <a href="{{ url('/') }}" class="small-box-footer">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -160,7 +163,7 @@
                         <div class="icon">
                             <i class="fa fa-folder-o"></i>
                         </div>
-                        {{--@if(isset($latestFolder))
+                        @if(isset($latestFolder))
                             <form action="{{ route('index') }}" method="POST" id="frm-last-folder" class="small-box-footer">
                                 @csrf
                                 <input type="hidden" name="folder_id" value="{{ $latestFolder['id'] }}">
@@ -169,12 +172,12 @@
                                     More Details <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </form>
-                        @else--}}
+                        @else
                         <a href="{{ url('/index') }}"
                            class="small-box-footer latest-folder-url">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
-                        {{--@endif--}}
+                        @endif
 
                     </div>
                 </div>

@@ -11,7 +11,6 @@
     {{ Html::style('css/material.min.css')}}
     {{ Html::style('css/dataTables.material.min.css') }}
     {{ Html::style('css/dropzone.min.css') }}
-    {{--{{ Html::style('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.css') }}--}}
 @stop
 
 @section('theme-global-styles')
@@ -90,44 +89,13 @@
 
 
 @section('body-inner-content')
+    <input name="f_id" type="hidden" value="{!! $folderID !!}">
     <div class="row">
 
         {{-- Left Side --}}
         <div class="col-md-3">
             <div class="box box-primary">
                 <div class="box-body">
-                    {{--<ul class="list-group" data-widget="tree" style="list-style: none;">
-                        <li class="">
-                            <a href="#">
-                                <i class="fa fa-folder-open"></i> <span> Some Text</span>
-                                <span class="pull-right">
-                                    <small class="label bg-yellow">2</small>
-                                </span>
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="#">
-                                <i class="fa fa-folder-open"></i> <span> Some Text</span>
-                                <span class="pull-right"><small class="label bg-yellow">2</small></span>
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="#">
-                                <i class="fa fa-folder-open"></i> <span> Some Text</span>
-                                <span class="pull-right">
-                                    <small class="label bg-yellow">2</small>
-                                </span>
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="#">
-                                <i class="fa fa-folder-open"></i> <span> Some Text</span>
-                                <span class="pull-right">
-                                    <small class="label bg-yellow">2</small>
-                                </span>
-                            </a>
-                        </li>
-                    </ul>--}}
                     <div class="table-responsive">
                         <table id="dt-list-folder-table-index" class="table table-responsive" width="100%">
                             <thead>
@@ -197,6 +165,7 @@
                                     <th width="120px">Date Modified</th>
                                     <th width="150px">Creator</th>
                                     <th width="250px">Comment</th>
+                                    <th width="150px">Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -211,7 +180,8 @@
         <div class="col-md-3" id="file-properties">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h4><i class="fa fa-usb fa-fw"></i>Some File
+                    <input type="hidden" id="file-descr-id">
+                    <h4 class="file-descr-name" style="overflow-wrap: break-word"><i class="fa fa-usb fa-fw"></i>Some File
                         <span class="pull-right">
                             <i class="fa fa-angle-double-right"></i>
                         </span>
@@ -229,110 +199,21 @@
 
                         <div id="collapseOne" class="collapse in">
                             <div class="box-body">
-                                <p id="file-description">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad
-                                squid. 3
-                                wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa
-                                nesciunt laborum
-                                </p>
+                                <p id="file-descr-text"></p>
                             </div>
                             <div class="box-footer">
                                 <span class="pull-left">
-                                    <a href="" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
-                                    {{--<a href="#" data-toggle="modal" data-target="#modal2" title="edit"><i class="fa fa-edit fa-fw"></i></a>--}}
-                                    <a href="#" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
-                                    <a href="" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
-                                    <a href="" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    <a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
+                                    <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
+                                    <a href="#" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
                                 </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="box box-primary">
-                        <div class="box-header with-border" data-toggle="collapse" data-target="#collapseTwo">
-                            <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#file-group" data-target="#collapseTwo">Contributor</a>
-                            </h4>
-                        </div>
-                        <div id="collapseTwo" class="collapse in">
-                            <div class="box-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <i class="fa fa-user fa-fw"></i> Creator
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fa fa-user fa-fw"></i> Editor
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fa fa-user fa-fw"></i> Validator
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="box-footer">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="box box-primary">
-                        <div class="box-header with-border" data-toggle="collapse" data-target="#collapseThree">
-                            <h4 class="box-title">
-                                <a data-toggle="collapse" data-parent="#file-group" data-target="#collapseThree">
-                                    Modified By
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseThree" class="collapse in">
-                            <div class="box-body">
-                                <table id="table1" class="table table-bordered table-hover" data-toggle="table"
-                                       data-click-to-select="true">
-                                    <thead>
-                                    <tr>
-                                        <th>File</th>
-                                        <th>Modified By</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <i class="fa fa-usb fa-fw"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                            <td>
-                                                <i class="fa fa-fw fa-user"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="fa fa-usb fa-fw"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                            <td>
-                                                <i class="fa fa-fw fa-user"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="fa fa-usb fa-fw"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                            <td>
-                                                <i class="fa fa-fw fa-user"></i>
-                                                <span>Some Text</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="box-footer">
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- /.box-body -->
-                <div class="box-footer">
-                </div>
+
             </div>
         </div>
 
@@ -340,31 +221,8 @@
 @stop
 
 @section('body-modals')
-
     @include('layouts.part.file-management-modal')
 
-    <!-- Create/Update Description -->
-    <!-- Modal -->
-    <div id="modal2" class="modal eng-modal fade " role="dialog">
-        <div class="modal-dialog eng-modal-dialog-centered">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><span><i class="fa fa-file "></i> File Description</span></h4>
-                </div>
-                <div class="modal-body">
-                    <textarea style="width: -moz-available; font-weight: normal;" rows="4"></textarea>
-                </div>
-                <div class="modal-footer">
-                    {!! Form::button('Cancel', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
-                    {!! Form::button('Save', ['class' => 'btn btn-info','id'=>'btn-file-descr']) !!}
-                </div>
-            </div>
-
-        </div>
-    </div>
 @stop
 
 @section('core-plugins')

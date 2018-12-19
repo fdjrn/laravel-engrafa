@@ -39,18 +39,6 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-
-    /**
-     * Redirect user when authenticated
-     *
-     * override function from trait RedirectsUsers->redirectPath()
-     * @return string
-     */
-    /*public function redirectPath()
-    {
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/homepage';
-    }*/
-
     /**
      * Logout Handler
      *
@@ -63,7 +51,7 @@ class LoginController extends Controller
 
         $request->session()->invalidate();
 
-        return $this->loggedOut($request) ?: redirect($this->redirectTo);
+        return $this->loggedOut($request) ?: redirect(url($this->redirectTo));
     }
 
     // public function index(Request $request){

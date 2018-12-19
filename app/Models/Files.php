@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Files extends Model
@@ -21,9 +22,13 @@ class Files extends Model
         'created_by'
     ];
 
-    public function owners()
+    public function owner()
     {
-        return $this->belongsToMany('App\User','files','id','created_by','id');
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+
+    public function files(){
+        return $this->hasMany(Bookmark::class, 'created_by', 'id');
     }
 
 }
