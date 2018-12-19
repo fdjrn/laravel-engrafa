@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Homepage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
 use App\Models\Files;
+use App\Models\Survey;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,10 +24,10 @@ class HomepageController extends Controller
 
     public function __construct()
     {
-        //
+        $this->middleware('auth');
     }
 
-    public function index(Request $request)
+    public function index()
     {
         $latestFile = DB::table('files')
             ->selectRaw("
@@ -40,13 +41,17 @@ class HomepageController extends Controller
 
         $latestFolder = Files::where('is_file', 0)->orderBy('updated_at', 'DESC')->first();
 
+        $lastSurveys = Survey::orderBy('updated_at', 'DESC')->first();
+
         return view('homepage.homepage')
             /*->with('latestFile-ext', $latestFile)*/
             ->with('latestFile', $latestFile)
+            ->with('latestSurvey', $lastSurveys)
             ->with('latestFolder', $latestFolder);
+
     }
 
-    public function listAll(Request $request)
+    public function listAll()
     {
         $lists = DB::table('files')
             ->join('users', 'users.id', '=', 'files.created_by')

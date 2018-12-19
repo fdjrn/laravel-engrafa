@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\Files;
+use Illuminate\Mail\Message;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\CanResetPassword;
@@ -30,4 +32,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function files(){
+        return $this->hasMany(Files::class, 'created_by', 'id');
+    }
+
+    public function bookmarks(){
+        return $this->hasMany(Bookmark::class, 'created_by', 'id');
+    }
 }
