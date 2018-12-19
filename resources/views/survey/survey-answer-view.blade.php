@@ -72,9 +72,13 @@
           @foreach($levels as $index => $level)
             <div class="box box-primary">
               <div class="box-header">
-                <a data-toggle="collapse" href="#question">
+                <a href="#" data-widget="collapse">
                   <h4 style="margin:2px 0px;">Level {{$index}}</h4>
                 </a>
+                <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  </button>
+                </div>
               </div>
 
               <div id="question" class="box-body collapse in form-horizontal">

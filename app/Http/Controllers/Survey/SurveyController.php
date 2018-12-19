@@ -15,6 +15,7 @@ use App\Models\Files;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
 use App\Models\Survey;
+use App\Models\Task;
 
 
 class SurveyController extends Controller
@@ -664,6 +665,28 @@ class SurveyController extends Controller
         }
     }
 
+    public function get_task_by_id($id,$task_id){
+        $tasks = DB::table('tasks')
+                ->select("*",DB::raw('DATE_FORMAT(tasks.due_date, "%m/%d/%Y %l:%i %p") as due_dates'))
+                ->where([
+                    ['id','=',$task_id],
+                    ['survey','=',$id]
+                ])
+                ->get()
+                ->first();
+
+        $task_participant = DB::table('task_participant')
+                ->select('team_member')
+                ->where([
+                    ['task','=',$task_id]
+                ])
+                ->get();
+        return response()->json([
+            'tasks' => json_encode($tasks),
+            'task_participant' => json_encode($task_participant)
+        ]);
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -857,6 +880,62 @@ class SurveyController extends Controller
         return json_encode([
             'status' => 1,
             'messages' => '/survey/'.$request->post('i_n_survey_id').'/task/'
+        ]);
+    }
+
+    public function task_update($id,$task_id,Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_task' => 'required|max:255|unique:tasks,name,'.$task_id,
+            'i_n_priority' => 'required',
+            'i_n_due_date' => 'required',
+            'i_n_assignee' => 'required',
+            'i_n_participant' => 'required',
+            'i_n_detail' => 'required'
+            ],
+            [
+                'i_n_name_task.required' => '&#8226;The <span class="text-danger">New Task Name</span> field is required',
+                'i_n_name_task.unique' => '&#8226;The <span class="text-danger">Task Name</span> already exists',
+                'i_n_priority.required' => '&#8226;The <span class="text-danger">Task Priority</span> field is required',
+                'i_n_due_date.required' => '&#8226;The <span class="text-danger">Task Due Date</span> field is required',
+                'i_n_assignee.required' => '&#8226;The <span class="text-danger">Task Assignee</span> field is required',
+                'i_n_participant.required' => '&#8226;The <span class="text-danger">Task Participants</span> field is required',
+                'i_n_detail.required' => '&#8226;The <span class="text-danger">Task Detail</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $task = Task::find($task_id);
+
+        $task->survey       = $request->post('i_n_survey_id');
+        $task->name         = $request->post('i_n_name_task');
+        $task->assign       = $request->post('i_n_assignee');
+        $task->due_date     = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_due_date'))->format('Y-m-d H:i');
+        $task->detail       = $request->post('i_n_detail');
+        $task->color        = $request->post('i_n_color');
+        $task->progress     = $request->post('i_n_progress');
+        $task->priority     = $request->post('i_n_priority');
+        $task->created_by   = Auth::user()->id;
+        $post               = $task->save();
+        if($post){
+            $deletedRows = \App\Models\TaskParticipants::where('task', $task_id)->delete();
+            foreach ($request->get('i_n_participant') as $participant) {
+                $taskparticipants = new \App\Models\TaskParticipants;
+                $taskparticipants->task = $task_id;
+                $taskparticipants->team_member = $participant;
+                $taskparticipants->save();
+            }
+        }
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/survey/'.$id.'/task/'
         ]);
     }
 

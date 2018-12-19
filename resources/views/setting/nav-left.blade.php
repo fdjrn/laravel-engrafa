@@ -26,18 +26,20 @@
             </a>
           </li>
           <li class="footer">
-            <a href="#">
-              <i class="fa fa-plus-circle fa-fw"></i>
-            </a>
-            <a href="#">
-              <i class="fa fa-folder fa-fw"></i>
-            </a>
-            <a href="#">
-              <i class="fa fa-sticky-note-o fa-fw"></i>
-            </a>
-            <a href="#">
-              <i class="fa fa-upload fa-fw"></i>
-            </a>
+            <div class="footer-tools">
+              <a href="#">
+                <i class="fa fa-plus-circle fa-fw"></i>
+              </a>
+              <a href="#">
+                <i class="fa fa-folder fa-fw"></i>
+              </a>
+              <a href="#">
+                <i class="fa fa-sticky-note-o fa-fw"></i>
+              </a>
+              <a href="#">
+                <i class="fa fa-upload fa-fw"></i>
+              </a>
+            </div>
           </li>
         </ul>
       </div>

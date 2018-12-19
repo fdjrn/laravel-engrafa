@@ -167,7 +167,7 @@
             @endif
           </div>
           <div class="col-md-7">
-            <div class="nav-tabs-custom">
+            <div class="nav-tabs-custom nav-tabs-customized">
               <ul class="nav nav-tabs">
                 <li class="active no-margin text-center">
                   <a href="#tab_1" data-toggle="tab">
@@ -248,7 +248,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Create New User</h4>
+          <h4 class="modal-title" id="m_title_user">Create New User</h4>
       </div>
       <div class="modal-body">
         <form name="form_n_user" id="form_n_user" method="POST" action="">
