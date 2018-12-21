@@ -72,16 +72,20 @@
               @foreach ($dashboards as $item)
                 <li class="dropdown btn-group @if ($item == reset($dashboards)) active @endif">
                   <a class="btn btn-dashboard" href="#tab_{{ $item->id }}" data-toggle="tab" id="{{ $item->id }}">{{ $item->name }}</a>
+                  @if ($item->created_by || $item->user)
                   <a data-toggle="dropdown" class="btn dropdown-toggle">
                     <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart" data-iddashboard="{{ $item->id }}">Add To Dashboard</a></li>
-                    <li><a id="delete-dashboard-{{ $item->id }}">Delete Dashboard</a></li>
+                      <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart" data-iddashboard="{{ $item->id }}">Add To Dashboard</a></li>
+                      <li><a id="delete-dashboard-{{ $item->id }}">Delete Dashboard</a></li>
                   </ul>
+                  @endif
                 </li>
               @endforeach
-                <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
+                @if ($user_role == "1-Super Admin")
+                  <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
+                @endif
               </ul>
             <div class="tab-content">
 
@@ -106,7 +110,7 @@
                               <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
                                     title="PDF">
                               <i class="fa fa-file-pdf-o"></i></button>
-                              <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                              <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share" data-iddashboard="{{ $item->id }}"
                                     title="Share">
                               <i class="fa fa-share"></i></button>
                               <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
@@ -234,6 +238,7 @@
               Share To
             </label>
             <div class="col-sm-9">
+                <input type="hidden" class="form-control" id="id_dashboard" name="id_dashboard">
                 <select id="share_to" name="share_to[]" class="form-control select2" multiple data-placeholder="Tambah Users"
                         style="width: 100%;">
                 </select>
@@ -431,15 +436,15 @@
                   });
                   if (element.chart_type=="1-Batang") {
                     if (survey.length>1) {
-                      var div_class = '<div class="col-md-8 align-self-center">';
-                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
+                      var div_class = '<div class="col-md-12 align-self-center">';
+                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="50" height="50"></canvas>';
                     } else if (survey.length==1) {
                       var div_class = '<div class="col-md-4 align-self-center">';
                       var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
                     }
                   } else if (element.chart_type=="2-Spider") {
                     if (survey.length>1) {
-                      var div_class = '<div class="col-md-8 align-self-center">';
+                      var div_class = '<div class="col-md-12 align-self-center">';
                       var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
                     } else if (survey.length==1) {
                       var div_class = '<div class="col-md-4 align-self-center">';
@@ -956,7 +961,7 @@
 
   {{-- Alert Delete Dashboard --}}
   @foreach ($dashboards as $item)
-    <script>
+    <script>   
       var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
       $(document).ready(function(){
         $("#delete-dashboard-{{ $item->id }}").click(function(){
@@ -973,17 +978,17 @@
               $.ajax({
                 type: "POST",
                 url: base_url+'/ajax_delele_dashboard',
-                data: { _token: CSRF_TOKEN, 'dashboard_id': {{ $item->id }} },
+                data: { _token: CSRF_TOKEN, 'dashboard_id': {{ $item->id }}, 'created_by': {{ $item->created_by }} },
                 dataType: "JSON",
                 success: function (response) {
                   if(response==1){
                       Swal(
                       'Deleted!',
-                      'Dashboard has been deleted Successfully!',
+                      '{{ $item->name }} has been deleted Successfully!',
                       'success'
                     )
                     window.location.href = base_url;
-                  } else {
+                  } else if (response==0){
                       Swal(
                         'Failed!',
                         'Dashboard failed to delete!',
@@ -1000,23 +1005,21 @@
     </script>
   @endforeach
 
-  @foreach ($dashboards as $item)
-  {{-- Fullscreen Dashboard --}}
-  <!-- <script>
-    $('#fullscreen').click(function() {
-        $('.box').css({
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 701
-        });
-    });
-  </script> -->
-
+  {{-- @foreach ($dashboards as $item) --}}
   <script>
-    var userid = [];
+
+    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpat di modal
+    $('#modal-share').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
+      
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('#id_dashboard').val(idDashboard)
+    })
+    
+    // ajax proses insert user id ke dashboard_user
     $(document).ready(function () {
       $('#ajaxSubmit').click(function (e) { 
         e.preventDefault();
@@ -1025,7 +1028,7 @@
           type: "POST",
           url: base_url+'/ajax_share_to',
           data: { '_token' : CSRF_TOKEN,
-                  'dashboard_id' : {{ $item->id }},
+                  'dashboard_id' : $('#id_dashboard').val(),
                   'iduser' : $('#share_to').val() },
           dataType: "JSON",
           success: function (response) {
@@ -1049,7 +1052,7 @@
       });
     });
   </script>
-  @endforeach
+  {{-- @endforeach --}}
 
   {{-- Show hide comparison --}}
   <script>
@@ -1088,7 +1091,7 @@
                   var item = JSON.parse(data);
                   $v_select.empty();
                   $v_select.append("<option value=''></option>");
-                  $.each(item, function(index,valuee) {        
+                  $.each(item, function(index,valuee) {    
                       $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
                   });
     
