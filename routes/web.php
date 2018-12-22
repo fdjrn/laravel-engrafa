@@ -91,7 +91,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/survey/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
 
-	Route::get('/survey/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
+	Route::get('/survey/{id}/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/survey/{id}/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::post('/survey/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');

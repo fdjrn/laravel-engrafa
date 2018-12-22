@@ -198,7 +198,7 @@
                     <option value=""></option>
                   </select>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="div_i_n_participant">
                 <label for="i_n_participant">Participants</label>
                 <select id="i_n_participant" name="i_n_participant[]" class="form-control select2" multiple="multiple" data-placeholder="Add Participants" style="width: 100%;">
                   <option value=""></option>
