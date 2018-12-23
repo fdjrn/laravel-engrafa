@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Index;
 
-use Illuminate\Http\Request;
+use App\Models\Files;
 use App\Http\Controllers\Controller;
 
 class IndexDetailController extends Controller
 {
-    //
-    public function index(Request $request){
-    	return view('index.index-detail');
+    public function index($id){
+        $files = Files::findOrFail($id);
+        return view('index.index-detail')->with('file_detail', $files);
     }
+
 }

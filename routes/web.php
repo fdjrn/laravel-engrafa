@@ -48,22 +48,32 @@ Route::middleware(['auth','web'])->group(function () {
 
     Route::get('/index','Index\IndexController@index')->name('index');
     Route::post('/index','Index\IndexController@index')->name('index.last.folder');
-	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/list-all/{id}','Index\IndexController@getListAll');
     Route::get('/index/list-all-previous/{id}','Index\IndexController@getListAllPrevious');
     Route::get('/index/list-folder/{id}','Index\IndexController@getListAllFolder');
     Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
-
     Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
     Route::post('/index/upload-files','Index\IndexController@uploadFiles');
-
     Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
-    Route::get('/index/get-file/{id}','Index\IndexController@getFilesById');
     Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
+    Route::delete('/index/delete-file/{id}','Index\IndexController@deleteFilesById');
 
-    /*Route::get('/index/list-all','Index\IndexController@getListAll');*/
-    /*Route::get('/index/list-folder','Index\IndexController@getListFolder');*/
-	/*Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');*/
+    Route::get('/index/get-file/{id}',function ($id){
+        $files = \App\Models\Files::findOrFail($id);
+        return $files;
+    });
+
+    Route::get('/index/download-file/{id}',function ($id){
+        $files = \App\Models\Files::find($id);
+
+        if ($files->is_file === 1){
+            return \Illuminate\Support\Facades\Storage::download($files->url, $files->name,
+                ['Content-Type' => $files->mime_type]);
+        }
+    });
+
+    Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
+
 
 	// chat
 	Route::get('/chat','Chat\ChatController@index');
@@ -106,6 +116,5 @@ Route::middleware(['auth','web'])->group(function () {
 
 //DocumentViewer Library
 Route::any('ViewerJS/{all?}', function(){
-
     return View::make('ViewerJS.index');
 });

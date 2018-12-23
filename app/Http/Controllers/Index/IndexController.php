@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Files;
 use App\Traits\FilesTrait;
+use http\Env\Response;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -34,7 +36,8 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
-        $folderIdReq = !is_null($request->get('folder_id')) ? $request->get('folder_id') : "0";
+        // $folderIdReq = !is_null($request->get('folder_id')) ? $request->get('folder_id') : "0";
+        $folderIdReq = $request->get('folder_id') ?? 0;
         return view('index.index')->with('folderID', $folderIdReq);
     }
 
@@ -54,22 +57,30 @@ class IndexController extends Controller
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($dt)) . '">';
             })
             ->addColumn('action', function ($f) {
-                return'
-                <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light">
-                    <i class="fa fa-bookmark fa-2x"></i>
-                </a>
-                <div class="btn-group">
-                    <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">View</a></li>
-                        <li><a href="#">Download</a></li>
-                        <li><a href="#">Upload New Version</a></li>
-                        <li><a href="#">See File Version</a></li>
-                    </ul>
-                </div>
-                ';
+
+                $newCol =
+                    '
+                    <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>
+                    <div class="btn-group">
+                        <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">View</a></li>';
+
+                $dlUrl = ($f->is_file === 1 ) ?
+                    '<li><a href="/index/download-file/'.$f->id.'">Download</a></li>' :
+                    '<li><a href="#">Download</a></li>';
+
+                $newCol =  $newCol . $dlUrl .'
+                                <li><a href="#">Upload New Version</a></li>
+                                <li><a href="#">See File Version</a></li>
+                            </ul>
+                        </div>
+                        ';
+
+                return $newCol;
+
             })
 
             ->with('mainRootFolderName', $root_folder_name)
@@ -95,20 +106,29 @@ class IndexController extends Controller
             ->addColumn('checkbox', function ($list) {
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';})
             ->addColumn('action', function ($f) {
-                return'
-                <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>
-                <div class="btn-group">
-                    <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">View</a></li>
-                        <li><a href="#">Download</a></li>
-                        <li><a href="#">Upload New Version</a></li>
-                        <li><a href="#">See File Version</a></li>
-                    </ul>
-                </div>
-                ';
+
+                $newCol =
+                    '
+                    <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>
+                    <div class="btn-group">
+                        <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">View</a></li>';
+
+                $dlUrl = ($f->is_file === 1 ) ?
+                    '<li><a href="/index/download-file/'.$f->id.'">Download</a></li>' :
+                    '<li><a href="#">Download</a></li>';
+
+                $newCol =  $newCol . $dlUrl .'
+                                <li><a href="#">Upload New Version</a></li>
+                                <li><a href="#">See File Version</a></li>
+                            </ul>
+                        </div>
+                        ';
+
+                return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
             ->with('mainRootFolderId', $root['folder_root'])
@@ -177,11 +197,12 @@ class IndexController extends Controller
 
             $root = Files::find($id);
             if ($root['id'] == 0) {
-                $folder_path = '/storage/index/' . $folder_name;
+                //$folder_path = '/storage/index/' . $folder_name;
+                $folder_path = $folder_name;
                 Storage::makeDirectory($folder_name);
             } else {
                 $folder_path = $root['url'] . '/' . $folder_name;
-                Storage::makeDirectory(substr($folder_path, 15));
+                Storage::makeDirectory($folder_path);
             }
 
             // Storage::makeDirectory($url);
@@ -212,38 +233,45 @@ class IndexController extends Controller
      */
     public function uploadFiles(Request $request)
     {
-        $folderId = $request->get('folderId');
-        $files = $request->file('file');
-        $file_flag = 1;
+        $folderRoot = $request->get('folderId');
 
-        $current_folder = Files::find($folderId);
+        $folderRoot = ($folderRoot === '' ? 0 : $folderRoot);
+
+        // dd($folderRoot);
+
+        $files = $request->file('file');
+        // $file_flag = 1;
+
+
+        $current_folder = Files::find($folderRoot);
 
         foreach ($files as $file) {
-            $file_name = $file->getClientOriginalName();
-            $file_size = $file->getClientSize();
-            $file_created_by = Auth()->user()->id;
+            $fileMimeType = $file->getClientMimeType();
+            $fileName = str_replace(' ','_',$file->getClientOriginalName());
+            $fileSize = $file->getClientSize();
+            $fileCreatedBy = Auth()->user()->id;
 
-            if ($folderId == 0) {
-                $folder_root = 0;
-                $file_url = '/storage/index/' . $file->getClientOriginalName();
+            if ($folderRoot == 0) {
+                $file_url = $fileName;
 
             } else {
-                $folder_root = $folderId; //$current_folder['folder_root'];
-                $file_url = $current_folder['url'] . '/' . $file->getClientOriginalName();
+                $file_url = $current_folder['url'] . '/' . $fileName;
             }
 
             $new_file = Files::create([
-                'folder_root' => $folder_root,
-                'name' => $file_name,
+                'folder_root' => $folderRoot,
+                'name' => $fileName,
                 'url' => $file_url,
-                'is_file' => $file_flag,
-                'size' => $file_size,
-                'created_by' => $file_created_by,
+                'is_file' => 1,
+                'size' => $fileSize,
+                'mime_type' => $fileMimeType,
+                'created_by' => $fileCreatedBy
             ]);
 
 
             if ($new_file) {
-                $file_path = substr($current_folder['url'], 15) . '/' . $file->getClientOriginalName();
+                // $file_path = substr($current_folder['url'], 15) . '/' . $file->getClientOriginalName();
+                $file_path = $new_file->url;
                 Storage::disk('public')->put($file_path, file_get_contents($file));
             } else {
                 return response()->json([
@@ -331,4 +359,24 @@ class IndexController extends Controller
         ]);
     }
 
+    /**
+     * Delete files by id
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteFilesById($id) {
+        $files = Files::find($id);
+
+        if ($files->is_file == 1) {
+            $files->delete();
+            Storage::disk('public')->delete($files->url);
+        } else {
+            $this->deleteFilesRecursive($files->id);
+            Storage::disk('public')->deleteDirectory($files->url);
+        }
+
+        return response()->json(['success' => true, 'message' => 'File/Folder Successfully Deleted!']);
+    }
 }
