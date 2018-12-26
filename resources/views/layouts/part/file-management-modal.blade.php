@@ -1,9 +1,9 @@
-{{--
+<!--
  Created by PhpStorm.
  User: fadjrin
  Date: 05/12/18
  Time: 15:41
---}}
+-->
 
 <!-- Create Folder Bootsrap Modal -->
 <div class="modal eng-modal fade" id="create-new-folder-modal" tabindex="-1" role="dialog"
@@ -73,7 +73,7 @@
     </div>
 </div>
 
-<!-- File Comment Modal -->
+<!-- File Comment/Description Modal -->
 <div class="modal eng-modal fade" id="comment-modals" tabindex="-1" role="dialog" aria-labelledby="createFolderModalLabel">
     <div class="modal-dialog eng-modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -103,7 +103,3 @@
         </div>
     </div>
 </div>
-
-
-{{--
---}}

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 trait FilesTrait
 {
     /**
+     * Get list all files and folder by folder root
+     *
      * @param $id
      * @return mixed
      */
@@ -30,6 +32,8 @@ trait FilesTrait
     }
 
     /**
+     * Get list all files and folder by id
+     *
      * @param $id
      * @return mixed
      */
@@ -45,6 +49,12 @@ trait FilesTrait
             ->get();
     }
 
+    /**
+     * Get list folder by folder root
+     *
+     * @param $id
+     * @return mixed
+     */
     public function getListFolderByRootId($id)
     {
         $folder =  Files::where('files.folder_root', $id)
@@ -73,6 +83,11 @@ trait FilesTrait
 
     }
 
+    /**
+     * get list folder by id
+     * @param $id
+     * @return mixed
+     */
     public function getListFolderById($id)
     {
         $folder =  Files::where('files.is_file', '=', 0)
@@ -100,6 +115,8 @@ trait FilesTrait
     }
 
     /**
+     * Get folder name
+     *
      * @param $id
      * @return mixed
      */
@@ -114,5 +131,20 @@ trait FilesTrait
         }
 
         return $folderName;
+    }
+
+    /**
+     * Delete record on files table recuresively
+     *
+     * @param $id
+     */
+    public function deleteFilesRecursive($id) {
+
+        $files = Files::where('folder_root', $id)->get();
+        foreach ($files as $file) {
+            $this->deleteFilesRecursive($file->id);
+        }
+
+        Files::find($id)->delete();
     }
 }

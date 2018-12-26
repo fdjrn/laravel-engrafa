@@ -17,6 +17,7 @@ class Files extends Model
         'is_file',
         'version',
         'size',
+        'mime_type',
         'description',
         'comment',
         'created_by'
