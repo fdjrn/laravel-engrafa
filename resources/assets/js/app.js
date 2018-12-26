@@ -15,7 +15,16 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
+// Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('chat-component', require('./components/chat/ChatComponent.vue'));
+Vue.component('chat-conversation-component', require('./components/chat/ChatConversationComponent.vue'));
+Vue.component('chat-room-component', require('./components/chat/ChatRoomComponent.vue'));
+Vue.component('chat-room-list-component', require('./components/chat/ChatRoomListComponent.vue'));
+Vue.component('chat-room-search-component', require('./components/chat/ChatRoomSearchComponent.vue'));
+Vue.component('chat-room-action-component', require('./components/chat/ChatRoomActionComponent.vue'));
+Vue.component('chat-room-invitation-component', require('./components/chat/ChatRoomInvitationComponent.vue'));
+Vue.component('chat-room-group-invitation-component', require('./components/chat/ChatRoomInvitationComponent.vue'));
+Vue.component('message-composer-component', require('./components/chat/MessageComposerComponent.vue'));
 
 const app = new Vue({
     el: '#app'

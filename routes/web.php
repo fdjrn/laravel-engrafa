@@ -76,8 +76,12 @@ Route::middleware(['auth','web'])->group(function () {
 
 
 	// chat
-	Route::get('/chat','Chat\ChatController@index');
+	Route::get('/chat','Chat\ChatController@index')->name('chat');
 	Route::get('/chat/invite','Chat\ChatController@invite');
+	Route::get('/chat/getUser','Chat\ChatController@getUser');
+	Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
+	Route::get('/message', 'Chat\MessageController@index')->name('message');
+	Route::post('/message', 'Chat\MessageController@store')->name('message.store');
 
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
