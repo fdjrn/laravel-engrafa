@@ -103,3 +103,23 @@
         </div>
     </div>
 </div>
+
+
+<!-- View File modal -->
+<div class="modal fade bs-modal-view-file eng-modal" tabindex="-1" role="dialog" aria-labelledby="viewFileModalLabel" style="height: auto">
+    <div class="modal-dialog eng-modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&nbsp;</span>
+                </button>
+                <h4 id="modal-view-caption" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <iframe width="100%" height="640px" id="iframe-view-file" name="iframe-view-file"></iframe>
+                {{--<embed width="100%" height="640px" id="iframe-veiw-file">--}}
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>

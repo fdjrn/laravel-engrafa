@@ -77,6 +77,11 @@
 @stop
 
 @section('custom-scripts')
+    <script>
+        window.onload = function () {
+            document.getElementById("iframe-view-file").setAttribute("visibility", "hidden");
+        }
+    </script>
 @stop
 
 @section('page-header')
@@ -203,7 +208,7 @@
                             </div>
                             <div class="box-footer">
                                 <span class="pull-left">
-                                    <a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
+                                    <a href="" id="view-file" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
                                     <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
                                     <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
                                     <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
@@ -221,7 +226,6 @@
 
 @section('body-modals')
     @include('layouts.part.file-management-modal')
-
 @stop
 
 @section('core-plugins')
@@ -238,7 +242,7 @@
     {{ Html::script('js/jquery.dataTables.min.js') }}
     {{ Html::script('js/dataTables.material.min.js') }}
     {{ Html::script('js/dropzone.min.js') }}
-    {{ Html::script('js/pages/index/file-explorer.js') }}
+    {{ Html::script('js/pages/index/file-explorer.min.js') }}
 @stop
 
 @section('theme-layout-scripts')

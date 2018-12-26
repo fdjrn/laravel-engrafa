@@ -15,20 +15,6 @@
 
 @section('page-level-styles')
     <style>
-        .example-modal .modal {
-            position: relative;
-            top: auto;
-            bottom: auto;
-            right: auto;
-            left: auto;
-            display: block;
-            z-index: 1;
-        }
-
-        .example-modal .modal {
-            background: transparent !important;
-        }
-
         .center-image {
             margin-left: auto;
             margin-right: auto;
@@ -58,16 +44,15 @@
                 <div class="box-header with-border">
                     <h4><i class="fa fa-sticky-note"></i>
                         <span class="pull-right">
-                            <a href="">
+                            <a href="#" id="file_detail-print">
                                 <i class="fa fa-print fa-fw" data-toggle="tooltip" title="print"></i>
                             </a>
                             <a href="">
                                 <i class="fa fa-usb fa-fw" data-toggle="tooltip" title="related document"></i>
                             </a>
-                            <a href="">
+                            <a href="" id="file_detail-download">
                                 <i class="fa fa-download fa-fw" data-toggle="tooltip" title="download"></i>
-                            </a>
-                            &nbsp;
+                            </a>                            &nbsp;
                             <span class="pull-right">
                                 <form action="{{ route('index') }}" method="POST" id="frm-index_detail" class="small-box-footer">
                                     @csrf
@@ -82,19 +67,9 @@
                 </div>
 
                 <div class="box-body" style="height: auto">
-                    @if ( $file_detail->mime_type === 'application/pdf')
-                        <iframe src="{{ url('http://localhost:8000/ViewerJS/index.html#../storage/index/'. $file_detail->url ) }}"
-                                width="100%" height="720px">
-                        </iframe>
-                    @elseif(substr($file_detail->mime_type,0,5) === 'image')
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($file_detail->url) }}"
-                             alt="{{ $file_detail->name }}" class="img-responsive center-image">
-
-                    @endif
-                </div>
-                <!-- /.box-body -->
-                <div class="box-footer">
-                    {{--Box Footer Here--}}
+                    <iframe src="{{\Illuminate\Support\Facades\Storage::url($file_detail->url)}}"
+                            id="index-detail-iframe" name ="index-detail-iframe"
+                            width="100%" height="640px"></iframe>
                 </div>
             </div>
         </div>
@@ -103,7 +78,7 @@
         <div class="col-md-3" id="file-properties">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <input type="hidden" id="file-descr-id">
+                    <input type="hidden" id="file-descr-id" value="{{ $file_detail->id }}">
                     <h4 class="file-descr-name" id="file-descr-name" style="overflow-wrap: break-word"><i
                                 class="fa fa-usb fa-fw"></i>
                         {{ $file_detail->name }}
@@ -125,12 +100,12 @@
 
                         <div id="collapseOne" class="collapse in">
                             <div class="box-body">
-                                <p id="{{ $file_detail->description }}"></p>
+                                <p id="index-detail-descr" style="font-weight: normal"> {{ $file_detail->description }} </p>
                             </div>
                             <div class="box-footer">
                                 <span class="pull-left">
-                                    <a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
-                                    <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i
+                                    {{--<a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>--}}
+                                    <a href="" id="edit-file" data-toggle="tooltip" title="edit"><i
                                                 class="fa fa-edit fa-fw"></i></a>
                                     <a href="#" data-toggle="tooltip" title="share"><i
                                                 class="fa fa-share fa-fw"></i></a>
@@ -160,13 +135,7 @@
 @stop
 
 @section('page-level-scripts')
-    <script>
-        $('#link-to-index').on('click', function (e) {
-            e.preventDefault();
-            $('#frm-index_detail').submit();
-        })
-
-    </script>
+    {{ Html::script('js/pages/index/index-detail.js') }}
 @stop
 
 @section('theme-layout-scripts')

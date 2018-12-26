@@ -25,23 +25,6 @@ function bookmarkFile(id) {
     });
 }
 
-function downloadFile(id) {
-    $.get({
-        url: '/index/download-file/' + id,
-        success: function (response) {
-            if (response.status === 'failed') {
-                swal({
-                    title: 'Download Failed!!',
-                    text: 'Allowed download tiype is file only',
-                    type: 'error',
-                    timer: '2000'
-                })
-            }
-        }
-
-    })
-}
-
 function setComment(id) {
     $.ajax({
         url: "/index/get-file/" + id,
@@ -442,4 +425,39 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#view-file').on('click', function (e) {
+        e.preventDefault();
+        let id = $('#file-descr-id').val();
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        };
+
+
+        $.ajax({
+            url: "/index/get-file/" + id,
+            type: "GET",
+            success: function (data) {
+
+                if (data.is_file === 1) {
+                    $('.bs-modal-view-file').modal('show');
+                    $('#modal-view-caption').html('<i class="fa fa-file"></i><span> &nbsp;' + data.name +'</span>');
+                    $('#iframe-view-file').attr('visibility','visible');
+                    $('#iframe-view-file').attr('src', base_url  +"/storage/index/"+ data.url);
+                }
+            },
+            error: function (response) {
+                if (response.status === '401')
+                    window.location.href = '/login';
+            }
+        })
+    });
+
+    $('.bs-modal-view-file').on('hidden.bs.modal', function (e) {
+        $('#iframe-view-file').attr('src','');
+    })
 });

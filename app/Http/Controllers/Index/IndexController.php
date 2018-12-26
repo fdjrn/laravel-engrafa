@@ -234,14 +234,8 @@ class IndexController extends Controller
     public function uploadFiles(Request $request)
     {
         $folderRoot = $request->get('folderId');
-
         $folderRoot = ($folderRoot === '' ? 0 : $folderRoot);
-
-        // dd($folderRoot);
-
         $files = $request->file('file');
-        // $file_flag = 1;
-
 
         $current_folder = Files::find($folderRoot);
 
@@ -270,13 +264,12 @@ class IndexController extends Controller
 
 
             if ($new_file) {
-                // $file_path = substr($current_folder['url'], 15) . '/' . $file->getClientOriginalName();
                 $file_path = $new_file->url;
                 Storage::disk('public')->put($file_path, file_get_contents($file));
             } else {
                 return response()->json([
                     'success' => false,
-                    'errors' => 'error cenah',
+                    'errors' => 'Failed to create File',
                 ], 404);
             }
         }
