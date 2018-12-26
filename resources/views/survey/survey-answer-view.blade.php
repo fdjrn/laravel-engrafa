@@ -101,12 +101,12 @@
                           {{ $survey->outcome }}&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->description }}</span>
                         </div>
                         <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
-                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->comment }}</span>
+                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{ $survey->comment ? $survey->comment : '-' }}</span>
                         </div>
                         <div class="row" style="margin-top: 4px;">
                           <div class="col-sm-3">
                             <div>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked disabled> {{ucfirst($survey->met_criteria)}}
+                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked disabled> {{ $survey->met_criteria ? ucfirst($survey->met_criteria) : '-'}}
                             </div>
                           </div>
                           <div class="col-sm-9">

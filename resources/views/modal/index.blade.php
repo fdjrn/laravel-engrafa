@@ -44,10 +44,10 @@
             </div>
             <div class="col-lg-6">
               <div class="form-group">
-                <label for="i_n_client" class="col-sm-4 control-label">Invite Client</label>
+                <label for="i_n_client" class="col-sm-4 control-label">Invite Responden</label>
 
                 <div class="col-sm-8">
-                  <select id="i_n_client" name="i_n_client[]" class="form-control select2" multiple data-placeholder="Add Client"
+                  <select id="i_n_client" name="i_n_client[]" class="form-control select2" multiple data-placeholder="Add Responden"
                           style="width: 100%;" >
                   </select>
                 </div>
@@ -57,7 +57,7 @@
               <div class="form-group">
                 <label for="i_n_survey_type" class="col-sm-2 control-label">Survey Type</label>
 
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Survey Type"
                           style="width: 100%;" >
                     <option value=""></option>
@@ -65,7 +65,7 @@
                     <option value="2-Pain">Pain Point</option>
                   </select>
                 </div>
-                <div class="col-sm-7">
+                <div class="col-sm-6">
                   <div class="box box-default" id="list-itgoal" style="overflow-x:hidden; overflow-y: auto; max-height: 250px;">
                     <div class="box-body">
                       @foreach($dataItGoal as $datait)
@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
+                                      <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='text' class="form-control" />
                                       <span class="input-group-addon">%</span>
                                   </div>
                                 </div>

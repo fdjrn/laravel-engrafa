@@ -1,22 +1,19 @@
 $(document).ready(function(){
+  $('.select2').each(function () {
+      $(this).select2({
+        width : '100%',
+        allowClear:true,
+        dropdownParent: $(this).parent()
+      });
+  });
+
   $("#mn_create_new_team").click(function(){
     $('#modal-n-survey').modal('show');
     initialize_select_user("#i_n_surveyor");
-    initialize_select_user("#i_n_client");
-  });
-
-  $("#b_create_new_team").click(function(){
-    $('#modal-n-survey').modal('show');
-    initialize_select_user("#i_n_surveyor");
-    initialize_select_user("#i_n_client");
-  });
-
-    $('.select2').each(function () {
-        $(this).select2({
-          placeholder: "Pilih Dari List",
-          dropdownParent: $(this).parent()
-        });
+    $('#i_n_surveyor').on("change", function(e) { 
+      initialize_select_user("#i_n_client",1);
     });
+  });
     $('#i_n_expire').datetimepicker({});
 
     if($("#i_n_survey_type").val() !== ""){
@@ -54,22 +51,28 @@ $(document).ready(function(){
 
 });
 
-function initialize_select_user(id_element){
+function initialize_select_user(id_element,v_check){
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user/no',
-      // data: {
-      //     'anakunit': idUnit
-      // },
+      url: base_url+'/survey/0/ajax_get_list_user/no',
       success: function (data) {
           // the next thing you want to do 
           var $v_select = $(id_element);
           var item = JSON.parse(data);
           $v_select.empty();
           $v_select.append("<option value=''></option>");
-          $.each(item, function(index,valuee) {        
-              $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
-          });
+          if(!v_check){
+            $.each(item, function(index,valuee) {
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+            });
+          }else{
+            var selectedValues = $('#i_n_surveyor').val();
+            $.each(item, function(index,valuee) { 
+              if(selectedValues.indexOf(valuee.id.toString()) == -1){
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+              }
+            });
+          }
 
           //manually trigger a change event for the contry so that the change handler will get triggered
           $v_select.change();

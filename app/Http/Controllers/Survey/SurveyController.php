@@ -141,7 +141,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -257,7 +257,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -493,7 +493,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -623,12 +623,19 @@ class SurveyController extends Controller
         return redirect('survey/'.$survey_id);
     }
 
-    public function ajax_get_list_user($condition)
+    public function ajax_get_list_user($id,$condition)
     {
         if($condition == 'no'){
             echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
-        }elseif($condition == 'yes'){
+        }elseif($condition == 'all'){
             echo json_encode(DB::table('users')->get());
+        }elseif($condition == 'task'){
+            $users = DB::Select("SELECT a.id, a.username FROM users a
+                                LEFT JOIN surveys b ON b.id = $id
+                                LEFT JOIN survey_members c ON c.survey = b.id
+                                WHERE a.id = b.created_by || a.id = c.user
+                                GROUP BY a.id, a.username");
+            echo json_encode($users);
         }else{
             $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
             echo json_encode($users);
@@ -709,7 +716,7 @@ class SurveyController extends Controller
                 'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
                 'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
                 'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Surveyor</span> field is required',
-                'i_n_client.required' => '&#8226;The <span class="text-danger">Client</span> field is required',
+                'i_n_client.required' => '&#8226;The <span class="text-danger">Responden</span> field is required',
                 'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
                 'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
                 'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',

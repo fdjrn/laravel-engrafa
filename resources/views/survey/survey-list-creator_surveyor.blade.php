@@ -4,7 +4,6 @@
         <li class="active"><a href="#tab_1" data-toggle="tab">List EDM</a></li>
         <li><a href="#tab_2" data-toggle="tab">Aggregation</a></li>
         <li><a href="#tab_3" data-toggle="tab">Done</a></li>
-        <!-- <li class="pull-right crud-button"><a href="#" id="b_create_new_team" class="text-success"><i class="fa fa-plus-circle"></i></a></li> -->
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">  

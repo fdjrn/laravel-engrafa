@@ -1,29 +1,39 @@
 $(document).ready(function(){
-  
+  cleanModal();
   $('#i_n_due_date').datetimepicker({});
   
   initialize_user_task("#i_n_assignee");
-  initialize_user_task("#i_n_participant");
   
   $('[data-toggle="tooltip"]').tooltip();
+
+  $('#i_n_assignee').on("select2:selecting", function(e) { 
+    initialize_user_task("#i_n_participant",1);
+    $('#div_i_n_participant').show();
+  });
 });
 
-function initialize_user_task(id_element){
+function initialize_user_task(id_element,v_check){
+  var survey_id = $('#i_n_survey_id').val();
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user/yes',
-      // data: {
-      //     'anakunit': idUnit
-      // },
+      url: base_url+'/survey/'+survey_id+'/ajax_get_list_user/task',
       success: function (data) {
           // the next thing you want to do 
           var $v_select = $(id_element);
           var item = JSON.parse(data);
           $v_select.empty();
           $v_select.append("<option value=''></option>");
-          $.each(item, function(index,valuee) {        
-              $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
-          });
+          if(!v_check){
+            $.each(item, function(index,valuee) {
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+            });
+          }else{
+            $.each(item, function(index,valuee) {
+              if(valuee.id != $("#i_n_assignee").val()){
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+              }
+            });
+          }
 
           //manually trigger a change event for the contry so that the change handler will get triggered
           $v_select.change();
@@ -32,6 +42,7 @@ function initialize_user_task(id_element){
 }
 
 function cleanModal(){
+  $('#div_i_n_participant').hide();
   $('#i_n_name_task').val(null);
   $('#i_type_modal').val('create');
   $('#i_n_due_date').val(null)
@@ -63,12 +74,14 @@ function openModals(type,taskId){
     $('#form_n_task').attr('action','');
     $('#m_new_task').modal('show');
   }else if(type == 'edit'){
+    $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-edit"></i>&nbsp;Edit Existing Task');
     $('#form_n_task').attr('action','/survey/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
     $('#m_new_task').modal('show');
     ajax_modal(survey_id,taskId);
   }else{
+    $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-eye"></i>&nbsp;View Existing Task');
     $('#form_n_task').attr('action','/survey/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
@@ -101,10 +114,15 @@ function ajax_modal(survey_id,taskId){
         $('#i_n_color').val(parse.color).trigger('change');
         $('#i_n_priority').val(parse.priority).trigger('change');
         $('#i_n_progress').val(parse.progress).trigger('change');
-        for (val in participants){
-          var member = participants[val].team_member;
-          $("#i_n_participant option[value="+member+"]").prop("selected",true).trigger("change")
-        }
+        $.ajax({
+           url:initialize_user_task("#i_n_participant",1),
+           success:function(){
+            for (val in participants){
+              var member = participants[val].team_member;
+              $("#i_n_participant option[value="+member+"]").prop("selected",true).trigger("change")
+            }
+          }
+        });
         $('#i_n_detail').val(parse.detail);
       }
     });

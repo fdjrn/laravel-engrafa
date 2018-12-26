@@ -14,32 +14,40 @@ $(document).ready(function(){
   table_done.el = $(table_done.id).dataTable({
     "order": []
   });
-    initialize_inv_user("#inv_responden");
     initialize_inv_user("#inv_surveyor");
+    $('#inv_surveyor').on("change", function(e) { 
+      initialize_inv_user("#inv_responden",1);
+    });
 });
 
 $("#o_invite_user").click(function(){
   $('#m_invite_user').modal('show');
 });
 
-function initialize_inv_user(id_element){
+function initialize_inv_user(id_element,v_check){
   var s_id = $("#s_id").val();
   if(s_id){
     $.ajax({
         type: 'GET',
-        url: base_url+'/survey/ajax_get_list_user/'+s_id,
-        // data: {
-        //     'anakunit': idUnit
-        // },
+        url: base_url+'/survey/'+s_id+'/ajax_get_list_user/'+s_id,
         success: function (data) {
             // the next thing you want to do 
             var $v_select = $(id_element);
-            var item = JSON.parse(data);
             $v_select.empty();
             $v_select.append("<option value=''></option>");
-            $.each(item, function(index,valuee) {        
-                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
-            });
+            var item = JSON.parse(data);
+            if(!v_check){
+              $.each(item, function(index,valuee) {
+                  $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+              });
+            }else{
+              var selectedValues = $('#inv_surveyor').val();
+              $.each(item, function(index,valuee) { 
+                if(selectedValues.indexOf(valuee.id.toString()) == -1){
+                  $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+                }
+              });
+            }
 
             //manually trigger a change event for the contry so that the change handler will get triggered
             $v_select.change();

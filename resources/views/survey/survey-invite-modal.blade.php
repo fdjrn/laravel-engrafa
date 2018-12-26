@@ -13,15 +13,16 @@
             @csrf
             <input type="hidden" name="user_id" id="user_id">
             <div class="form-group">
-              <label for="inv_responden" class="control-label">Add Responden</label>
-              <select id="inv_responden" name="inv_responden[]" class="form-control select2" multiple data-placeholder="Add User"
+              <label for="inv_surveyor" class="control-label">Add Surveyor</label>
+              <select id="inv_surveyor" name="inv_surveyor[]" class="form-control select2" multiple data-placeholder="Add Surveyor"
                       style="width: 100%;" >
               </select>
             </div>
             <div class="form-group">
-              <label for="inv_surveyor" class="control-label">Add Surveyor</label>
-              <select id="inv_surveyor" name="inv_surveyor[]" class="form-control select2" multiple data-placeholder="Add User"
+              <label for="inv_responden" class="control-label">Add Responden</label>
+              <select id="inv_responden" name="inv_responden[]" class="form-control select2" multiple data-placeholder="Add Responden"
                       style="width: 100%;" >
+                    <option value=""></option>
               </select>
             </div>
           </form>
