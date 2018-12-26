@@ -73,6 +73,39 @@
     </div>
 </div>
 
+<!-- Upload New Version Bootsrap Modal -->
+<div class="modal eng-modal fade" id="upload-files-new-version-modal" tabindex="-1" role="dialog"
+     aria-labelledby="uploadFilesModalLabel">
+    <div class="modal-dialog eng-modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&nbsp;</span>
+                </button>
+                <h4 class="modal-title"><i class="fa fa-file"></i><span> Upload New Version</span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group has-feedback">
+                    <label>Root Files:</label>
+                        <p id="rootFileName"></p>
+                </div>
+                <div class="form-group has-feedback">
+                    <form class="dropzone upload-file-form" id="upload-file-new-form" method="POST" enctype="multipart/form-data" action="">
+                        @csrf
+                        <div class="fallback">
+                            <input type="file" name="new-file-version"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {!! Form::button('Close', ['class' => 'btn btn-default','data-dismiss'=>'modal', 'id'=>'btn-close-modal']) !!}
+                {!! Form::submit('Upload', ['class' => 'btn btn-info','id'=>'btn-upload-new-files']) !!}
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- File Comment/Description Modal -->
 <div class="modal eng-modal fade" id="comment-modals" tabindex="-1" role="dialog" aria-labelledby="createFolderModalLabel">
     <div class="modal-dialog eng-modal-dialog-centered" role="document">

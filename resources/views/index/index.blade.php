@@ -242,7 +242,7 @@
     {{ Html::script('js/jquery.dataTables.min.js') }}
     {{ Html::script('js/dataTables.material.min.js') }}
     {{ Html::script('js/dropzone.min.js') }}
-    {{ Html::script('js/pages/index/file-explorer.min.js') }}
+    {{ Html::script('js/pages/index/file-explorer.js') }}
 @stop
 
 @section('theme-layout-scripts')
