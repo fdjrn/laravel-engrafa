@@ -20,10 +20,11 @@ class DashboardController extends Controller
 {
     public function index(Request $Request){
         $userid = Auth::user()->id;
+        $user_role = Auth::user()->role;
 
         // tab nama dashboard
         $name_dashboard = DB::table('dashboards')
-        ->select('dashboards.id','dashboards.name')
+        ->select('dashboards.id','dashboards.name','dashboard_users.user','dashboard_users.created_by')
         ->leftJoin('dashboard_users','dashboard_users.dashboard','=','dashboards.id')
         ->where('dashboard_users.user',$userid)
         ->get();
@@ -60,7 +61,7 @@ class DashboardController extends Controller
             }
         }
         // dd($arrayProcess);
-        
+        $data['user_role']     = $user_role;
         $data['dashboards']    = $name_dashboard->toArray();
         $data['surveys']       = $list_survey;
         $data['chart_type']    = $list_chart_type->toArray();
@@ -87,6 +88,7 @@ class DashboardController extends Controller
             $input_dashboard_users = [
                 'user' => $userid,
                 'dashboard' => $dashboard->id,
+                'created_by' => $userid
             ];
             $dashboard_users = Dashboard_users::create($input_dashboard_users);
             return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Dashboard berhasil ditambahkan']);
@@ -134,7 +136,7 @@ class DashboardController extends Controller
        
        $list_user = DB::table('users')->get();
        
-       echo json_encode($list_user);
+       echo json_encode($list_user); 
     }
 
     public function ajax_get_dashboard(Request $request)
@@ -186,13 +188,29 @@ class DashboardController extends Controller
     {
         $userid = Auth::user()->id;
 
-        $delete_dashboard = DB::table('dashboards')->where('id', '=', $request->dashboard_id)->delete();
-        $delete_dashboard_users = DB::table('dashboard_users')->where('dashboard', '=', $request->dashboard_id)->delete();
+        //cek jika user login sama dengan user pembuat dashboard
+        if ($request->created_by==$userid) {
+            $delete_dashboard = DB::table('dashboards')->where('id', '=', $request->dashboard_id)->delete();
+            $delete_dashboard_users = DB::table('dashboard_users')->where('dashboard', '=', $request->dashboard_id)->delete();
 
-        if ($delete_dashboard && $delete_dashboard_users) {
-            $response = 1;
+            // jika berhasil di delete kasih response
+            if ($delete_dashboard && $delete_dashboard_users) {
+                $response = 1;
+            } else {
+                $response = 0;
+            }
         } else {
-            $response = 0;
+            $delete_dashboard_users = DB::table('dashboard_users')
+            ->where('user', '=', $userid)
+            ->where('dashboard', '=', $request->dashboard_id)
+            ->delete();
+
+            // jika berhasil di delete kasih response
+            if ($delete_dashboard_users) {
+                $response = 1;
+            } else {
+                $response = 0;
+            }
         }
 
         return response()->json($response);
@@ -206,7 +224,8 @@ class DashboardController extends Controller
                 'dashboard' => $request->dashboard_id,
                 'user' => $v,
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => date('Y-m-d H:i:s'),
+                'created_by' => 0
             ];
 
             $insert_users_to_dashboard = DB::table('dashboard_users')->insert($input_dashboard_users);
