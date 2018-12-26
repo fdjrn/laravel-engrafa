@@ -23,6 +23,24 @@
               <h4><i class="fa fa-files-o"></i>&nbsp;&nbsp;<span>Survey</span></h4>
             </a>
           </li>
+          <li class="list_user">
+            <div id="carousel-example-multi" class="carousel carousel-multi slide" data-ride="carousel">
+              <div class="carousel-inner" role="listbox">
+                @foreach($survey_members as $index => $survey_member)
+                  <div class="item {{ !$index ? 'active' : '' }}">
+                    <div class="media media-card">
+                      <div class="icon-user">
+                        <i class="{{ $survey_member->role == '1-Surveyor' ? 'fa fa-user-secret' : 'fa fa-user' }}" title="{{ $survey_member->username }}"></i>
+                      </div>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+              <a class="right carousel-control" href="#carousel-example-multi" data-slide="next">
+                <span class="fa fa-angle-right"></span>
+              </a>
+            </div>
+          </li>
           @if($status_ownership != 'RESPONDEN')
           <li class="footer">
             <a id="o_invite_user">

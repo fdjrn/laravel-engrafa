@@ -63,6 +63,21 @@
     var aurl = url.split("/").splice(0, 4).join("/");
     var burl = url.split("/").splice(0, 5).join("/");
 
+    $('.carousel.carousel-multi .item').each(function () {
+      var next = $(this).next();
+      if (!next.length) {
+        next = $(this).siblings(':first');
+      }
+      next.children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+
+      if (next.next().length > 0) {
+        next.next().children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+      }
+      else {
+        $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
+      }
+    });
+
     // for sidebar menu entirely but not cover treeview
     $('ul.sidebar-menu a').filter(function() {
       if (this.href == url){

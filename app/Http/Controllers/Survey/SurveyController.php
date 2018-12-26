@@ -64,6 +64,8 @@ class SurveyController extends Controller
                 ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) = 7")
                 ->get();
         }
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
         
         return view('survey.survey',$data);
     }
@@ -112,14 +114,7 @@ class SurveyController extends Controller
 
         if($d_surveys->first()){
             if ($d_surveys->first()->created_by != Auth::user()->id){
-                $data['survey_members'] = DB::table('survey_members')
-                    ->select('survey_members.user','users.username')
-                    ->leftJoin('users','users.id','=','survey_members.user')
-                    ->where([
-                        ['survey','=',$id],
-                        ['survey_members.role','=','2-Responden']
-                    ])
-                    ->get();
+                $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
                 $ok = 0;
                 foreach($data['survey_members'] as $surmem){
                     if($surmem->user == Auth::user()->id){
@@ -229,13 +224,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -465,13 +454,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -636,6 +619,15 @@ class SurveyController extends Controller
                                 WHERE a.id = b.created_by || a.id = c.user
                                 GROUP BY a.id, a.username");
             echo json_encode($users);
+        }elseif($condition == 'user_survey'){
+            $survey_members = DB::table('survey_members')
+                ->select('survey_members.user','survey_members.role','users.username')
+                ->leftJoin('users','users.id','=','survey_members.user')
+                ->where([
+                    ['survey','=',$id]
+                ])
+                ->get();
+            return $survey_members;
         }else{
             $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
             echo json_encode($users);
@@ -808,7 +800,7 @@ class SurveyController extends Controller
             ]);
         }
 
-        if($request->get('inv_responden')){
+        if($request->get('inv_surveyor')){
             foreach ($request->get('inv_surveyor') as $surveyor) {
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $surveyor;
@@ -818,7 +810,7 @@ class SurveyController extends Controller
             } 
         }               
 
-        if($request->get('inv_surveyor')){
+        if($request->get('inv_responden')){
             foreach ($request->get('inv_responden') as $responden) {
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $responden;

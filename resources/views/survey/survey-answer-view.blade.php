@@ -160,9 +160,7 @@
           </div>
           <div class="box-body">
             @foreach($survey_members as $survey_member)
-              @if($survey_member->role == '2-Responden')
-                <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
-              @endif
+              <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
             @endforeach
           </div>
           <!-- /.box-body -->

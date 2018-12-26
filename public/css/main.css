@@ -52,6 +52,72 @@
 .inside-sidemenu > .box > .box-body > ul > li > a > h4{
   margin:0px;
 }
+.inside-sidemenu > .box > .box-body > ul > li.list_user {
+  background-color: #3478a1;
+  border-top: none;
+  margin:0px;
+  padding: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  color: #fff;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .icon-user{
+  height: 50px;
+  width : 50px;
+  line-height: 43px;
+  text-align: center;
+  font-size: 25px;
+  border:solid 3px #fff;
+  border-radius: 100%;
+}
+
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-inner .active.left {
+  left: 0%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-inner .next {
+  left: 33%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-inner .prev {
+  left: 0%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-control.left,
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-control.right {
+  background-image: none;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner > .item {
+  transition: 500ms ease-in-out left;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner > .item > .media-card {
+  background: #3478a1;
+  display: table-cell;
+  width: 1%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner > .item > .media-card:last-of-type {
+  border-right: none;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner .active {
+  display: table;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner .active.left {
+  left: 0%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner .active.right {
+  left: 33%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner .next {
+  left: 33%;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner .prev {
+  left: 0%;
+}
+@media all and (transform-3d), (-webkit-transform-3d) {
+  .inside-sidemenu > .box > .box-body > ul > li.list_user .carousel-multi .carousel-inner > .item {
+    transition: 500ms ease-in-out all;
+    backface-visibility: visible;
+    transform: none!important;
+  }
+}
+
 .inside-sidemenu > .box > .box-body > ul > li.footer {
   background-color: #2a6283;
   text-align: center;
