@@ -24,10 +24,6 @@
 <!-- Sparkline -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js')}}"></script>
 
-<!-- jvectormap -->
-{{-- <script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js')}}"></script> --}}
-{{-- <script src="{{ asset('theme/AdminLTE/plugins/jvectormap/jquery-jvectormap-world-mill-en.js')}}"></script> --}}
-
 <!-- jQuery Knob Chart -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-knob/dist/jquery.knob.min.js')}}"></script>
 <!-- daterangepicker -->
@@ -51,7 +47,7 @@
 <script src="{{ asset('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
-<script src="{{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.min.js')}}"></script>
+{{ Html::script( asset('js/sweetalert2.all.js')) }}
 <script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>

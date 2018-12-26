@@ -29,7 +29,7 @@
     }
   </style>
 
-  <link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css')}}">
+  {{--<link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css')}}">  dipindah jadi global style --}}
 @stop
 
 @section('theme-layout-styles')
@@ -405,7 +405,8 @@
 
 @section('page-level-plugins')
   <script src="{{ asset('js/pages/dashboard/Chart.js')}}"></script>
-  <script src="{{ asset('js/pages/dashboard/sweetalert2.all.min.js')}}"></script>
+  {{--<script src="{{ asset('js/pages/dashboard/sweetalert2.all.min.js')}}"></script> dipindah ke global theme plugin --}}
+
 @stop
 
 @section('theme-global-scripts')

@@ -181,7 +181,7 @@
             <div class="box box-primary">
                 <div class="box-header with-border">
                     <input type="hidden" id="file-descr-id">
-                    <h4 class="file-descr-name" style="overflow-wrap: break-word"><i class="fa fa-usb fa-fw"></i>Some File
+                    <h4 class="file-descr-name" id="file-descr-name" style="overflow-wrap: break-word"><i class="fa fa-usb fa-fw"></i>
                         <span class="pull-right">
                             <i class="fa fa-angle-double-right"></i>
                         </span>
@@ -206,14 +206,13 @@
                                     <a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
                                     <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
                                     <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
-                                    <a href="#" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- /.box-body -->
-
             </div>
         </div>
 
@@ -239,7 +238,6 @@
     {{ Html::script('js/jquery.dataTables.min.js') }}
     {{ Html::script('js/dataTables.material.min.js') }}
     {{ Html::script('js/dropzone.min.js') }}
-    {{--{{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js') }}--}}
     {{ Html::script('js/pages/index/file-explorer.js') }}
 @stop
 

@@ -1,13 +1,12 @@
 Dropzone.autoDiscover = false;
+var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
 function bookmarkFile(id) {
-    var csrf_token = $('meta[name="csrf-token"]').attr('content');
-
     $.ajax({
-        url: "/index/bookmark-file/" + id ,
+        url: "/index/bookmark-file/" + id,
         type: "POST",
-        data : {'_token' : csrf_token},
-        success: function(response) {
+        data: {'_token': csrf_token},
+        success: function (response) {
             swal({
                 title: 'Bookmark Success!',
                 text: response.data.name + ", " + response.message,
@@ -15,7 +14,7 @@ function bookmarkFile(id) {
                 timer: '2000'
             })
         },
-        error : function(data) {
+        error: function (data) {
             swal({
                 title: 'Bookmark Failed!',
                 text: data.responseJSON.data.name + ", " + data.responseJSON.message,
@@ -26,10 +25,27 @@ function bookmarkFile(id) {
     });
 }
 
+function downloadFile(id) {
+    $.get({
+        url: '/index/download-file/' + id,
+        success: function (response) {
+            if (response.status === 'failed') {
+                swal({
+                    title: 'Download Failed!!',
+                    text: 'Allowed download tiype is file only',
+                    type: 'error',
+                    timer: '2000'
+                })
+            }
+        }
+
+    })
+}
+
 function setComment(id) {
     $.ajax({
         url: "/index/get-file/" + id,
-        type:"GET",
+        type: "GET",
         success: function (data) {
             $('#comment-modals').modal('show');
             if (data.is_file === 0) {
@@ -54,15 +70,14 @@ function setComment(id) {
 $(document).ready(function () {
     var rootFolderId = 0;
     var rootFolderName = "";
-    var currentFolderId = 0;
     var closeModalInterval;
-    var f_id = $('input:hidden[name = f_id]').val();
+    var filesId = $('input:hidden[name = f_id]').val();
 
     var dtMain = $("#dt-file-exp-table-index").DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/index/list-all/" + f_id,
+            url: "/index/list-all/" + filesId,
             error: function (xhr, status, err) {
                 if (err === 'Unauthorized') {
                     window.location.href = '/login';
@@ -74,6 +89,7 @@ $(document).ready(function () {
             {
                 data: "name",
                 "fnCreatedCell": function (nTd, sData, oData) {
+
                     if (oData.is_file === '1') {
                         $(nTd).html("<span><i class='fa fa-file fa-lg'></i></span>&nbsp; " + sData);
                     } else {
@@ -86,28 +102,31 @@ $(document).ready(function () {
             {
                 data: "comment",
                 "fnCreatedCell": function (nTd, sData, oData) {
-                    if (sData !== null){
-                        $(nTd).html("<a class='btn btn-outline-warning btn-xs' onclick='setComment(" + oData.id +")'>" +
+                    if (sData !== null) {
+                        $(nTd).html("<a class='btn btn-outline-warning btn-xs' onclick='setComment(" + oData.id + ")'>" +
                             "<span><i class='fa fa-comment fa-2x'></i></span></a> " + sData);
 
                     } else {
-                        $(nTd).html("<a class='btn btn-outline-warning btn-xs' onclick='setComment(" + oData.id +")'>" +
+                        $(nTd).html("<a class='btn btn-outline-warning btn-xs' onclick='setComment(" + oData.id + ")'>" +
                             "<span><i class='fa fa-comment fa-2x'></i></span></a> ");
                     }
                 }
             },
-            { data: "action", name: "action", orderable: false, searchable: false}
+            {data: "action", name: "action", orderable: false, searchable: false}
         ],
         columnDefs: [{
             targets: [0, 1, 2, 3, 4, 5],
-            className: "mdl-data-table__cell--non-numeric"
+            className: "mdl-data-table__cell--non-numeric header-cursor"
         }],
         "fnDrawCallback": function () {
             var api = this.api();
             var json = api.ajax.json();
+
             rootFolderId = json.mainRootFolderId;
             rootFolderName = json.mainRootFolderName;
             $("#root-folder-name").text(rootFolderName);
+
+            filesId = json.mainRootFolderId;
         }
     });
 
@@ -117,13 +136,13 @@ $(document).ready(function () {
         "bPaginate": false,
         "bInfo": false,
         "dom": "<fl<t>ip>",
-        ajax: "/index/list-folder/" + f_id,
+        ajax: "/index/list-folder/" + filesId,
         columns: [{
             data: "name",
             "fnCreatedCell": function (nTd, sData, oData) {
                 $(nTd).html("<i class='fa fa-folder fa-lg'></i><span>&nbsp; " + sData +
                     "</span> <span class='pull-right'>" +
-                    "<small class='label bg-yellow'>"+ oData.child_count +"</small></span>"
+                    "<small class='label bg-yellow'>" + oData.child_count + "</small></span>"
                 );
             }
         }],
@@ -146,7 +165,7 @@ $(document).ready(function () {
     function getCurrentFolderDetail(id) {
         dtMain.ajax.url("/index/list-all/" + id).load();
         dtFolder.ajax.url("/index/list-folder/" + id).load();
-        currentFolderId = id;
+        filesId = id;
     }
 
     function goPreviousMainFolder() {
@@ -172,7 +191,7 @@ $(document).ready(function () {
         dictFileTooBig: 'Max file size is 25MB',
         dictMaxFilesExceeded: 'Max files uploaded is 4',
         success: function () {
-            getCurrentMainFolderDetail(currentFolderId);
+            getCurrentMainFolderDetail(filesId);
         }
     });
 
@@ -186,24 +205,39 @@ $(document).ready(function () {
         }
     });
 
+    function setFilesProperties(data,status){
+        if (status === true) {
+            $('#file-descr-id').val(data.id);
+            $('.file-descr-name').html(
+                '<i class="fa fa-usb fa-fw"></i> ' + data.name +
+                '<span class="pull-right">' +
+                '   <i class="fa fa-angle-double-right"></i>' +
+                '</span>'
+            );
+            $('#file-descr-text').text(data.description);
+        } else {
+            $('#file-descr-id').val('');
+            $('.file-descr-name').html(
+                '<i class="fa fa-usb fa-fw"></i> ' +
+                '<span class="pull-right">' +
+                '   <i class="fa fa-angle-double-right"></i>' +
+                '</span>'
+            );
+            $('#file-descr-text').text('');
+        }
+    }
+
     $('#dt-file-exp-table-index tbody').on('click', 'tr', function () {
-        var data = dtMain.row( this ).data();
+        var data = dtMain.row(this).data();
 
         if ($(this).hasClass('is-selected')) {
             $(this).removeClass('is-selected');
+            setFilesProperties(data, false);
         } else {
             dtMain.$('tr.is-selected').removeClass('is-selected');
             $(this).addClass('is-selected');
+            setFilesProperties(data, true);
         }
-
-        $('#file-descr-id').val(data.id);
-        $('.file-descr-name').html(
-            '<i class="fa fa-usb fa-fw"></i> '+ data.name +
-            '<span class="pull-right">' +
-            '   <i class="fa fa-angle-double-right"></i>' +
-            '</span>'
-        );
-        $('#file-descr-text').text(data.description);
     });
 
     $("#file-exp-select-all").on("click", function () {
@@ -215,6 +249,8 @@ $(document).ready(function () {
         var rootId = dtMain.row(this).data().id;
         if (dtMain.row(this).data().is_file === 0) {
             getCurrentMainFolderDetail(rootId);
+        } else {
+            window.location.href = '/index/detail/' + rootId;
         }
     });
 
@@ -235,21 +271,6 @@ $(document).ready(function () {
 
     $('#create-new-folder-form').submit(function (e) {
         e.preventDefault();
-        $('#btn-create-folder').click();
-    });
-
-    $('#create-new-folder-modal').on('shown.bs.modal', function () {
-        $('#folderName').focus();
-    });
-
-    $('#create-new-folder-modal').on('hidden.bs.modal', function () {
-        $('#folderName').val("");
-        $('#success-msg').addClass('hide');
-        $('#folder-name-error').html("");
-        clearInterval(closeModalInterval);
-    });
-
-    $('#btn-create-folder').on('click', function () {
         var formData = $('#create-new-folder-form').serialize();
         $('#folder-name-error').html("");
 
@@ -273,6 +294,17 @@ $(document).ready(function () {
         });
     });
 
+    $('#create-new-folder-modal').on('shown.bs.modal', function () {
+        $('#folderName').focus();
+    });
+
+    $('#create-new-folder-modal').on('hidden.bs.modal', function () {
+        $('#folderName').val("");
+        $('#success-msg').addClass('hide');
+        $('#folder-name-error').html("");
+        clearInterval(closeModalInterval);
+    });
+
     $('#btn-save-comment').on('click', function () {
         var formData = $('#comments-form').serialize();
         var fileId = $('#fileCommentId').val();
@@ -283,11 +315,13 @@ $(document).ready(function () {
             data: formData,
             success: function (response) {
                 $('#comment-modals').modal('hide');
-
-
                 dtMain.ajax.url("/index/list-all/" + response.data.folder_root).load();
-                $('#file-descr-text').text(response.data.description);
-                //dtMain.$('tr.is-selected').removeClass('is-selected');
+                if (response.tipe === 'description'){
+                    $('#file-descr-text').text(response.data.description);
+                    setFilesProperties(response.data, true);
+                } else {
+                    setFilesProperties(null, false);
+                }
 
                 swal({
                     title: 'Success!',
@@ -296,7 +330,7 @@ $(document).ready(function () {
                     timer: '1500'
                 });
             },
-            error: function (response) {
+            error: function () {
                 swal({
                     title: 'Error!',
                     text: "Something went wrong",
@@ -311,32 +345,30 @@ $(document).ready(function () {
         myDropzone.processQueue();
     });
 
-    $('#upload-file-form').submit(function (e) {
-        e.preventDefault();
-        $('#btnUpload').click();
-    });
-
     myDropzone.on("sending", function (file, xhr, formData) {
-        // Will send the filesize along with the file as POST data.
-        formData.append("filesize", file.size);
-        formData.append("folderId", currentFolderId);
+        // formData.append("filesize", file.size);
+        formData.append("folderId", filesId);
+        console.log(file.type);
     });
 
     myDropzone.on("complete", function (file) {
         myDropzone.removeFile(file);
     });
 
-    $('#upload-file-form').on('hidden.bs.modal', function () {
-        myDropzone.complete();
-        getCurrentMainFolderDetail(rootFolderId);
-    });
-
-    $('#edit-file-descr').on('click',function (e) {
-        let fId = $('#file-descr-id').val();
+    $('#edit-file-descr').on('click', function (e) {
         e.preventDefault();
+        let id = $('#file-descr-id').val();
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        }
+
         $.ajax({
-            url: "/index/get-file/" + fId,
-            type:"GET",
+            url: "/index/get-file/" + id,
+            type: "GET",
             success: function (data) {
                 $('#comment-modals').modal('show');
                 if (data.is_file === 0) {
@@ -356,5 +388,58 @@ $(document).ready(function () {
                 console.log(response);
             }
         })
-    })
+    });
+
+    $('#delete-file').on('click', function (e) {
+        e.preventDefault();
+        let id = $('#file-descr-id').val();
+        let csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        }
+
+        Swal({
+            title: 'Are you sure?',
+            text: '"' + $('#file-descr-name').text() + '" will be deleted. You won\'t be able to revert this!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: '/index/delete-file/' + id,
+                    type: 'POST',
+                    data: {'_method': 'DELETE', '_token': csrf_token},
+                    success: function (response) {
+                        if (response.success) {
+                            getCurrentMainFolderDetail(filesId);
+                            setFilesProperties(null, false);
+                            Swal({
+                                title: 'Success!',
+                                text: response.message,
+                                type: 'success',
+                                timer: '2000'
+                            });
+                        }
+                    },
+                    fail: function () {
+                        Swal({
+                            title: 'Failure!',
+                            text: 'Your file/folder has not been deleted.',
+                            type: 'error',
+                            timer: '2000'
+                        });
+                    }
+
+
+                });
+            }
+        });
+    });
 });
