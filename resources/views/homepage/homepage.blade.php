@@ -66,6 +66,11 @@
 @stop
 
 @section('custom-scripts')
+    <script>
+        window.onload = function () {
+            document.getElementById("iframe-view-file").setAttribute("visibility", "hidden");
+        }
+    </script>
 @stop
 
 @section('page-header')
@@ -113,6 +118,7 @@
                     <div class="small-box bg-red">
                         <div class="inner">
                             <h3>Dokumen</h3>
+                            <input type="hidden" name="file_id" value="{{ isset($latestFile) ? $latestFile->id : 0 }}">
                             <p class="latest-file-name">
                                 {!! isset($latestFile) ? $latestFile->name : '[No Data]' !!}
                             </p>
@@ -120,12 +126,7 @@
                         <div class="icon">
                             <i class="fa fa-file-o"></i>
                         </div>
-                        {{--<a href="{{ isset($latestFile) ? url($latestFile['url']) : '#' }}"
-                           class="small-box-footer latest-file-url">
-                            More Details <i class="fa fa-arrow-circle-right"></i>
-                        </a>--}}
-                        {{--<a data-toggle="modal" data-target=""></a>--}}
-                        <a href="" data-toggle="modal" id="latest-file-link"
+                        <a href="#" data-toggle="modal" id="latest-file-link"
                            class="small-box-footer latest-file-url" >
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
@@ -137,7 +138,7 @@
                     <div class="small-box bg-purple">
                         <div class="inner">
                             <h3>Survey</h3>
-                            {{--<p>[No Data]</p>--}}
+                            <input type="hidden" name="survey_id" value="{{ isset($latestSurvey) ? $latestSurvey['id'] : 0}}">
                             <p class="latest-survey-name">
                                 {!! isset($latestSurvey) ? $latestSurvey['name'] : '[No Data]' !!}
                             </p>
@@ -145,7 +146,7 @@
                         <div class="icon">
                             <i class="fa fa-copy"></i>
                         </div>
-                        <a href="{{ url('/') }}" class="small-box-footer">
+                        <a href="#" class="small-box-footer latest-survey">
                             More Details <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -166,7 +167,7 @@
                         @if(isset($latestFolder))
                             <form action="{{ route('index') }}" method="POST" id="frm-last-folder" class="small-box-footer">
                                 @csrf
-                                <input type="hidden" name="folder_id" value="{{ $latestFolder['id'] }}">
+                                <input type="hidden" name="folder_id" value="{{ isset($latestFolder) ? $latestFolder['id'] : 0 }}">
                                 <a href="#"
                                    class="small-box-footer latest-folder-url" id="latest-folder-link">
                                     More Details <i class="fa fa-arrow-circle-right"></i>
@@ -205,47 +206,6 @@
 
 @section('body-modals')
     @include('layouts.part.file-management-modal')
-
-    {{-- Image only--}}
-    <div id="view-image-modal" class="modal eng-modal fade " role="dialog">
-        <div class="modal-dialog eng-modal-dialog-centered">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><span><i class="fa fa-file "></i> View Detail</span></h4>
-                </div>
-                <div class="modal-body">
-                    @if (@isset($latestFile)){
-                        <img id="img-src" class="img-responsive" src="{{ url( $latestFile->url) }}">
-                    @endif
-                </div>
-                <div class="modal-footer">
-                    {!! Form::button('Close', ['class' => 'btn btn-info','data-dismiss'=>'modal']) !!}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Pdf only--}}
-    {{--<div id="view-pdf-modal" class="modal eng-modal fade " role="dialog">
-        <div class="modal-dialog eng-modal-dialog-centered">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><span><i class="fa fa-file "></i> View Detail</span></h4>
-                </div>
-                <div class="modal-body">
-                    <img id="img-src" class="img-responsive" src="{{ url( $latestFile->url) }}">
-                </div>
-                <div class="modal-footer">
-                    {!! Form::button('Close', ['class' => 'btn btn-info','data-dismiss'=>'modal']) !!}
-                </div>
-            </div>
-        </div>
-    </div>--}}
-
 @stop
 
 @section('core-plugins')
