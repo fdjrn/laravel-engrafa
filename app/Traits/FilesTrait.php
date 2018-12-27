@@ -158,8 +158,11 @@ trait FilesTrait
     {
         $files = Files::findOrFail($id);
 
-        $fileHistory = DB::select(
-        "SELECT * FROM files WHERE id = ? UNION SELECT * FROM files WHERE file_root = ?", array($files['id'], $files['id'])
+        $fileHistory = DB::select("
+        SELECT *, CONCAT(round(size/1024,2), ' Kb') AS size_in_kb FROM files WHERE id = ? 
+        UNION 
+        SELECT *, CONCAT(round(size/1024,2), ' Kb') AS size_in_kb FROM files WHERE file_root = ? 
+        ORDER BY version", array($files['id'], $files['id'])
         );
 
         return $fileHistory;

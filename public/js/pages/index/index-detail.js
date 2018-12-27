@@ -1,4 +1,23 @@
 $(document).ready( function () {
+
+    var dtHistory = $("#file-history-table").DataTable({
+        processing: true,
+        serverSide: true,
+        "searching": false,
+        // "dom": "<fl<t>ip>",
+        ajax: "/index/file-history/" + $('#file-descr-id').val(),
+        columns: [
+            { data: "name" },
+            { data: "created_at" },
+            { data: "size_in_kb" },
+            {data: "action", name: "action", orderable: false, searchable: false}
+        ],
+        columnDefs: [{
+            targets: [0, 1, 3],
+            className: "mdl-data-table__cell--non-numeric header-cursor"
+        }]
+    });
+
     $('#link-to-index').on('click', function (e) {
         e.preventDefault();
         $('#frm-index_detail').submit();
@@ -110,5 +129,27 @@ $(document).ready( function () {
         e.preventDefault();
         let url = '/index/download-file/' + $('#file-descr-id').val();
         $(location).attr('href',url);
+    });
+
+    $('#file-detail-related').on('click', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/index/get-file/" + $('#file-descr-id').val(),
+            type: 'GET',
+            success: function (result) {
+                $('.bs-modal-file-history').modal('show');
+                $('#modal-history-caption').text(result.name);
+                $('#fileHistoryId').val(result.id);
+
+                let Id = (result.file_root == 0) ? result.id : result.file_root;
+                dtHistory.ajax.url("/index/file-history/" + Id).load();
+            },
+            error: function (err) {
+                console.log(err);
+            }
+
+        });
+
     })
 });

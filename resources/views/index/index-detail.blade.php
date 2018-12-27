@@ -8,6 +8,8 @@
 @stop
 
 @section('page-level-plugin-styles')
+    {{ Html::style('css/material.min.css')}}
+    {{ Html::style('css/dataTables.material.min.css') }}
 @stop
 
 @section('theme-global-styles')
@@ -15,9 +17,56 @@
 
 @section('page-level-styles')
     <style>
-        .center-image {
-            margin-left: auto;
-            margin-right: auto;
+        .eng-modal-dialog-centered{
+            display: inline-block;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .eng-modal {
+            text-align: center;
+            padding: 0!important;
+        }
+
+        .eng-modal:before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+            margin-right: -4px;
+        }
+
+        .mdl-data-table th {
+            vertical-align: bottom;
+            text-overflow: ellipsis;
+            font-weight: inherit;
+            line-height: 24px;
+            letter-spacing: 0;
+            font-size: inherit;
+            color: inherit;
+            padding-bottom: 8px;
+        }
+
+        .mdl-data-table td {
+            border-top: 1px solid rgba(0,0,0,.12);
+            border-bottom: 1px solid rgba(0,0,0,.12);
+            padding-top: 12px;
+            vertical-align: middle;
+            font-weight: 400;
+            font-size: inherit;
+        }
+
+        .custom-dropdown-btn > ul {
+            width: inherit;
+        }
+
+        .header-cursor {
+            cursor: pointer;
+        }
+
+        .table-responsive tbody td{
+            font-size: inherit;
+            font-weight: normal;
         }
     </style>
 @stop
@@ -47,7 +96,7 @@
                             <a href="#" id="file_detail-print">
                                 <i class="fa fa-print fa-fw" data-toggle="tooltip" title="print"></i>
                             </a>
-                            <a href="">
+                            <a href="" id="file-detail-related">
                                 <i class="fa fa-usb fa-fw" data-toggle="tooltip" title="related document"></i>
                             </a>
                             <a href="" id="file_detail-download">
@@ -123,6 +172,38 @@
 @stop
 
 @section('body-modals')
+
+    <!-- View File Relations -->
+    <div class="modal fade bs-modal-file-history eng-modal" tabindex="-1" role="dialog" aria-labelledby="viewFileModalLabel" style="height: auto">
+        <div class="modal-dialog eng-modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&nbsp;</span>
+                    </button>
+                    <div align="center">
+                        <h4 class="modal-title">History</h4>
+                        <h4 id="modal-history-caption" class="modal-title"></h4>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="file-history-table" class="mdl-data-table" width="100%">
+                            <thead>
+                            <tr>
+                                <th width="250px">Name</th>
+                                <th width="120px">Date Modified</th>
+                                <th width="250px">Size</th>
+                                <th width="150px">Action</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('core-plugins')

@@ -159,7 +159,7 @@
 </div>
 
 <!-- View File History Modal -->
-<div  id="app" class="modal fade bs-modal-file-history eng-modal" tabindex="-1" role="dialog" aria-labelledby="viewFileModalLabel" style="height: auto">
+<div class="modal fade bs-modal-file-history eng-modal" tabindex="-1" role="dialog" aria-labelledby="viewFileModalLabel" style="height: auto">
     <div class="modal-dialog eng-modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -167,12 +167,24 @@
                     <span aria-hidden="true">&nbsp;</span>
                 </button>
                 <div align="center">
+                    <input type="hidden" name="fileHistoryId" id="fileHistoryId">
                     <h4 class="modal-title">History</h4>
                     <h4 id="modal-history-caption" class="modal-title"></h4>
                 </div>
             </div>
             <div class="modal-body">
-
+                <div class="table-responsive">
+                    <table id="file-history-table" class="mdl-data-table" width="100%">
+                        <thead>
+                        <tr>
+                            <th width="250px">Name</th>
+                            <th width="120px">Date Modified</th>
+                            <th width="250px">Size</th>
+                            <th width="150px">Action</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer"></div>
         </div>

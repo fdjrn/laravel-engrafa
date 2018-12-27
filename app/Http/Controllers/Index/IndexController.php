@@ -399,13 +399,20 @@ class IndexController extends Controller
     }
 
     /**
-     * Show file history
+     * Show list history files
      *
      * @param $id
-     * @return \Illuminate\Support\Collection
+     * @return mixed
+     * @throws \Exception
      */
     public function showFileHistory($id)
     {
-        return $this->getFileHistory($id);
+        $data = $this->getFileHistory($id);
+        return DataTables::of($data)
+            ->addColumn('action', function ($dt) {
+                /*return '<a href="/index/download-file/'.$dt->id.' class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a>';*/
+                return '<a href="/index/download-file/'.$dt->id.'" class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a></a>';
+            })
+            ->make(true);
     }
 }

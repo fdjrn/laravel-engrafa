@@ -2,8 +2,6 @@ Dropzone.autoDiscover = false;
 
 var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-
-
 function bookmarkFile(id) {
     $.ajax({
         url: "/index/bookmark-file/" + id,
@@ -69,15 +67,43 @@ function uploadNewVersion(id) {
 }
 
 function seeFileHistory(id){
-    $.get({
+    var dtHistory = $("#file-history-table").DataTable();
+
+    dtHistory.destroy();
+
+    $.ajax({
         url: "/index/get-file/" + id,
-        success: function(result) {
+        type: 'GET',
+        success: function (result) {
             $('.bs-modal-file-history').modal('show');
             $('#modal-history-caption').text(result.name);
+            $('#fileHistoryId').val(result.id);
+
+            let fId = (result.file_root == 0) ? result.id : result.file_root;
+
+            dtHistory = $("#file-history-table").DataTable({
+                processing: true,
+                serverSide: true,
+                "searching": false,
+                // "dom": "<fl<t>ip>",
+                ajax: "/index/file-history/" + fId,
+                columns: [
+                    { data: "name" },
+                    { data: "created_at" },
+                    { data: "size_in_kb" },
+                    {data: "action", name: "action", orderable: false, searchable: false}
+                ],
+                columnDefs: [{
+                    targets: [0, 1, 3],
+                    className: "mdl-data-table__cell--non-numeric header-cursor"
+                }]
+            });
+
         },
-        error: function (e) {
-            console.log(e);
+        error: function (err) {
+            console.log(err);
         }
+
     });
 }
 

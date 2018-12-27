@@ -68,8 +68,11 @@ Route::middleware(['auth','web'])->group(function () {
         $files = \App\Models\Files::find($id);
 
         if ($files->is_file === 1){
-            return \Illuminate\Support\Facades\Storage::download($files->url, $files->name,
-                ['Content-Type' => $files->mime_type]);
+            if (\Illuminate\Support\Facades\Storage::exists($files->url))
+                return \Illuminate\Support\Facades\Storage::download($files->url, $files->name,
+                    ['Content-Type' => $files->mime_type]);
+            else
+                return abort(404);
         }
     });
 
