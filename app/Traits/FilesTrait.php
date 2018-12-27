@@ -138,13 +138,30 @@ trait FilesTrait
      *
      * @param $id
      */
-    public function deleteFilesRecursive($id) {
-
+    public function deleteFilesRecursive($id)
+    {
         $files = Files::where('folder_root', $id)->get();
         foreach ($files as $file) {
             $this->deleteFilesRecursive($file->id);
         }
 
         Files::find($id)->delete();
+    }
+
+    /**
+     * Get list file history
+     *
+     * @param $id
+     * @return array
+     */
+    public function getFileHistory($id)
+    {
+        $files = Files::findOrFail($id);
+
+        $fileHistory = DB::select(
+        "SELECT * FROM files WHERE id = ? UNION SELECT * FROM files WHERE file_root = ?", array($files['id'], $files['id'])
+        );
+
+        return $fileHistory;
     }
 }

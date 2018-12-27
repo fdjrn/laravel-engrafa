@@ -7,6 +7,7 @@ use App\Models\Bookmark;
 use App\Models\Files;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -34,7 +35,6 @@ class IndexController extends Controller
 
     public function index(Request $request)
     {
-        // $folderIdReq = !is_null($request->get('folder_id')) ? $request->get('folder_id') : "0";
         $folderIdReq = $request->get('folder_id') ?? 0;
         return view('index.index')->with('folderID', $folderIdReq);
     }
@@ -55,17 +55,19 @@ class IndexController extends Controller
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($dt)) . '">';
             })
             ->addColumn('action', function ($file) {
-                /*'<li><a data-toggle="modal" id="upload_new_file_btn" data-target="#upload-files-new-version-modal">Upload New Version</a></li>' :*/
+
                 $newCol =
                     '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
                     '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
                 $list = ($file->is_file === 1 ) ?
                     '<li><a href="/index/detail/'. $file->id .'">View</a></li><li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                    '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>' :
-                    '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>';
+                    '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
+                    '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>' :
+                    '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
+                    '<li><a href="#">See File Version</a></li>';
 
-                $newCol =  $newCol . $list .'<li><a href="#">See File Version</a></li></ul></div>';
+                $newCol =  $newCol . $list .'</ul></div>';
                 return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
@@ -90,29 +92,18 @@ class IndexController extends Controller
         return DataTables::of($data)
             ->addColumn('checkbox', function ($list) {
                 return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';})
-            ->addColumn('action', function ($f) {
+            ->addColumn('action', function ($file) {
 
                 $newCol =
-                    '
-                    <a onclick="bookmarkFile('. $f->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>
-                    <div class="btn-group">
-                        <a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">View</a></li>';
+                    '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
+                    '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                    '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
+                $list = ($file->is_file === 1 ) ?
+                    '<li><a href="/index/detail/'. $file->id .'">View</a></li><li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
+                    '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>' :
+                    '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>';
 
-                $dlUrl = ($f->is_file === 1 ) ?
-                    '<li><a href="/index/download-file/'.$f->id.'">Download</a></li>' :
-                    '<li><a href="#">Download</a></li>';
-
-                $newCol =  $newCol . $dlUrl .'
-                                <li><a href="#">Upload New Version</a></li>
-                                <li><a href="#">See File Version</a></li>
-                            </ul>
-                        </div>
-                        ';
-
+                $newCol =  $newCol . $list .'<li><a href="#">See File Version</a></li></ul></div>';
                 return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
@@ -232,12 +223,14 @@ class IndexController extends Controller
             }
 
             $new_file = Files::create([
+                'file_root' => 0,
                 'folder_root' => $folderRoot,
                 'name' => $fileName,
                 'url' => $file_url,
                 'is_file' => 1,
                 'size' => $fileSize,
                 'mime_type' => $fileMimeType,
+                'version' => 1,
                 'created_by' => $fileCreatedBy
             ]);
 
@@ -294,12 +287,6 @@ class IndexController extends Controller
         }
     }
 
-    /*public function getFilesById($id)
-    {
-        $files = Files::findOrFail($id);
-        return $files;
-    }*/
-
     /**
      * Update record in table Files
      *
@@ -346,26 +333,51 @@ class IndexController extends Controller
         return response()->json(['success' => true, 'message' => 'File/Folder Successfully Deleted!']);
     }
 
-    public function uploadNewVersion(Request $request, $id)
+    /**
+     * Upload new version of file based on selected files
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadNewVersion(Request $request)
     {
-        // find current root file
-        $rootFile = Files::findOrFail($id);
+        $reqFileId = $request->get('fileroot');
+        $reqFolderRootId = $request->get('folderId');
         $files = $request->file('new-file-version');
+
+        // find current files
+        $currentFile = Files::findOrFail($reqFileId);
+
+        // count file_root child then adjust it;
+        if ($currentFile['file_root'] == 0) {
+            $fileVersion = Files::where('file_root', $currentFile['id'])->count() + 2;
+        } else {
+            $fileVersion = Files::where('file_root', $currentFile['file_root'])->count() + 2;
+        }
+
+        $fileRoot = ($currentFile['file_root'] == 0) ? $currentFile['id'] : $currentFile['file_root'];
 
         foreach ($files as $file) {
             $fileMimeType = $file->getClientMimeType();
             $fileName = str_replace(' ','_',$file->getClientOriginalName());
             $fileSize = $file->getClientSize();
             $fileCreatedBy = Auth()->user()->id;
-            $fileUrl = $rootFile['url'] . '/' . $fileName;
+
+            if ($reqFolderRootId == 0) {
+                $fileUrl = $fileName;
+            } else {
+                $lenUrl = strlen($currentFile['name']);
+                $fileUrl = substr($currentFile['url'], 0, -($lenUrl)) . $fileName;
+            }
 
             $new_file = Files::create([
-                'file_root' => $rootFile['id'],
-                'folder_root' => $rootFile['folder_root'],
+                'file_root' => $fileRoot,
+                'folder_root' => $currentFile['folder_root'],
                 'name' => $fileName,
                 'url' => $fileUrl,
                 'is_file' => 1,
                 'size' => $fileSize,
+                'version' =>$fileVersion,
                 'mime_type' => $fileMimeType,
                 'created_by' => $fileCreatedBy
             ]);
@@ -384,5 +396,16 @@ class IndexController extends Controller
         return response()->json([
             'success' => true
         ]);
+    }
+
+    /**
+     * Show file history
+     *
+     * @param $id
+     * @return \Illuminate\Support\Collection
+     */
+    public function showFileHistory($id)
+    {
+        return $this->getFileHistory($id);
     }
 }

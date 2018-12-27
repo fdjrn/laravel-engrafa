@@ -87,12 +87,14 @@
             <div class="modal-body">
                 <div class="form-group has-feedback">
                     <label>Root Files:</label>
-                        <p id="rootFileName"></p>
+                    <p id="rootFileName"></p>
+                    <input type="hidden" name="fileRootId" id="fileRootId">
                 </div>
                 <div class="form-group has-feedback">
                     <form class="dropzone upload-file-form" id="upload-file-new-form" method="POST" enctype="multipart/form-data" action="">
                         @csrf
                         <div class="fallback">
+
                             <input type="file" name="new-file-version"/>
                         </div>
                     </form>
@@ -150,9 +152,30 @@
             </div>
             <div class="modal-body">
                 <iframe width="100%" height="640px" id="iframe-view-file" name="iframe-view-file"></iframe>
-                {{--<embed width="100%" height="640px" id="iframe-veiw-file">--}}
             </div>
             <div class="modal-footer"></div>
         </div>
     </div>
 </div>
+
+<!-- View File History Modal -->
+<div  id="app" class="modal fade bs-modal-file-history eng-modal" tabindex="-1" role="dialog" aria-labelledby="viewFileModalLabel" style="height: auto">
+    <div class="modal-dialog eng-modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&nbsp;</span>
+                </button>
+                <div align="center">
+                    <h4 class="modal-title">History</h4>
+                    <h4 id="modal-history-caption" class="modal-title"></h4>
+                </div>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+

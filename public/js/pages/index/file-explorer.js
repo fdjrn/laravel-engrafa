@@ -1,5 +1,8 @@
 Dropzone.autoDiscover = false;
+
 var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+
 
 function bookmarkFile(id) {
     $.ajax({
@@ -55,18 +58,31 @@ function uploadNewVersion(id) {
     $.get({
         url: "/index/get-file/" + id,
         success: function (result) {
-            console.log(result.name);
             $('#upload-files-new-version-modal').modal('show');
             $('#rootFileName').text(result.name);
+            $('#fileRootId').val(result.id);
         },
         error: function (e) {
             console.log(e);
         }
-    })
+    });
+}
 
+function seeFileHistory(id){
+    $.get({
+        url: "/index/get-file/" + id,
+        success: function(result) {
+            $('.bs-modal-file-history').modal('show');
+            $('#modal-history-caption').text(result.name);
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
 }
 
 $(document).ready(function () {
+    var testVar = "yoyoi";
     var rootFolderId = 0;
     var rootFolderName = "";
     var closeModalInterval;
@@ -206,19 +222,19 @@ $(document).ready(function () {
         dzUploadFile.processQueue();
     });
 
-    var dzUploadNewFile = new Dropzone('#upload-files-new-version-modal', {
-        paramName: "file",
-        url: '/index/upload-files',
+    var dzUploadNewFile = new Dropzone('#upload-file-new-form', {
+        paramName: "new-file-version",
+        url: '/index/upload-new-version',
         method: 'POST',
         maxFilesize: 25,
-        maxFiles: 4,
-        parallelUploads: 4,
+        maxFiles: 1,
+        parallelUploads: 1,
         uploadMultiple: true,
         autoProcessQueue: false,
         //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
         addRemoveLinks: true,
         dictFileTooBig: 'Max file size is 25MB',
-        dictMaxFilesExceeded: 'Max files uploaded is 4',
+        dictMaxFilesExceeded: 'Only 1 files allowed upload',
         success: function () {
             getCurrentMainFolderDetail(filesId);
         }
@@ -231,10 +247,15 @@ $(document).ready(function () {
 
 
     dzUploadNewFile.on("sending", function (file, xhr, formData) {
+        formData.append("fileroot", $('input:hidden[name="fileRootId"]').val());
         formData.append("folderId", filesId);
     });
 
     dzUploadNewFile.on("complete", function (file) {
+        dzUploadNewFile.removeFile(file);
+    });
+
+    dzUploadNewFile.on("canceled", function (file) {
         dzUploadNewFile.removeFile(file);
     });
 
@@ -426,7 +447,6 @@ $(document).ready(function () {
     $('#delete-file').on('click', function (e) {
         e.preventDefault();
         let id = $('#file-descr-id').val();
-        let csrf_token = $('meta[name="csrf-token"]').attr('content');
 
         if (id === ''){
             swal("Warning!!!",
@@ -486,7 +506,6 @@ $(document).ready(function () {
                 'warning');
             return;
         };
-
 
         $.ajax({
             url: "/index/get-file/" + id,

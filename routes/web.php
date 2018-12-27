@@ -54,6 +54,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
     Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
     Route::post('/index/upload-files','Index\IndexController@uploadFiles');
+    Route::post('/index/upload-new-version','Index\IndexController@uploadNewVersion');
     Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
     Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
     Route::delete('/index/delete-file/{id}','Index\IndexController@deleteFilesById');
@@ -73,6 +74,8 @@ Route::middleware(['auth','web'])->group(function () {
     });
 
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
+
+    Route::get('index/file-history/{id}','Index\IndexController@showFileHistory');
 
 
 	// chat

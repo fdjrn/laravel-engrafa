@@ -232,7 +232,7 @@
 @stop
 
 @section('page-level-plugins')
-
+    {{--<script src="{{ asset('js/app.js')}}"></script>--}}
 @stop
 
 @section('theme-global-scripts')
