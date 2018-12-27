@@ -56,18 +56,24 @@
   background-color: #3478a1;
   border-top: none;
   margin:0px;
-  padding: 5px;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-top: 2px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 0px;
   color: #fff;
+}
+.inside-sidemenu > .box > .box-body > ul > li.list_user > p {
+  font-weight: normal;
+  margin-bottom: 2px;
 }
 .inside-sidemenu > .box > .box-body > ul > li.list_user .icon-user{
   height: 50px;
   width : 50px;
-  line-height: 43px;
+  line-height: 50px;
   text-align: center;
   font-size: 25px;
-  border:solid 3px #fff;
+  background-color: #fff;
+  color:#3478a1;
   border-radius: 100%;
 }
 

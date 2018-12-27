@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="0" type='text' class="form-control" />
+                                      <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='text' class="form-control" />
                                       <span class="input-group-addon">%</span>
                                   </div>
                                 </div>

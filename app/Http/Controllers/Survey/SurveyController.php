@@ -627,7 +627,15 @@ class SurveyController extends Controller
                     ['survey','=',$id]
                 ])
                 ->get();
-            return $survey_members;
+
+            $survey_creator = DB::table('surveys')
+                ->select('surveys.created_by as user',DB::raw("'0-Creator' as role"),'users.username')
+                ->leftJoin('users','users.id','=','surveys.created_by')
+                ->where([
+                    ['surveys.id','=',$id]
+                ])
+                ->get();
+            return array_merge(json_decode($survey_creator), json_decode($survey_members));
         }else{
             $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
             echo json_encode($users);
@@ -650,6 +658,8 @@ class SurveyController extends Controller
             ->select('surveys.id')
             ->where('surveys.id',$id)
             ->get();
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
 
         if($data_survey->first()){
             $data_tasks = DB::table('tasks')
@@ -730,6 +740,7 @@ class SurveyController extends Controller
 
         if($post){
             $id = $survey->id;
+
             if($request->get('i_n_surveyor')){
                 foreach ($request->get('i_n_surveyor') as $surveyor) {
                     $surveymembers = new \App\Models\SurveyMembers;
@@ -740,9 +751,9 @@ class SurveyController extends Controller
                 }                
             }
             if($request->get('i_n_client')){
-                foreach ($request->get('i_n_client') as $surveyor) {
+                foreach ($request->get('i_n_client') as $client) {
                     $surveymembers = new \App\Models\SurveyMembers;
-                    $surveymembers->user = $surveyor;
+                    $surveymembers->user = $client;
                     $surveymembers->survey = $id;
                     $surveymembers->role = "2-Responden";
                     $surveymembers->save();
@@ -771,6 +782,73 @@ class SurveyController extends Controller
                     }
                 }
             }
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Created New Survey : ".$request->post('i_n_name_survey');
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $id;
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            if($request->get('i_n_surveyor') && $notif_post){
+                foreach ($request->get('i_n_surveyor') as $surveyor) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }                
+            }
+            if($request->get('i_n_client') && $notif_post){
+                foreach ($request->get('i_n_client') as $client) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $client;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
+            }
+
+            $chatRoom = new \App\Models\ChatRoom;
+            $chatRoom->name = $request->post('i_n_name_survey');
+            $chatRoom->chat_type = '3-Survey';
+            $chatRoom->survey = $id;
+            $chatRoom->created_by = Auth::user()->id;
+            $chatRoom_post = $chatRoom->save();
+
+            if($chatRoom_post){
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chatRoom->id;
+                $chatMember->user = Auth::user()->id;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($request->get('i_n_surveyor')){
+                    foreach ($request->get('i_n_surveyor') as $surveyor) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $surveyor;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }                
+                }
+                if($request->get('i_n_client')){
+                    foreach ($request->get('i_n_client') as $client) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $client;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }
+                }
+            }
+
             return json_encode([
                 'status' => 1,
                 'messages' => '/survey/'.$id

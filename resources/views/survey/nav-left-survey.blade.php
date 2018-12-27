@@ -24,13 +24,14 @@
             </a>
           </li>
           <li class="list_user">
+            <p><i class="fa fa-users"></i>&nbsp;List User</p>
             <div id="carousel-example-multi" class="carousel carousel-multi slide" data-ride="carousel">
               <div class="carousel-inner" role="listbox">
                 @foreach($survey_members as $index => $survey_member)
                   <div class="item {{ !$index ? 'active' : '' }}">
                     <div class="media media-card">
-                      <div class="icon-user">
-                        <i class="{{ $survey_member->role == '1-Surveyor' ? 'fa fa-user-secret' : 'fa fa-user' }}" title="{{ $survey_member->username }}"></i>
+                      <div class="icon-user" data-toggle="tooltip" data-placement="bottom" data-container="body" title="{{ $survey_member->username.' - '.(explode('-',$survey_member->role))[1] }}">
+                        <i class="{{ $survey_member->role == '2-Responden' ? 'fa fa-user' : 'fa fa-user-secret' }}"></i>
                       </div>
                     </div>
                   </div>
