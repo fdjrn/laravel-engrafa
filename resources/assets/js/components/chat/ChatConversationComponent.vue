@@ -1,5 +1,5 @@
 <template>
-	<div class="direct-chat-messages" style="height: 400px">
+	<div class="direct-chat-messages" style="height: 510px">
             <!-- Message. Default to the left -->
             <div class="direct-chat-msg">
               <div class="direct-chat-info clearfix">

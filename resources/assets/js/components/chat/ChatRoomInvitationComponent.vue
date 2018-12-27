@@ -16,7 +16,7 @@
 							</div>
 						</div>  
 						<div class="modal-footer justify-content-start" style="text-align:center;">
-							<button class="btn btn-primary" @click="inviteUser">Invite</button>
+							<button class="btn btn-primary" @click="createPersonalChatRoom">Invite</button>
 						</div>
 				</div>
 			</div>
@@ -50,8 +50,17 @@
 
 		},
 		methods : {
-			inviteUser(){
-				console.log('selected user ' + this.selectedUser);
+			createPersonalChatRoom(){
+				let chatType = "1-Personal";
+				axios.post('/chat/invite',{
+					'userId' : this.selectedUser,
+					'chatType' : "1-Personal"
+				})
+				.then(response => {
+					this.$emit('createPersonalChatRoom',response.data.chatRoom,response.data.exist);
+					$('#inviteModal').modal('hide');
+					$('.modal-backdrop').remove();
+				});
 			}
 		}, 
 		bind: function () {

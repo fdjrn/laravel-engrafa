@@ -1,6 +1,6 @@
 <template>
   <ul class="products-list product-list-in-box">
-    <li class="item"  v-for="user in users">
+    <li class="item"  v-for="chatRoom in chatRooms">
       <div class="product-img">
         <span class="direct-chat-img bg-blue">
           <i class="fa fa-user" style="padding: 13px 15px;"></i><!-- /.direct-chat-img -->
@@ -8,7 +8,7 @@
       </div>
       <div class="product-info">
         <a href="javascript:void(0)" class="product-title">
-            {{ user.name }}
+            {{ chatRoom.name }}
         </a>
         <span class="pull-right">
           <!-- <small class="label ">
@@ -20,7 +20,7 @@
           <small class="label bg-yellow">2</small> -->
         </span>
         <span class="product-description">
-          {{user.email}}
+          {{ chatRoom.updated_at }}
         </span>
       </div>
     </li>
@@ -31,14 +31,13 @@
 <script>
   export default{
     props: {
-      users : {
+      chatRooms : {
         type : Array,
         default : []
       }
     },
     mounted() {
-      console.log("chat room list mounted");
-      console.log(this.users);
+
     }
   }
 </script>

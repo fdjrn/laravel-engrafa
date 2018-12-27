@@ -42,7 +42,7 @@
     <!-- col-md-9 -->
 
     <div class="col-md-4">
-      <chat-room-component ></chat-room-component>
+      <chat-room-component :user="{{ auth()->user() }}" ></chat-room-component>
     </div>
     <!-- col-md-3 -->
   </div>
