@@ -878,6 +878,18 @@ class SurveyController extends Controller
             ]);
         }
 
+        $survey_name = DB::table('surveys')->select('name')->where('id','=',$id)->get()->first()->name;
+
+        $notification = new \App\Models\Notifications;
+        $notification->notification_text = "@".Auth::user()->username." Invited you to Survey : ".$survey_name;
+        $notification->modul = '2-Survey';
+        $notification->modul_id = $id;
+        $notification->created_by = Auth::user()->id;
+        $notification->notification_start = Carbon::now()->toDateTimeString();
+        $notif_post = $notification->save();
+
+        $chat_rooms_id = DB::table('chat_rooms')->select('id')->where('survey','=',$id)->get()->first()->id;
+
         if($request->get('inv_surveyor')){
             foreach ($request->get('inv_surveyor') as $surveyor) {
                 $surveymembers = new \App\Models\SurveyMembers;
@@ -885,6 +897,22 @@ class SurveyController extends Controller
                 $surveymembers->survey = $id;
                 $surveymembers->role = "1-Surveyor";
                 $surveymembers->save();
+
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $surveyor;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             } 
         }               
 
@@ -895,6 +923,22 @@ class SurveyController extends Controller
                 $surveymembers->survey = $id;
                 $surveymembers->role = "2-Responden";
                 $surveymembers->save();
+                
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $responden;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $responden;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             }
         }
         
@@ -946,11 +990,38 @@ class SurveyController extends Controller
         $post = $task->save();
         if($post){
             $id = $task->id;
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name;
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $request->post('i_n_survey_id');
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            $notificationReceivers = new \App\Models\NotificationReceivers;
+            $notificationReceivers->notification = $notification->id;
+            $notificationReceivers->receiver = $request->post('i_n_assignee');
+            $notificationReceivers->is_read = 0;
+            $notificationReceivers->created_by = Auth::user()->id;
+            $notificationReceivers->save();
+
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;
                 $taskparticipants->task = $id;
                 $taskparticipants->team_member = $participant;
                 $taskparticipants->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             }
         }
 
@@ -990,6 +1061,8 @@ class SurveyController extends Controller
 
         $task = Task::find($task_id);
 
+        $assignee = $task->assign;
+
         $task->survey       = $request->post('i_n_survey_id');
         $task->name         = $request->post('i_n_name_task');
         $task->assign       = $request->post('i_n_assignee');
@@ -1001,6 +1074,49 @@ class SurveyController extends Controller
         $task->created_by   = Auth::user()->id;
         $post               = $task->save();
         if($post){
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            if($assignee != $request->post('i_n_assignee')){
+                $notification = new \App\Models\Notifications;
+                $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Assignee";
+                $notification->modul = '2-Survey';
+                $notification->modul_id = $request->post('i_n_survey_id');
+                $notification->created_by = Auth::user()->id;
+                $notification->notification_start = Carbon::now()->toDateTimeString();
+                $notif_post = $notification->save();
+
+                $notificationReceivers = new \App\Models\NotificationReceivers;
+                $notificationReceivers->notification = $notification->id;
+                $notificationReceivers->receiver = $request->post('i_n_assignee');
+                $notificationReceivers->is_read = 0;
+                $notificationReceivers->created_by = Auth::user()->id;
+                $notificationReceivers->save();
+            }
+
+            foreach ($request->get('i_n_participant') as $participant) {
+                $available = \App\Models\TaskParticipants::where([
+                    ['task','=',$task_id],
+                    ['team_member','=',$participant]
+                ]);
+                if(!$available->first()){
+                    $notification = new \App\Models\Notifications;
+                    $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Participant";
+                    $notification->modul = '2-Survey';
+                    $notification->modul_id = $request->post('i_n_survey_id');
+                    $notification->created_by = Auth::user()->id;
+                    $notification->notification_start = Carbon::now()->toDateTimeString();
+                    $notif_post = $notification->save();
+
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
+            }
+
             $deletedRows = \App\Models\TaskParticipants::where('task', $task_id)->delete();
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;
