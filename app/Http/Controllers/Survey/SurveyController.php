@@ -49,7 +49,7 @@ class SurveyController extends Controller
             ->where('surveys.id',$id)
             ->get()->first()->name;
 
-        if($data['status_ownership'] == 'RESPONDEN'){
+        if(explode("-",$data['status_ownership'])[0] == 2){
             $data['surveys'] = (clone $query_survey)
                 ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 4")
                 ->get();
@@ -746,7 +746,7 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "1-Surveyor";
+                    $surveymembers->role = "1-Manager";
                     $surveymembers->save();
                 }                
             }
@@ -755,7 +755,7 @@ class SurveyController extends Controller
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $client;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "2-Responden";
+                    $surveymembers->role = "2-Assessor";
                     $surveymembers->save();
                 }
             }
@@ -895,7 +895,7 @@ class SurveyController extends Controller
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $surveyor;
                 $surveymembers->survey = $id;
-                $surveymembers->role = "1-Surveyor";
+                $surveymembers->role = "1-Manager";
                 $surveymembers->save();
 
                 $chatMember = new \App\Models\ChatMember;
@@ -921,7 +921,7 @@ class SurveyController extends Controller
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $responden;
                 $surveymembers->survey = $id;
-                $surveymembers->role = "2-Responden";
+                $surveymembers->role = "2-Assessor";
                 $surveymembers->save();
                 
                 $chatMember = new \App\Models\ChatMember;

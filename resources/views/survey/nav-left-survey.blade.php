@@ -31,7 +31,7 @@
                   <div class="item {{ !$index ? 'active' : '' }}">
                     <div class="media media-card">
                       <div class="icon-user" data-toggle="tooltip" data-placement="bottom" data-container="body" title="{{ $survey_member->username.' - '.(explode('-',$survey_member->role))[1] }}">
-                        <i class="{{ $survey_member->role == '2-Responden' ? 'fa fa-user' : 'fa fa-user-secret' }}"></i>
+                        <i class="{{ explode('-',$survey_member->role)[0] == 2 ? 'fa fa-user' : 'fa fa-user-secret' }}"></i>
                       </div>
                     </div>
                   </div>
@@ -42,7 +42,7 @@
               </a>
             </div>
           </li>
-          @if($status_ownership != 'RESPONDEN')
+          @if($status_ownership < 2)
           <li class="footer">
             <a id="o_invite_user">
               <h4><i class="fa fa-user-plus"></i>&nbsp;&nbsp;<span>Invite</span></h4>
