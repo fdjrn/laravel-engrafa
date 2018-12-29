@@ -84,10 +84,12 @@ Route::middleware(['auth','web'])->group(function () {
 	// chat
 	Route::get('/chat','Chat\ChatController@index')->name('chat');
 	Route::post('/chat/invite','Chat\ChatController@invite');
-	Route::get('/chat/getChatRoom','Chat\ChatController@getChatRoom');
+	Route::post('/chat/invite/group','Chat\ChatController@inviteGroup');
+	Route::get('/chat/getChatRoom/{chatRoom?}/','Chat\ChatController@getChatRoom');
+	Route::get('/chat/getChatHistory/{chatRoom?}/','Chat\ChatController@getChatHistory');
 	Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
 	Route::get('/message', 'Chat\MessageController@index')->name('message');
-	Route::post('/message', 'Chat\MessageController@store')->name('message.store');
+	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
 
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');

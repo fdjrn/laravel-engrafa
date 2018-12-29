@@ -16,6 +16,7 @@ window.Vue = require('vue');
  */
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('chat-personal-component', require('./components/chat/ChatPersonalComponent.vue'));
 Vue.component('chat-component', require('./components/chat/ChatComponent.vue'));
 Vue.component('chat-conversation-component', require('./components/chat/ChatConversationComponent.vue'));
 Vue.component('chat-room-component', require('./components/chat/ChatRoomComponent.vue'));

@@ -9,7 +9,7 @@
 						<div class="modal-body">
 							
 							<div class="form-group">
-								<select id="users" name="users" class="form-control " data-placeholder="User" v-model="selectedUser" 
+								<select id="users" name="users" class="form-control" data-placeholder="User" v-model="selectedUser" 
 	                      style="width: 100%;" >
 	                      			<option v-for="user in users" :value="user.id">{{user.name}}</option>
 	          					</select>
@@ -32,7 +32,7 @@
 		data() {
 			return {
 				users : null,
-				selectedUser : 3
+				selectedUser : -1
 			}
 		},
 		ready: function(){
@@ -60,6 +60,8 @@
 					this.$emit('createPersonalChatRoom',response.data.chatRoom,response.data.exist);
 					$('#inviteModal').modal('hide');
 					$('.modal-backdrop').remove();
+
+					this.selectedUser = -1;
 				});
 			}
 		}, 

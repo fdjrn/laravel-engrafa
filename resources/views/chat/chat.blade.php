@@ -35,17 +35,7 @@
 
 @section('body-inner-content')
 <div id="app">
-  <div class="row">
-    <div class="col-md-8">
-      <chat-component :user="{{ auth()->user() }}"></chat-component>
-    </div>
-    <!-- col-md-9 -->
-
-    <div class="col-md-4">
-      <chat-room-component :user="{{ auth()->user() }}" ></chat-room-component>
-    </div>
-    <!-- col-md-3 -->
-  </div>
+  <chat-personal-component :user="{{ auth()->user() }}"></chat-personal-component>
 </div>
 @stop
 
@@ -60,11 +50,15 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/app.js')}}"></script>
+
 <script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script> <script>
   $(function () {
     //Initialize Select2 Elements
     $('.select2').select2()
   })
+</script>
+
+<script>
 </script>
   <!-- select2 -->
 @stop

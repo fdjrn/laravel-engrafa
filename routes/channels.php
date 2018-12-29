@@ -14,3 +14,13 @@
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('invitation.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+    // return true;
+});
+
+Broadcast::channel('chat.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+    // return true;
+});
