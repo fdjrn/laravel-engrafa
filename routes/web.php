@@ -55,6 +55,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
     Route::post('/index/create-new-folder/{id}','Index\IndexController@createNewFolder');
     Route::post('/index/upload-files','Index\IndexController@uploadFiles');
+    Route::post('/index/upload-new-version','Index\IndexController@uploadNewVersion');
     Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
     Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
     Route::delete('/index/delete-file/{id}','Index\IndexController@deleteFilesById');
@@ -68,21 +69,28 @@ Route::middleware(['auth','web'])->group(function () {
         $files = \App\Models\Files::find($id);
 
         if ($files->is_file === 1){
-            return \Illuminate\Support\Facades\Storage::download($files->url, $files->name,
-                ['Content-Type' => $files->mime_type]);
+            if (\Illuminate\Support\Facades\Storage::exists($files->url))
+                return \Illuminate\Support\Facades\Storage::download($files->url, $files->name,
+                    ['Content-Type' => $files->mime_type]);
+            else
+                return abort(404);
         }
     });
 
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
 
+    Route::get('index/file-history/{id}','Index\IndexController@showFileHistory');
+
 
 	// chat
 	Route::get('/chat','Chat\ChatController@index')->name('chat');
 	Route::post('/chat/invite','Chat\ChatController@invite');
-	Route::get('/chat/getChatRoom','Chat\ChatController@getChatRoom');
+	Route::post('/chat/invite/group','Chat\ChatController@inviteGroup');
+	Route::get('/chat/getChatRoom/{chatRoom?}/','Chat\ChatController@getChatRoom');
+	Route::get('/chat/getChatHistory/{chatRoom?}/','Chat\ChatController@getChatHistory');
 	Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
 	Route::get('/message', 'Chat\MessageController@index')->name('message');
-	Route::post('/message', 'Chat\MessageController@store')->name('message.store');
+	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
 
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');

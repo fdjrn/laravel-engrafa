@@ -138,13 +138,33 @@ trait FilesTrait
      *
      * @param $id
      */
-    public function deleteFilesRecursive($id) {
-
+    public function deleteFilesRecursive($id)
+    {
         $files = Files::where('folder_root', $id)->get();
         foreach ($files as $file) {
             $this->deleteFilesRecursive($file->id);
         }
 
         Files::find($id)->delete();
+    }
+
+    /**
+     * Get list file history
+     *
+     * @param $id
+     * @return array
+     */
+    public function getFileHistory($id)
+    {
+        $files = Files::findOrFail($id);
+
+        $fileHistory = DB::select("
+        SELECT *, CONCAT(round(size/1024,2), ' Kb') AS size_in_kb FROM files WHERE id = ? 
+        UNION 
+        SELECT *, CONCAT(round(size/1024,2), ' Kb') AS size_in_kb FROM files WHERE file_root = ? 
+        ORDER BY version", array($files['id'], $files['id'])
+        );
+
+        return $fileHistory;
     }
 }

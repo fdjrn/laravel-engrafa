@@ -1,4 +1,5 @@
 Dropzone.autoDiscover = false;
+
 var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
 function bookmarkFile(id) {
@@ -23,23 +24,6 @@ function bookmarkFile(id) {
             })
         }
     });
-}
-
-function downloadFile(id) {
-    $.get({
-        url: '/index/download-file/' + id,
-        success: function (response) {
-            if (response.status === 'failed') {
-                swal({
-                    title: 'Download Failed!!',
-                    text: 'Allowed download tiype is file only',
-                    type: 'error',
-                    timer: '2000'
-                })
-            }
-        }
-
-    })
 }
 
 function setComment(id) {
@@ -67,7 +51,64 @@ function setComment(id) {
     })
 }
 
+function uploadNewVersion(id) {
+
+    $.get({
+        url: "/index/get-file/" + id,
+        success: function (result) {
+            $('#upload-files-new-version-modal').modal('show');
+            $('#rootFileName').text(result.name);
+            $('#fileRootId').val(result.id);
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}
+
+function seeFileHistory(id){
+    var dtHistory = $("#file-history-table").DataTable();
+
+    dtHistory.destroy();
+
+    $.ajax({
+        url: "/index/get-file/" + id,
+        type: 'GET',
+        success: function (result) {
+            $('.bs-modal-file-history').modal('show');
+            $('#modal-history-caption').text(result.name);
+            $('#fileHistoryId').val(result.id);
+
+            let fId = (result.file_root == 0) ? result.id : result.file_root;
+
+            dtHistory = $("#file-history-table").DataTable({
+                processing: true,
+                serverSide: true,
+                "searching": false,
+                // "dom": "<fl<t>ip>",
+                ajax: "/index/file-history/" + fId,
+                columns: [
+                    { data: "name" },
+                    { data: "created_at" },
+                    { data: "size_in_kb" },
+                    {data: "action", name: "action", orderable: false, searchable: false}
+                ],
+                columnDefs: [{
+                    targets: [0, 1, 3],
+                    className: "mdl-data-table__cell--non-numeric header-cursor"
+                }]
+            });
+
+        },
+        error: function (err) {
+            console.log(err);
+        }
+
+    });
+}
+
 $(document).ready(function () {
+    var testVar = "yoyoi";
     var rootFolderId = 0;
     var rootFolderName = "";
     var closeModalInterval;
@@ -177,7 +218,7 @@ $(document).ready(function () {
 
     $('#file-descr-id').val('');
 
-    var myDropzone = new Dropzone('#upload-file-form', {
+    var dzUploadFile = new Dropzone('#upload-file-form', {
         paramName: "file",
         url: '/index/upload-files',
         method: 'POST',
@@ -193,6 +234,59 @@ $(document).ready(function () {
         success: function () {
             getCurrentMainFolderDetail(filesId);
         }
+    });
+
+    dzUploadFile.on("sending", function (file, xhr, formData) {
+        formData.append("folderId", filesId);
+    });
+
+    dzUploadFile.on("complete", function (file) {
+        dzUploadFile.removeFile(file);
+    });
+
+    $('#btn-upload-files').on('click', function () {
+        dzUploadFile.processQueue();
+    });
+
+    var dzUploadNewFile = new Dropzone('#upload-file-new-form', {
+        paramName: "new-file-version",
+        url: '/index/upload-new-version',
+        method: 'POST',
+        maxFilesize: 25,
+        maxFiles: 1,
+        parallelUploads: 1,
+        uploadMultiple: true,
+        autoProcessQueue: false,
+        //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
+        addRemoveLinks: true,
+        dictFileTooBig: 'Max file size is 25MB',
+        dictMaxFilesExceeded: 'Only 1 files allowed upload',
+        success: function () {
+            getCurrentMainFolderDetail(filesId);
+        }
+    });
+
+    $('#upload-files-new-version-modal').on('show', function () {
+        let rootFileName = $('#file-descr-name').text();
+        $('#rootFileName').text(rootFileName);
+    })
+
+
+    dzUploadNewFile.on("sending", function (file, xhr, formData) {
+        formData.append("fileroot", $('input:hidden[name="fileRootId"]').val());
+        formData.append("folderId", filesId);
+    });
+
+    dzUploadNewFile.on("complete", function (file) {
+        dzUploadNewFile.removeFile(file);
+    });
+
+    dzUploadNewFile.on("canceled", function (file) {
+        dzUploadNewFile.removeFile(file);
+    });
+
+    $('#btn-upload-new-files').on('click', function () {
+        dzUploadNewFile.processQueue();
     });
 
     $("#dt-file-exp-table-index tbody").on("change", "input[type='checkbox']", function () {
@@ -341,20 +435,6 @@ $(document).ready(function () {
         });
     });
 
-    $('#btn-upload-files').on('click', function () {
-        myDropzone.processQueue();
-    });
-
-    myDropzone.on("sending", function (file, xhr, formData) {
-        // formData.append("filesize", file.size);
-        formData.append("folderId", filesId);
-        console.log(file.type);
-    });
-
-    myDropzone.on("complete", function (file) {
-        myDropzone.removeFile(file);
-    });
-
     $('#edit-file-descr').on('click', function (e) {
         e.preventDefault();
         let id = $('#file-descr-id').val();
@@ -393,7 +473,6 @@ $(document).ready(function () {
     $('#delete-file').on('click', function (e) {
         e.preventDefault();
         let id = $('#file-descr-id').val();
-        let csrf_token = $('meta[name="csrf-token"]').attr('content');
 
         if (id === ''){
             swal("Warning!!!",
@@ -442,4 +521,38 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#view-file').on('click', function (e) {
+        e.preventDefault();
+        let id = $('#file-descr-id').val();
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        };
+
+        $.ajax({
+            url: "/index/get-file/" + id,
+            type: "GET",
+            success: function (data) {
+
+                if (data.is_file === 1) {
+                    $('.bs-modal-view-file').modal('show');
+                    $('#modal-view-caption').html('<i class="fa fa-file"></i><span> &nbsp;' + data.name +'</span>');
+                    $('#iframe-view-file').attr('visibility','visible');
+                    $('#iframe-view-file').attr('src', base_url  +"/storage/index/"+ data.url);
+                }
+            },
+            error: function (response) {
+                if (response.status === '401')
+                    window.location.href = '/login';
+            }
+        })
+    });
+
+    $('.bs-modal-view-file').on('hidden.bs.modal', function (e) {
+        $('#iframe-view-file').attr('src','');
+    })
 });

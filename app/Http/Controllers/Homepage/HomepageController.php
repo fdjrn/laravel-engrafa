@@ -75,7 +75,7 @@ class HomepageController extends Controller
         $folder_name = $request->input('folderName');
         if ($validator->passes()) {
 
-            $folder_path = '/storage/index/' . $folder_name;
+            $folder_path = $folder_name;
             Storage::makeDirectory($folder_name);
 
             $folder = new Files();
@@ -99,32 +99,32 @@ class HomepageController extends Controller
     public function uploadFiles(Request $request)
     {
         $files = $request->file('file');
-        $file_flag = 1;
 
         foreach ($files as $file){
-            $file_name = $file->getClientOriginalName();
-            $file_size = $file->getClientSize();
-            $file_created_by = Auth()->user()->id;
-
-            $folder_root = 0;
-            $file_url = '/storage/index/' . $file->getClientOriginalName();
+            $fileMimeType = $file->getClientMimeType();
+            $fileName = str_replace(' ','_',$file->getClientOriginalName());
+            $fileSize = $file->getClientSize();
+            $fileCreatedBy = Auth()->user()->id;
+            $file_url = $fileName;
 
             $new_file = Files::create([
-                'folder_root' => $folder_root,
-                'name' => $file_name,
+                'folder_root' => 0,
+                'name' => $fileName,
                 'url' => $file_url,
-                'is_file' => $file_flag,
-                'size' => $file_size,
-                'created_by' => $file_created_by,
+                'is_file' => 1,
+                'size' => $fileSize,
+                'mime_type' => $fileMimeType,
+                'created_by' => $fileCreatedBy
             ]);
 
+
             if ($new_file) {
-                $file_path = '/'.$file->getClientOriginalName();
+                $file_path = $new_file->url;
                 Storage::disk('public')->put($file_path, file_get_contents($file));
             } else {
                 return response()->json([
                     'success' => false,
-                    'errors' => 'error cenah',
+                    'errors' => 'Failed to create File',
                 ], 404);
             }
         }

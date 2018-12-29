@@ -64,7 +64,7 @@
         </li>
         @endforeach -->
         @each('layouts.part.partial-menu',$roleMenus,'menu','layouts.part.partial-menu','mnsurvey')
-        <li class="treeview">
+        <li >
           <a href="{{ url('chat') }}">
             <i class="fa fa-comment"></i> <span>Chat</span>
           </a>
