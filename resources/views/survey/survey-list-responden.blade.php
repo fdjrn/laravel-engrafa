@@ -6,7 +6,8 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">
-          <div class="table-responsive">   
+          <div class="table-responsive">
+            @if($surveys->first())   
             <table id="table_edm" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
@@ -15,40 +16,48 @@
                 </tr>
               </thead>
               <tbody>
-                @if($surveys->first())
-                  @foreach($surveys as $survey)
-                    <tr>
-                      <td>
-                        <div>
-                          <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
-                            <p>
-                              {{$survey->process}}
-                            </p>
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                        @if($survey->status == '1-Waiting')
-                          <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Waiting"><i class="fa fa-play fa-fw"></i></a>
-                        @elseif($survey->status == '2-Process Survey')
-                          <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Process"><i class="fa fa-ellipsis-h fa-fw"></i></a>
-                        @elseif($survey->status == '3-On Save Survey')
-                          <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="On Save"><i class="fa fa-pause fa-fw"></i></a>
-                        @endif
-                      </td>
-                    </tr>
-                  @endforeach
-                @else
+                @foreach($surveys as $survey)
                   <tr>
-                    <td colspan="2" class="text-center">No Pending Process Available</td>
+                    <td>
+                      <div>
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
+                          <p>
+                            {{$survey->process}}
+                          </p>
+                        </a>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      @if($survey->status == '1-Waiting')
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Waiting"><i class="fa fa-play fa-fw"></i></a>
+                      @elseif($survey->status == '2-Process Survey')
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Process"><i class="fa fa-ellipsis-h fa-fw"></i></a>
+                      @elseif($survey->status == '3-On Save Survey')
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="On Save"><i class="fa fa-pause fa-fw"></i></a>
+                      @endif
+                    </td>
                   </tr>
-                @endif
+                @endforeach
               </tbody>
             </table>
+            @else     
+            <table class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
+              <thead>
+                  <th>Name</th>
+                  <th>Start</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="2" class="text-center">No Pending Process Available</td>
+                </tr>
+              </tbody>
+            </table>
+            @endif
           </div>
         </div>
         <div class="tab-pane" id="tab_2">
-          <div class="table-responsive">        
+          <div class="table-responsive">
+            @if($surveys_done->first())        
             <table id="table_done" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
                 <tr>
@@ -57,7 +66,6 @@
                 </tr>
               </thead>
               <tbody>
-                @if($surveys_done->first())
                   @foreach($surveys_done as $survey)
                     <tr>
                       <td>
@@ -74,13 +82,21 @@
                       </td>
                     </tr>
                   @endforeach
-                @else
-                  <tr>
-                    <td colspan="2" class="text-center">No Finished Process Available</td>
-                  </tr>
-                @endif
               </tbody>
             </table>
+            @else     
+            <table class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
+              <thead>
+                  <th>Name</th>
+                  <th>Start</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="2" class="text-center">No Finished Process Available</td>
+                </tr>
+              </tbody>
+            </table>
+            @endif
           </div>
         </div>
       </div>
