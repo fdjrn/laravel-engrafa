@@ -80,8 +80,7 @@ $("#form_i_user").submit(function(e) {
             swal({
               type: 'error',
               title: 'Gagal',
-              html:true,
-              text: parse.messages
+              html: parse.messages
             });
           }
          },

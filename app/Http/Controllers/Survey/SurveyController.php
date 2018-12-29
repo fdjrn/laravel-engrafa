@@ -64,6 +64,8 @@ class SurveyController extends Controller
                 ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) = 7")
                 ->get();
         }
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
         
         return view('survey.survey',$data);
     }
@@ -112,14 +114,7 @@ class SurveyController extends Controller
 
         if($d_surveys->first()){
             if ($d_surveys->first()->created_by != Auth::user()->id){
-                $data['survey_members'] = DB::table('survey_members')
-                    ->select('survey_members.user','users.username')
-                    ->leftJoin('users','users.id','=','survey_members.user')
-                    ->where([
-                        ['survey','=',$id],
-                        ['survey_members.role','=','2-Responden']
-                    ])
-                    ->get();
+                $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
                 $ok = 0;
                 foreach($data['survey_members'] as $surmem){
                     if($surmem->user == Auth::user()->id){
@@ -229,13 +224,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -465,13 +454,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -636,6 +619,23 @@ class SurveyController extends Controller
                                 WHERE a.id = b.created_by || a.id = c.user
                                 GROUP BY a.id, a.username");
             echo json_encode($users);
+        }elseif($condition == 'user_survey'){
+            $survey_members = DB::table('survey_members')
+                ->select('survey_members.user','survey_members.role','users.username')
+                ->leftJoin('users','users.id','=','survey_members.user')
+                ->where([
+                    ['survey','=',$id]
+                ])
+                ->get();
+
+            $survey_creator = DB::table('surveys')
+                ->select('surveys.created_by as user',DB::raw("'0-Creator' as role"),'users.username')
+                ->leftJoin('users','users.id','=','surveys.created_by')
+                ->where([
+                    ['surveys.id','=',$id]
+                ])
+                ->get();
+            return array_merge(json_decode($survey_creator), json_decode($survey_members));
         }else{
             $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
             echo json_encode($users);
@@ -658,6 +658,8 @@ class SurveyController extends Controller
             ->select('surveys.id')
             ->where('surveys.id',$id)
             ->get();
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
 
         if($data_survey->first()){
             $data_tasks = DB::table('tasks')
@@ -738,6 +740,7 @@ class SurveyController extends Controller
 
         if($post){
             $id = $survey->id;
+
             if($request->get('i_n_surveyor')){
                 foreach ($request->get('i_n_surveyor') as $surveyor) {
                     $surveymembers = new \App\Models\SurveyMembers;
@@ -748,9 +751,9 @@ class SurveyController extends Controller
                 }                
             }
             if($request->get('i_n_client')){
-                foreach ($request->get('i_n_client') as $surveyor) {
+                foreach ($request->get('i_n_client') as $client) {
                     $surveymembers = new \App\Models\SurveyMembers;
-                    $surveymembers->user = $surveyor;
+                    $surveymembers->user = $client;
                     $surveymembers->survey = $id;
                     $surveymembers->role = "2-Responden";
                     $surveymembers->save();
@@ -779,6 +782,73 @@ class SurveyController extends Controller
                     }
                 }
             }
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Created New Survey : ".$request->post('i_n_name_survey');
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $id;
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            if($request->get('i_n_surveyor') && $notif_post){
+                foreach ($request->get('i_n_surveyor') as $surveyor) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }                
+            }
+            if($request->get('i_n_client') && $notif_post){
+                foreach ($request->get('i_n_client') as $client) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $client;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
+            }
+
+            $chatRoom = new \App\Models\ChatRoom;
+            $chatRoom->name = $request->post('i_n_name_survey');
+            $chatRoom->chat_type = '3-Survey';
+            $chatRoom->survey = $id;
+            $chatRoom->created_by = Auth::user()->id;
+            $chatRoom_post = $chatRoom->save();
+
+            if($chatRoom_post){
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chatRoom->id;
+                $chatMember->user = Auth::user()->id;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($request->get('i_n_surveyor')){
+                    foreach ($request->get('i_n_surveyor') as $surveyor) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $surveyor;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }                
+                }
+                if($request->get('i_n_client')){
+                    foreach ($request->get('i_n_client') as $client) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $client;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }
+                }
+            }
+
             return json_encode([
                 'status' => 1,
                 'messages' => '/survey/'.$id
@@ -808,23 +878,67 @@ class SurveyController extends Controller
             ]);
         }
 
-        if($request->get('inv_responden')){
+        $survey_name = DB::table('surveys')->select('name')->where('id','=',$id)->get()->first()->name;
+
+        $notification = new \App\Models\Notifications;
+        $notification->notification_text = "@".Auth::user()->username." Invited you to Survey : ".$survey_name;
+        $notification->modul = '2-Survey';
+        $notification->modul_id = $id;
+        $notification->created_by = Auth::user()->id;
+        $notification->notification_start = Carbon::now()->toDateTimeString();
+        $notif_post = $notification->save();
+
+        $chat_rooms_id = DB::table('chat_rooms')->select('id')->where('survey','=',$id)->get()->first()->id;
+
+        if($request->get('inv_surveyor')){
             foreach ($request->get('inv_surveyor') as $surveyor) {
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $surveyor;
                 $surveymembers->survey = $id;
                 $surveymembers->role = "1-Surveyor";
                 $surveymembers->save();
+
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $surveyor;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             } 
         }               
 
-        if($request->get('inv_surveyor')){
+        if($request->get('inv_responden')){
             foreach ($request->get('inv_responden') as $responden) {
                 $surveymembers = new \App\Models\SurveyMembers;
                 $surveymembers->user = $responden;
                 $surveymembers->survey = $id;
                 $surveymembers->role = "2-Responden";
                 $surveymembers->save();
+                
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $responden;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $responden;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             }
         }
         
@@ -876,11 +990,38 @@ class SurveyController extends Controller
         $post = $task->save();
         if($post){
             $id = $task->id;
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name;
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $request->post('i_n_survey_id');
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            $notificationReceivers = new \App\Models\NotificationReceivers;
+            $notificationReceivers->notification = $notification->id;
+            $notificationReceivers->receiver = $request->post('i_n_assignee');
+            $notificationReceivers->is_read = 0;
+            $notificationReceivers->created_by = Auth::user()->id;
+            $notificationReceivers->save();
+
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;
                 $taskparticipants->task = $id;
                 $taskparticipants->team_member = $participant;
                 $taskparticipants->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
             }
         }
 
@@ -920,6 +1061,8 @@ class SurveyController extends Controller
 
         $task = Task::find($task_id);
 
+        $assignee = $task->assign;
+
         $task->survey       = $request->post('i_n_survey_id');
         $task->name         = $request->post('i_n_name_task');
         $task->assign       = $request->post('i_n_assignee');
@@ -931,6 +1074,49 @@ class SurveyController extends Controller
         $task->created_by   = Auth::user()->id;
         $post               = $task->save();
         if($post){
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            if($assignee != $request->post('i_n_assignee')){
+                $notification = new \App\Models\Notifications;
+                $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Assignee";
+                $notification->modul = '2-Survey';
+                $notification->modul_id = $request->post('i_n_survey_id');
+                $notification->created_by = Auth::user()->id;
+                $notification->notification_start = Carbon::now()->toDateTimeString();
+                $notif_post = $notification->save();
+
+                $notificationReceivers = new \App\Models\NotificationReceivers;
+                $notificationReceivers->notification = $notification->id;
+                $notificationReceivers->receiver = $request->post('i_n_assignee');
+                $notificationReceivers->is_read = 0;
+                $notificationReceivers->created_by = Auth::user()->id;
+                $notificationReceivers->save();
+            }
+
+            foreach ($request->get('i_n_participant') as $participant) {
+                $available = \App\Models\TaskParticipants::where([
+                    ['task','=',$task_id],
+                    ['team_member','=',$participant]
+                ]);
+                if(!$available->first()){
+                    $notification = new \App\Models\Notifications;
+                    $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Participant";
+                    $notification->modul = '2-Survey';
+                    $notification->modul_id = $request->post('i_n_survey_id');
+                    $notification->created_by = Auth::user()->id;
+                    $notification->notification_start = Carbon::now()->toDateTimeString();
+                    $notif_post = $notification->save();
+
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+                }
+            }
+
             $deletedRows = \App\Models\TaskParticipants::where('task', $task_id)->delete();
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;

@@ -57,11 +57,30 @@
     $('.colorselector').colorselector();
 </script>
 <script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
     var base_url = {!! json_encode(url('/')) !!};
     var supported_type = 'application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     var url = $(location).attr('href');
     var aurl = url.split("/").splice(0, 4).join("/");
     var burl = url.split("/").splice(0, 5).join("/");
+
+    $('.carousel.carousel-multi .item').each(function () {
+      var next = $(this).next();
+      if (!next.length) {
+        next = $(this).siblings(':first');
+      }
+      next.children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+
+      if (next.next().length > 0) {
+        next.next().children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+      }
+      else {
+        $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
+      }
+    });
 
     // for sidebar menu entirely but not cover treeview
     $('ul.sidebar-menu a').filter(function() {

@@ -9,9 +9,9 @@ $(document).ready(function(){
 
   $("#mn_create_new_team").click(function(){
     $('#modal-n-survey').modal('show');
-    initialize_select_user("#i_n_surveyor");
+    init_n_survey_user("#i_n_surveyor");
     $('#i_n_surveyor').on("change", function(e) { 
-      initialize_select_user("#i_n_client",1);
+      init_n_survey_user("#i_n_client",1);
     });
   });
     $('#i_n_expire').datetimepicker({});
@@ -51,7 +51,7 @@ $(document).ready(function(){
 
 });
 
-function initialize_select_user(id_element,v_check){
+function init_n_survey_user(id_element,v_check){
   $.ajax({
       type: 'GET',
       url: base_url+'/survey/0/ajax_get_list_user/no',
@@ -104,8 +104,7 @@ $("#form_n_survey").submit(function(e) {
             swal({
               type: 'error',
               title: 'Gagal',
-              html:true,
-              text: parse.messages
+              html:parse.messages
             });
           }
          },

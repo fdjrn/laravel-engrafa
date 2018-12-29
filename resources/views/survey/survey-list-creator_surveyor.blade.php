@@ -7,19 +7,16 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">  
-          <div class="table-responsive">     
+          <div class="table-responsive">
+            @if($surveys->first())     
             <table id="table_edm" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
-                <tr>
                   <th>Name</th>
                   <th>Type</th>
-                  <!-- <th>Date Modified</th> -->
                   <th>Analyze</th>
                   <th>More</th>
-                </tr>
               </thead>
               <tbody>
-                @if($surveys->first())
                   @foreach($surveys as $survey)
                       <tr>
                         <td>
@@ -29,7 +26,6 @@
                               </p>
                           </div>
                         </td>
-                        <!-- <td>@{{@$survey->updated_at}}</td> -->
                         <td>
                         @if((explode('-',$survey->status))[0] >= 4)
                           <span class="status_survey text-green" title="Survey has been done">{{ explode("-",$survey->PP)[1] }}</span>
@@ -52,32 +48,39 @@
                         </td>
                       </tr>
                   @endforeach
-                @else
-                  <tr>
-                    <td colspan="4" class="text-center">No Survey Available</td>
-                  </tr>
-                @endif
               </tbody>
             </table>
+            @else     
+            <table class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
+              <thead>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Analyze</th>
+                  <th>More</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="4" class="text-center">No Data Available</td>
+                </tr>
+              </tbody>
+            </table>
+            @endif
           </div>
         </div>
         <div class="tab-pane" id="tab_2">
           @include('survey.survey-aggregation')
         </div>
         <div class="tab-pane" id="tab_3">  
-          <div class="table-responsive">  
+          <div class="table-responsive">
+            @if($surveys_done->first())  
             <table id="table_done" class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
               <thead>
-                <tr>
                   <th>Name</th>
                   <th>Type</th>
-                  <!-- <th>Date Modified</th> -->
                   <th>Analyze</th>
                   <th>More</th>
-                </tr>
               </thead>
               <tbody>
-                @if($surveys_done->first())
                   @foreach($surveys_done as $survey)
                     <tr>
                       <td>
@@ -87,7 +90,6 @@
                             </p>
                         </div>
                       </td>
-                      <!-- <td>@{{@$survey->updated_at}}</td> -->
                       <td>
                         <span class="status_survey text-green" title="Survey has been analyzed">{{ explode("-",$survey->PP)[1] }}</span>
                       </td>
@@ -102,13 +104,23 @@
                       </td>
                     </tr>
                   @endforeach
-                @else
-                  <tr>
-                    <td colspan="4" class="text-center">No Done Analyzed Survey Available</td>
-                  </tr>
-                @endif
               </tbody>
             </table>
+            @else     
+            <table class="table table-hover table-condensed" data-toggle="table" data-click-to-select="true">
+              <thead>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Analyze</th>
+                  <th>More</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="4" class="text-center">No Data Available</td>
+                </tr>
+              </tbody>
+            </table>
+            @endif
           </div>
         </div>
       </div>

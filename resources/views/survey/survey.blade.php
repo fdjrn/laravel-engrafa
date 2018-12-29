@@ -89,8 +89,6 @@
 
 @section('page-level-scripts')
 {{ Html::script('js/pages/survey.js')}}
-{{ Html::script('theme/AdminLTE/bower_components/chart.js2/Chart.js')}}
-{{ Html::script('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}
 {{ Html::script('js/pages/survey/survey.aggregate.js')}}
 @stop
 

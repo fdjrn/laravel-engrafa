@@ -3,8 +3,6 @@ $(document).ready(function(){
   $('#i_n_due_date').datetimepicker({});
   
   initialize_user_task("#i_n_assignee");
-  
-  $('[data-toggle="tooltip"]').tooltip();
 
   $('#i_n_assignee').on("select2:selecting", function(e) { 
     initialize_user_task("#i_n_participant",1);
@@ -160,8 +158,7 @@ $("#form_n_task").submit(function(e) {
             swal({
               type: 'error',
               title: 'Gagal',
-              html:true,
-              text: parse.messages
+              html: parse.messages
             });
           }
          },
