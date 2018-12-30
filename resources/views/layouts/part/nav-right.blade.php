@@ -13,74 +13,9 @@
           <p>{{Auth::user()->name}}</p>
         </div>
       </div>
+      <div class="tab-content" id="notif">
 
-      <div class="tab-content">
-        <div class="tab-pane" id="control-sidebar-notification-tab">
-          <h3 class="control-sidebar-heading">
-            <i class="fa fa-bell fa-fw"></i>
-            <span>&nbsp;</span>
-            <span> Notification</span>
-            <span class="pull-right">
-              <i class="fa fa-book fa-fw"></i>
-              <i class="fa fa-remove fa-fw"></i>
-            </span>
-          </h3>
-          
-          <ul class="control-sidebar-menu">
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-user bg-red"></i>
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">
-                    User 1
-                    <div class="pull-right">
-                      <span>1h</span>
-                      <span>&nbsp;</span>
-                      <i class="label bg-yellow">3</i>
-                    </div>
-                  </h4>
-                  <p>How About App</p>
-                </div>
-              </a>
-            </li>
-
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-calendar bg-blue"></i>
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">
-                    My Calendar
-                    <div class="pull-right">
-                      <span>2d</span>
-                      <span>&nbsp;</span>
-                      <i class="label bg-yellow">1</i>
-                    </div>
-                  </h4>
-                  <p>For Event</p>
-                </div>
-              </a>
-            </li>
-
-            <li>
-              <a href="javascript:void(0)">
-                <i class="menu-icon fa fa-cube bg-green"></i>
-                <div class="menu-info">
-                  <h4 class="control-sidebar-subheading">
-                    Dev Team
-                    <div class="pull-right">
-                      <span>5d</span>
-                      <span>&nbsp;</span>
-                      <i class="label bg-yellow">1</i>
-                    </div>
-                  </h4>
-                  <p>For Event</p>
-                </div>
-              </a>
-            </li>
-
-          </ul>
-        </div>
-        <!-- tab-pane -->
+        <notification-component :user="{{auth()->user()}}"></notification-component>
 
         <div class="tab-pane" id="control-sidebar-bookmark-tab">
           <h3 class="control-sidebar-heading">

@@ -17,16 +17,8 @@
       
       <!-- sidebar menu: : style can be found in sidebar.less -->
 
-      <ul class="sidebar-menu" data-widget="tree">        
-        <li class="treeview" data-toggle="control-sidebar">  
-            <a href="#control-sidebar-notification-tab" data-toggle="tab">
-                <i class="fa fa-bell"></i>
-                <span>Notifications</span>
-                <span class="pull-right-container">
-                  <small class="label pull-right bg-green">5</small>
-                </span>
-            </a>
-        </li>
+      <ul class="sidebar-menu" data-widget="tree" id="notifToogle">      
+        <notification-toogle-component :user="{{auth()->user()}}"></notification-toogle-component>
         <li data-toggle="control-sidebar">
           <a href="#control-sidebar-recent-tab" data-toggle="tab">
             <i class="fa fa-clock-o"></i> 

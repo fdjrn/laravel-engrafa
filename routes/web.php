@@ -38,7 +38,8 @@ Route::middleware(['auth','web'])->group(function () {
 
 	Route::get('/ajax_get_list_user', 'Dashboard\DashboardController@ajax_get_list_user');
 	Route::post('/ajax_delele_dashboard', 'Dashboard\DashboardController@ajax_delele_dashboard');
-	Route::any('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
+	Route::post('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
+	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard'); 
 
 	// index & file explorer/homepages
     Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
@@ -91,6 +92,12 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/message', 'Chat\MessageController@index')->name('message');
 	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
 
+	//notification
+	Route::get('/notification/getNotification/{date?}/','Notification\NotificationController@getNotifications');
+	Route::get('/notification/getUnreadNotification/','Notification\NotificationController@getUnreadNotifications');
+	Route::post('/notification/read','Notification\NotificationController@read');
+	Route::post('/notification/read/all','Notification\NotificationController@readAll');
+
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
 	// survey responden
@@ -102,6 +109,8 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/survey/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
+	Route::get('/survey/{id}/analyze/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.analyze.doneView');
+	Route::post('/survey/{id}/invite', 'Survey\SurveyController@invite')->name('survey.invite');
 	// survey agregation
 	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
 	Route::get("/survey/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");
@@ -110,15 +119,19 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/survey/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/survey/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
 
-	Route::get('/survey/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
+	Route::get('/survey/{id}/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/survey/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
-	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	Route::post('/survey/{id}/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	Route::post('/survey/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');
+	Route::get('/survey/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 
 	//setting
 	Route::get('/setting', 'Setting\SettingController@index')->name('setting');
 	Route::get('/setting/users', 'Setting\SettingController@users')->name('setting.users');
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
+	Route::get('/setting/users/{id}', 'Setting\SettingController@get_user_by_id');
+	Route::post('/setting/users/edit_user','Setting\SettingController@edit_user')->name('setting.edit_user');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
