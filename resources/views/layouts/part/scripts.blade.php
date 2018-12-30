@@ -53,6 +53,7 @@
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
 
+
 <script>
     $('.colorselector').colorselector();
 </script>
@@ -142,7 +143,7 @@
     <script src="{{ asset ('js/pages/'.$js_files) }}"></script>
 @else
     @if (!empty($js_files2) && $js_exists2)
-    	<script src="{{ asset ('js/pages/'.$suburl1.'/'. $js_files) }}"></script>
+      <script src="{{ asset ('js/pages/'.$suburl1.'/'. $js_files) }}"></script>
     @endif
 @endif
 <!-- AdminLTE for demo purposes -->
