@@ -52,6 +52,7 @@
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
+<script src="{{ asset('js/app.js')}}"></script>
 
 <script>
     $('.colorselector').colorselector();
@@ -127,6 +128,7 @@
       }
     }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active'); 
 </script>
+
 
 @php
     $js_files = Request::segment(2).'.js';

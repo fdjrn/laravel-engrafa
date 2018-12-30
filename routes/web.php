@@ -92,6 +92,12 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/message', 'Chat\MessageController@index')->name('message');
 	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
 
+	//notification
+	Route::get('/notification/getNotification/{date?}/','Notification\NotificationController@getNotifications');
+	Route::get('/notification/getUnreadNotification/','Notification\NotificationController@getUnreadNotifications');
+	Route::post('/notification/read','Notification\NotificationController@read');
+	Route::post('/notification/read/all','Notification\NotificationController@readAll');
+
 	// survey
 	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
 	// survey responden

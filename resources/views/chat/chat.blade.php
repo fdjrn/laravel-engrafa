@@ -49,7 +49,7 @@
 @stop
 
 @section('page-level-scripts')
-<script src="{{ asset('js/app.js')}}"></script>
+<!-- <script src="{{ asset('js/app.js')}}"></script> -->
 
 <script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script> <script>
   $(function () {
