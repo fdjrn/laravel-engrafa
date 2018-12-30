@@ -7,6 +7,7 @@
 <!-- BEGIN CORE PLUGINS -->
 
 <!-- jQuery 3 -->
+<script src="{{ asset('js/app.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery/dist/jquery.min.js')}}"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery-ui/jquery-ui.min.js')}}"></script>
@@ -52,7 +53,6 @@
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
-<script src="{{ asset('js/app.js')}}"></script>
 
 <script>
     $('.colorselector').colorselector();
