@@ -27,6 +27,18 @@ Vue.component('chat-room-invitation-component', require('./components/chat/ChatR
 Vue.component('chat-room-group-invitation-component', require('./components/chat/ChatRoomInvitationComponent.vue'));
 Vue.component('message-composer-component', require('./components/chat/MessageComposerComponent.vue'));
 
+Vue.component('notification-component', require('./components/notification/NotificationComponent.vue'));
+Vue.component('notification-toogle-component', require('./components/notification/NotificationToogleComponent.vue'));
+
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+});
+
+
+const notif = new Vue({
+    el: '#notif',
+});
+
+const notifToogle = new Vue({
+    el: '#notifToogle',
 });

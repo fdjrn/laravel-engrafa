@@ -50,17 +50,38 @@
 {{ Html::script( asset('js/sweetalert2.all.js')) }}
 <script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
+<script src="{{ asset('js/app.js')}}"></script>
 
 <script>
     $('.colorselector').colorselector();
 </script>
 <script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
     var base_url = {!! json_encode(url('/')) !!};
     var supported_type = 'application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     var url = $(location).attr('href');
     var aurl = url.split("/").splice(0, 4).join("/");
     var burl = url.split("/").splice(0, 5).join("/");
+
+    $('.carousel.carousel-multi .item').each(function () {
+      var next = $(this).next();
+      if (!next.length) {
+        next = $(this).siblings(':first');
+      }
+      next.children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+
+      if (next.next().length > 0) {
+        next.next().children(':first-child').clone().attr("aria-hidden", "true").appendTo($(this));
+      }
+      else {
+        $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
+      }
+    });
 
     // for sidebar menu entirely but not cover treeview
     $('ul.sidebar-menu a').filter(function() {
@@ -75,6 +96,29 @@
       }
     }).parent().addClass('active');
 
+    var menu_status = false;
+    $('ul.inside-submenu a').filter(function() {
+      if (this.href == url){
+        menu_status = true;
+        return true;
+      }else if(this.href+"#" == url && menu_status == false){
+        menu_status = true;
+        return true;
+      }
+    }).parent().addClass('active');
+
+    if(menu_status == false){
+      $('ul.inside-submenu a').filter(function() {
+        if(this.href == aurl && menu_status == false){
+            menu_status = true;
+            return true;
+        }else if(this.href == burl && menu_status == false){
+            menu_status = true;
+            return true;
+        }
+      }).parent().addClass('active');
+    }
+
     // for treeview
     $('ul.treeview-menu a').filter(function() {
       if (this.href == url){
@@ -84,6 +128,7 @@
       }
     }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active'); 
 </script>
+
 
 @php
     $js_files = Request::segment(2).'.js';

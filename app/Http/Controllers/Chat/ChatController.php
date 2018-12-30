@@ -13,8 +13,11 @@ use App\User;
 use App\Models\ChatRoom;
 use App\Models\ChatMember;
 use App\Models\Chat;
+use App\Models\Notifications;
+use App\Models\NotificationReceivers;
 use App\Events\ChatInvitation;
 use App\Events\NewMessage;
+use App\Events\NewNotification;
 
 class ChatController extends Controller
 {
@@ -41,8 +44,23 @@ class ChatController extends Controller
             ->where('user','<>',Auth::user()->id)
             ->get();
 
+        $notification = new Notifications;
+        $notification->notification_text = $request->message;
+        $notification->modul = '1-Chat';
+        $notification->modul_id = $request->chatRoomId;
+        $notification->created_by = Auth::user()->id;
+        $notification->save();
+
         foreach ($chatMembers as $chatMember) {
+            $notificationReceiver = new NotificationReceivers;
+            $notificationReceiver->notification = $notification->id;
+            $notificationReceiver->receiver = $chatMember->user;
+            $notificationReceiver->is_read = 0;
+            $notificationReceiver->created_by = Auth::user()->id;
+            $notificationReceiver->save();
+            
             broadcast(new NewMessage($chatStored, $chatMember));
+            broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
         }
 
         $chat = new Chat;
