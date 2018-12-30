@@ -61,28 +61,6 @@
             <i class="fa fa-comment"></i> <span>Chat</span>
           </a>
         </li>
-        <!-- search form -->
-        <form action="#" method="get" class="sidebar-form">
-          <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search...">
-            <span class="input-group-btn">
-                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                  </button>
-                </span>
-          </div>
-        </form>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-user"></i>
-            <span>User 1</span>
-          </a>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-user"></i>
-            <span>User 2</span>
-          </a>
-        </li>
         <li class="header">
         <span>Setting</span>
         </li>
