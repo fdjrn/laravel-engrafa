@@ -43,7 +43,7 @@ function cleanModal(){
   $('#div_i_n_participant').hide();
   $('#i_n_name_task').val(null);
   $('#i_type_modal').val('create');
-  $('#i_n_due_date').val(null)
+  $('#i_n_due_date').val(null);
   $('#i_n_assignee').val(null).trigger('change');
   $('#i_n_progress').val(0).trigger('change');
   $('#i_n_progress_gr').hide();

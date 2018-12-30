@@ -9,7 +9,6 @@ $(document).ready(function(){
 
   clearNSurveyModal();
 
-    $('#modal-n-survey').modal('show');
   $("#mn_create_new_team").click(function(){
     clearNSurveyModal();
     $('#modal-n-survey').modal('show');
@@ -66,6 +65,8 @@ $(document).ready(function(){
 });
 
 function clearNSurveyModal(){
+  $('#i_n_name_survey').val(null);
+  $('#i_n_expire').val(null);
   $('#modal-n-survey').find('input[type=checkbox]:checked').prop('checked', false);
   $('.list-itgoal-purpose').hide();
   $('.list-itgoal-pain').hide();

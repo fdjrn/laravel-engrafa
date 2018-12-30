@@ -58,9 +58,9 @@
                 <label for="i_n_survey_type" class="col-sm-2 control-label">Drivers</label>
 
                 <div class="col-sm-2">
-                  <input name="drivers_purpose" id="drivers_purpose" value="1" style="vertical-align:middle" type="checkbox">&nbsp;Purpose
+                  <input name="drivers_purpose" id="drivers_purpose" value="1-Purpose" style="vertical-align:middle" type="checkbox">&nbsp;Purpose
                   <br>
-                  <input name="drivers_pain" id="drivers_pain" value="2" style="vertical-align:middle" type="checkbox">&nbsp;Pain Point
+                  <input name="drivers_pain" id="drivers_pain" value="2-Pain" style="vertical-align:middle" type="checkbox">&nbsp;Pain Point
                   <!-- <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Drivers"
                           style="width: 100%;" >
                     <option value=""></option>
@@ -200,8 +200,8 @@
                 <label for="i_n_expire" class="col-sm-2 control-label">Survey Expiration</label>
 
                 <div class="col-sm-4">
-                  <div class='input-group date' id='i_n_expire'>
-                      <input name="i_n_expire" type='text' class="form-control" />
+                  <div class='input-group date'>
+                      <input name="i_n_expire" id='i_n_expire' type='text' class="form-control" />
                       <span class="input-group-addon">
                           <span class="glyphicon glyphicon-calendar"></span>
                       </span>

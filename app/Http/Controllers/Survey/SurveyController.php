@@ -710,16 +710,18 @@ class SurveyController extends Controller
             'i_n_name_survey' => 'required|unique:surveys,name|max:255',
             'i_n_surveyor' => 'required',
             'i_n_client' => 'required',
-            'i_n_survey_type' => 'required',
+            // 'i_n_survey_type' => 'required',
+            'drivers_purpose' => 'required_without:drivers_pain',
             'i_n_expire' => 'required',
             'i_itgoal' => 'required'
             ],
             [
                 'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
                 'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
-                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Surveyor</span> field is required',
-                'i_n_client.required' => '&#8226;The <span class="text-danger">Responden</span> field is required',
-                'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Manager</span> field is required',
+                'i_n_client.required' => '&#8226;The <span class="text-danger">Assessor</span> field is required',
+                // 'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'drivers_purpose.required_without' => '&#8226;The <span class="text-danger">Drivers</span> field is required',
                 'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
                 'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',
             ]
@@ -731,7 +733,9 @@ class SurveyController extends Controller
                 'messages' => implode("<br>",$validator->messages()->all())
             ]);
         }
-        $survey_type = $request->post('i_n_survey_type');
+        $survey_purpose = $request->post('drivers_purpose');
+        $survey_pain = $request->post('drivers_pain');
+
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
         $survey->expired = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_expire'))->format('Y-m-d H:i');
@@ -760,24 +764,50 @@ class SurveyController extends Controller
                 }
             }
             if($request->get('i_itgoal')){
-                foreach ($request->get('i_itgoal')[$survey_type] as $itgoal){
-                    $id_itgoal = DB::table('it_related_goal')->insertGetId(
-                        [   'it_goal' => $itgoal, 
-                            'survey' => $id
-                        ]
-                    );
-                    if($request->get('i_itgoal_process')[$survey_type]){
-                        foreach($request->get('i_itgoal_process')[$survey_type][$itgoal] as $itgoalprocess){
-                                $survey_process = DB::table('survey_process')->insertGetId(
-                                    [   
-                                        'it_related_goal' => $id_itgoal,
-                                        'process' => $itgoalprocess,
-                                        'survey' => $id,
-                                        'target_level' => $request->get('i_itgoal_process_level')[$survey_type][$itgoal][$itgoalprocess],
-                                        'target_percent' => $request->get('i_itgoal_process_percent')[$survey_type][$itgoal][$itgoalprocess],
-                                        'status' => '1-Waiting'
-                                    ]
-                                );
+                if($survey_purpose){
+                    foreach ($request->get('i_itgoal')[$survey_purpose] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
+                            ]
+                        );
+                        if($request->get('i_itgoal_process')[$survey_purpose]){
+                            foreach($request->get('i_itgoal_process')[$survey_purpose][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
+                        }
+                    }
+                }
+
+                if($survey_pain){
+                    foreach ($request->get('i_itgoal')[$survey_pain] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
+                            ]
+                        );
+                        if($request->get('i_itgoal_process')[$survey_pain]){
+                            foreach($request->get('i_itgoal_process')[$survey_pain][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
                         }
                     }
                 }
@@ -867,7 +897,7 @@ class SurveyController extends Controller
                 'inv_responden' => 'required_without:inv_surveyor',
             ],
             [
-                'inv_responden.required_without' => '&#8226;The <span class="text-danger">Responden or Surveyor</span> field is required',
+                'inv_responden.required_without' => '&#8226;The <span class="text-danger">Manager or Assessor</span> field is required',
             ]
         );
 
