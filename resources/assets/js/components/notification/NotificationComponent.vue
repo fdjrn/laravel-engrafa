@@ -66,7 +66,9 @@
 			NotificationClicked(notification, index){
 
 				let url = "javascript:void(0)";
-				if(notification.modul == '2-Survey'){
+				if(notification.modul == '1-Chat'){
+					url = "/chat/";
+				}else if(notification.modul == '2-Survey'){
 					url = "/survey/"+notification.modul_id;
 				}else if(notification.modul == '3-Quisioner'){
 
@@ -86,7 +88,7 @@
 					});
 				}
 
-				window.location.href = '/survey/'+notification.modul_id;
+				window.location.href = url+notification.modul_id;
 			},
 			ReadAllNotification(){
 				axios.post('/notification/read/all',{

@@ -1,5 +1,5 @@
 <template>
-  <div class="input-group">
+  <div class="form-group">
     <!-- <span class="input-group-btn">
       <button type="button" class="btn btn-primary btn-flat">
         <i class="fa fa-plus"></i>
@@ -11,6 +11,7 @@
         <i class="fa fa-microphone"></i>
       </button>
     </span> -->
+    
     <input type="text" name="sendMessage" @keyup.enter="sendMessage" v-model="message" class="form-control" placeholder="Type Message ...">
   </div>
 </template>
