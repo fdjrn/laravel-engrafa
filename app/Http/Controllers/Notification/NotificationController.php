@@ -33,9 +33,9 @@ class NotificationController extends Controller
     		->join('users','users.id','notifications.created_by')
     		->whereRaw("notification_receivers.created_at < STR_TO_DATE('".$request->date."','%Y-%m-%d %H:%i:%S')" )
     		->where('notification_receivers.receiver',Auth::user()->id)
-    		->where('notifications.modul','<>','1-Chat')
+    		// ->where('notifications.modul','<>','1-Chat')
     		->orderBy('notification_receivers.created_at', 'desc')
-    		->limit(1)
+    		->limit(20)
     		->get();
 
 		return response()->json($notifications);
