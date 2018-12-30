@@ -45,7 +45,7 @@ class Survey extends Model
 
         $status_ownership = "";
         if ($data_survey->first()->created_by == Auth::user()->id){
-            $status_ownership = "CREATOR";
+            $status_ownership = "0-CREATOR";
         }else{
             $status_of_surveys = DB::table('survey_members')
                 ->select('role')
@@ -55,7 +55,7 @@ class Survey extends Model
                 ])
                 ->get();
             if($status_of_surveys->first()){
-                $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
+                $status_ownership = strtoupper($status_of_surveys->first()->role);
             }else{
                 abort(404);
             }

@@ -33,10 +33,10 @@
             </div>
             <div class="col-lg-6">
               <div class="form-group">
-                <label for="i_n_surveyor" class="col-sm-4 control-label">Invite Surveyor</label>
+                <label for="i_n_surveyor" class="col-sm-4 control-label">Invite Manager</label>
 
                 <div class="col-sm-8">
-                  <select id="i_n_surveyor" name="i_n_surveyor[]" class="form-control select2" multiple data-placeholder="Add Surveyor"
+                  <select id="i_n_surveyor" name="i_n_surveyor[]" class="form-control select2" multiple data-placeholder="Add Manager"
                           style="width: 100%;" >
                   </select>
                 </div>
@@ -44,10 +44,10 @@
             </div>
             <div class="col-lg-6">
               <div class="form-group">
-                <label for="i_n_client" class="col-sm-4 control-label">Invite Responden</label>
+                <label for="i_n_client" class="col-sm-4 control-label">Invite Assessor</label>
 
                 <div class="col-sm-8">
-                  <select id="i_n_client" name="i_n_client[]" class="form-control select2" multiple data-placeholder="Add Responden"
+                  <select id="i_n_client" name="i_n_client[]" class="form-control select2" multiple data-placeholder="Add Assessor"
                           style="width: 100%;" >
                   </select>
                 </div>
@@ -55,10 +55,10 @@
             </div>
             <div class="col-lg-12">
               <div class="form-group">
-                <label for="i_n_survey_type" class="col-sm-2 control-label">Survey Type</label>
+                <label for="i_n_survey_type" class="col-sm-2 control-label">Drivers</label>
 
                 <div class="col-sm-4">
-                  <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Survey Type"
+                  <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Drivers"
                           style="width: 100%;" >
                     <option value=""></option>
                     <option value="1-Purpose">Purpose</option>
@@ -80,19 +80,19 @@
                               <div class="form-group">
                                 <label class="col-sm-4 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
                                 <input type="hidden" name="i_itgoal_process[1-Purpose][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
-                                <div class="col-sm-5" style="padding-left: 2px; padding-right: 2px;">
+                                <div class="col-sm-7" style="padding-left: 2px; padding-right: 2px;">
                                   <select name="i_itgoal_process_level[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
                                     @foreach($dataLevel as $key => $level)
                                     <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
                                     @endforeach
                                   </select>
+                                  <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='hidden' class="form-control" />
+                                  <!-- <span class="input-group-addon">%</span> -->
                                 </div>
-                                <div class="col-sm-3" style="padding-left:1px;">
+                                <!-- <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='text' class="form-control" />
-                                      <span class="input-group-addon">%</span>
                                   </div>
-                                </div>
+                                </div> -->
                               </div>
                               @endif
                             @endforeach
@@ -109,19 +109,19 @@
                               <div class="form-group">
                                 <label class="col-sm-4 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
                                 <input type="hidden" name="i_itgoal_process[2-Pain][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
-                                <div class="col-sm-5" style="padding-left: 2px; padding-right: 2px;">
+                                <div class="col-sm-7" style="padding-left: 2px; padding-right: 2px;">
                                   <select name="i_itgoal_process_level[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
                                     @foreach($dataLevel as $key => $level)
                                     <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
                                     @endforeach
                                   </select>
+                                  <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='hidden' class="form-control" />
+                                  <!-- <span class="input-group-addon">%</span> -->
                                 </div>
-                                <div class="col-sm-3" style="padding-left:1px;">
+                                <!-- <div class="col-sm-3" style="padding-left:1px;">
                                   <div class='input-group' id='i_itgoal_process_percent'>
-                                      <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='text' class="form-control" />
-                                      <span class="input-group-addon">%</span>
                                   </div>
-                                </div>
+                                </div> -->
                               </div>
                               @endif
                             @endforeach

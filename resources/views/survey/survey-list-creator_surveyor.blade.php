@@ -1,9 +1,9 @@
 
     <div class="nav-tabs-custom">
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#tab_1" data-toggle="tab">List EDM</a></li>
-        <li><a href="#tab_2" data-toggle="tab">Aggregation</a></li>
-        <li><a href="#tab_3" data-toggle="tab">Done</a></li>
+        <li class="active"><a href="#tab_1" data-toggle="tab">Process List</a></li>
+        <li><a href="#tab_2" data-toggle="tab">Result</a></li>
+        <li><a href="#tab_3" data-toggle="tab">Finish</a></li>
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="tab_1">  
@@ -28,16 +28,16 @@
                         </td>
                         <td>
                         @if((explode('-',$survey->status))[0] >= 4)
-                          <span class="status_survey text-green" title="Survey has been done">{{ explode("-",$survey->PP)[1] }}</span>
+                          <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah diisi oleh Assessor">{{ explode("-",$survey->PP)[1] }}</span>
                         @else
-                          <span class="status_survey" title="Survey hasn't been done">{{ explode("-",$survey->PP)[1] }}</span>
+                          <span class="status_survey" data-toggle="tooltip" data-placement="bottom" title="Proses belum diisi oleh Assessor">{{ explode("-",$survey->PP)[1] }}</span>
                         @endif
                         </td>
                         <td class="text-center">
                         @if((explode('-',$survey->status))[0] >= 4)
-                          <a href="{{route('survey.analyze',['id'=> $survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Survey can be analyzed"><i class="fa fa-bar-chart"></i></a>
+                          <a href="{{route('survey.analyze',['id'=> $survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses bisa dianalisa, sudah diisi oleh Assessor"><i class="fa fa-bar-chart"></i></a>
                         @else
-                          <a class="btn btn-default btn-sm adisabled" title="Survey can't be analyzed"><i class="fa fa-bar-chart"></i></a>
+                          <a class="btn btn-default btn-sm adisabled" data-toggle="tooltip" data-placement="bottom" title="Proses tidak bisa dianalisa, harus diisi oleh Assessor terlebih dahulu"><i class="fa fa-bar-chart"></i></a>
                         @endif
                         </td>
                         <td class="text-center">
@@ -60,7 +60,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="4" class="text-center">No Data Available</td>
+                  <td colspan="4" class="text-center">No Pending Process Available</td>
                 </tr>
               </tbody>
             </table>
@@ -91,10 +91,10 @@
                         </div>
                       </td>
                       <td>
-                        <span class="status_survey text-green" title="Survey has been analyzed">{{ explode("-",$survey->PP)[1] }}</span>
+                        <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa">{{ explode("-",$survey->PP)[1] }}</span>
                       </td>
                       <td class="text-center">
-                        <a href="{{route('survey.analyze.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" title="Survey has been analyzed"><i class="fa fa-bar-chart"></i></a>
+                        <a href="{{route('survey.analyze.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa"><i class="fa fa-bar-chart"></i></a>
                       </td>
                       <td class="text-center">
                         <div class="btn-group">
@@ -116,7 +116,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td colspan="4" class="text-center">No Data Available</td>
+                  <td colspan="4" class="text-center">No Finished Process Available</td>
                 </tr>
               </tbody>
             </table>

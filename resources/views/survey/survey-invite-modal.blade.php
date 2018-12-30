@@ -1,4 +1,4 @@
-@if($status_ownership != 'RESPONDEN')
+@if(explode("-",$status_ownership)[0] < 2)
 <input type="hidden" id="s_id" value="{{$survey_id}}">
   <div class="modal fade" id="m_invite_user">
     <div class="modal-dialog modal-sm">
@@ -13,14 +13,14 @@
             @csrf
             <input type="hidden" name="user_id" id="user_id">
             <div class="form-group">
-              <label for="inv_surveyor" class="control-label">Add Surveyor</label>
-              <select id="inv_surveyor" name="inv_surveyor[]" class="form-control select2" multiple data-placeholder="Add Surveyor"
+              <label for="inv_surveyor" class="control-label">Add Manager</label>
+              <select id="inv_surveyor" name="inv_surveyor[]" class="form-control select2" multiple data-placeholder="Add Manager"
                       style="width: 100%;" >
               </select>
             </div>
             <div class="form-group">
-              <label for="inv_responden" class="control-label">Add Responden</label>
-              <select id="inv_responden" name="inv_responden[]" class="form-control select2" multiple data-placeholder="Add Responden"
+              <label for="inv_responden" class="control-label">Add Assessor</label>
+              <select id="inv_responden" name="inv_responden[]" class="form-control select2" multiple data-placeholder="Add Assessor"
                       style="width: 100%;" >
                     <option value=""></option>
               </select>

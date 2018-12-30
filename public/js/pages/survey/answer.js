@@ -35,11 +35,9 @@ function getWP(input){
           {
               data: 'file',
               render: function(data, type, row, meta) {
-                let action = "Document Unavailable";
+                let action = "File Unavailable";
                 if(mtype == 'answer' && row.process !== null){
                  action = "<input type='file' name='files["+row.id+"]' style='width:100%;' accept='"+supported_type+"' />";
-                }else{
-                  action = '';
                 }
                 if(data){
                   action="<a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+

@@ -136,7 +136,7 @@
                     <label for="note" class="col-sm-2 control-label">Note</label>
 
                     <div class="col-sm-10">
-                      <textarea name="note[{{$index}}][{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
+                      <textarea name="note[{{$index}}][{{$survey->id}}]" style="width:100%; resize: vertical; font-weight: normal;"></textarea>
                     </div>
                   </div>
                 @endforeach
@@ -179,7 +179,7 @@
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+            <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
         </div>
         <input type="hidden" id="curWP">
         <div class="modal-body">
