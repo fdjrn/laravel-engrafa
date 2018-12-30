@@ -20,10 +20,11 @@ class DashboardController extends Controller
 {
     public function index(Request $Request){
         $userid = Auth::user()->id;
+        $user_role = Auth::user()->role;
 
         // tab nama dashboard
         $name_dashboard = DB::table('dashboards')
-        ->select('dashboards.id','dashboards.name')
+        ->select('dashboards.id','dashboards.name','dashboard_users.user','dashboard_users.created_by')
         ->leftJoin('dashboard_users','dashboard_users.dashboard','=','dashboards.id')
         ->where('dashboard_users.user',$userid)
         ->get();
@@ -60,7 +61,7 @@ class DashboardController extends Controller
             }
         }
         // dd($arrayProcess);
-        
+        $data['user_role']     = $user_role;
         $data['dashboards']    = $name_dashboard->toArray();
         $data['surveys']       = $list_survey;
         $data['chart_type']    = $list_chart_type->toArray();
@@ -87,6 +88,7 @@ class DashboardController extends Controller
             $input_dashboard_users = [
                 'user' => $userid,
                 'dashboard' => $dashboard->id,
+                'created_by' => $userid
             ];
             $dashboard_users = Dashboard_users::create($input_dashboard_users);
             return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Dashboard berhasil ditambahkan']);
@@ -109,12 +111,16 @@ class DashboardController extends Controller
 
         $charts = Dashboard_charts::create($input_dashboard_chart);
         if ($charts) {
-            $input_dashboard_survey = [
-                'survey' => $input['survey'],
-                'chart' => $charts->id // get last insert id from charts 
-            ];
-            
-            $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+            $count_survey = count($input['survey']);
+            for ($i=0; $i < $count_survey; $i++) { 
+                $input_dashboard_survey = [
+                    'survey' => $input['survey'][$i],
+                    'chart' => $charts->id // get last insert id from charts 
+                ];
+                
+                $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+            }
+
             if ($dashboard_survey) {
                 return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil ditambahkan']);
             } else {
@@ -127,20 +133,84 @@ class DashboardController extends Controller
 
     public function ajax_get_list_user()
     {
-       echo json_encode(DB::table('users')->get());
+       
+       $list_user = DB::table('users')->get();
+       
+       echo json_encode($list_user); 
+    }
+
+    public function ajax_get_dashboard(Request $request)
+    {
+        $userid         = Auth::user()->id;
+        $dashboardid    = $request->id;
+
+        // ambil id user yang terdaftar di dashboard
+        $users_dashboard = DB::table('dashboard_users')
+        ->where('dashboard', $dashboardid)
+        ->where('user',$userid)->get();
+
+        // cek jika user terdaftar di dashboard maka tampilkan dashboard dan grafik
+        if ($users_dashboard) {
+            $charts = DB::table("charts")
+            ->where('dashboard',$dashboardid)
+            ->get();
+
+            $labels = DB::table("charts")
+            ->select('charts.id as charts_id', 'surveys.name', 'surveys.id as surveys_id')
+            ->leftJoin('dashboard_surveys','charts.id','dashboard_surveys.chart')
+            ->leftJoin('surveys','dashboard_surveys.survey','surveys.id')
+            ->where('charts.dashboard',$dashboardid)
+            ->get();
+
+            $dashboard_surveys = DB::table("charts")
+            ->select('charts.id as charts_id','surveys.id as surveys_id','survey_process.process', 'survey_process.target_level', 'survey_process.level', 'survey_process.target_percent', 'survey_process.percent')
+            ->leftJoin('dashboard_surveys','charts.id','dashboard_surveys.chart')
+            ->leftJoin('surveys','dashboard_surveys.survey','surveys.id')
+            ->leftJoin('survey_process','surveys.id','survey_process.survey')
+            ->where('charts.dashboard',$dashboardid)
+            ->get();
+        } else {
+            $charts = "";
+            $labels = "";
+            $dashboard_surveys = "";
+        }
+
+        $data = array (
+            'charts' => $charts,
+            'labels' => $labels,
+            'process' => $dashboard_surveys
+        );
+
+        return response()->json($data);
     }
 
     public function ajax_delele_dashboard(Request $request)
     {
         $userid = Auth::user()->id;
 
-        $delete_dashboard = DB::table('dashboards')->where('id', '=', $request->dashboard_id)->delete();
-        $delete_dashboard_users = DB::table('dashboard_users')->where('dashboard', '=', $request->dashboard_id)->delete();
+        //cek jika user login sama dengan user pembuat dashboard
+        if ($request->created_by==$userid) {
+            $delete_dashboard = DB::table('dashboards')->where('id', '=', $request->dashboard_id)->delete();
+            $delete_dashboard_users = DB::table('dashboard_users')->where('dashboard', '=', $request->dashboard_id)->delete();
 
-        if ($delete_dashboard && $delete_dashboard_users) {
-            $response = 1;
+            // jika berhasil di delete kasih response
+            if ($delete_dashboard && $delete_dashboard_users) {
+                $response = 1;
+            } else {
+                $response = 0;
+            }
         } else {
-            $response = 0;
+            $delete_dashboard_users = DB::table('dashboard_users')
+            ->where('user', '=', $userid)
+            ->where('dashboard', '=', $request->dashboard_id)
+            ->delete();
+
+            // jika berhasil di delete kasih response
+            if ($delete_dashboard_users) {
+                $response = 1;
+            } else {
+                $response = 0;
+            }
         }
 
         return response()->json($response);
@@ -149,6 +219,24 @@ class DashboardController extends Controller
     public function ajax_share_to(Request $request) {
         $userid = Auth::user()->id;
 
-        echo json_encode($request->userid);
+        foreach ($request->iduser as $k => $v) {
+            $input_dashboard_users = [
+                'dashboard' => $request->dashboard_id,
+                'user' => $v,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'created_by' => 0
+            ];
+
+            $insert_users_to_dashboard = DB::table('dashboard_users')->insert($input_dashboard_users);
+        }
+
+        if ($insert_users_to_dashboard) {
+            $response = 1;
+        } else {
+            $response = 0;
+        }
+
+        return response()->json($response);
     }
 }

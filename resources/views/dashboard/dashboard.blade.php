@@ -71,17 +71,21 @@
             <ul class="nav nav-tabs">
               @foreach ($dashboards as $item)
                 <li class="dropdown btn-group @if ($item == reset($dashboards)) active @endif">
-                  <a class="btn" href="#tab_{{ $item->id }}" data-toggle="tab">{{ $item->name }}</a>
+                  <a class="btn btn-dashboard" href="#tab_{{ $item->id }}" data-toggle="tab" id="{{ $item->id }}">{{ $item->name }}</a>
+                  @if ($item->created_by || $item->user)
                   <a data-toggle="dropdown" class="btn dropdown-toggle">
                     <span class="caret"></span>
                   </a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart" data-idDashboard="{{ $item->id }}">Add To Dashboard</a></li>
-                    <li><a id="delete-dashboard-{{ $item->id }}">Delete Dashboard</a></li>
+                      <li><a href="#tab-dropdown1" data-toggle="modal" data-target="#modal-choose-chart" data-iddashboard="{{ $item->id }}">Add To Dashboard</a></li>
+                      <li><a id="delete-dashboard-{{ $item->id }}">Delete Dashboard</a></li>
                   </ul>
+                  @endif
                 </li>
               @endforeach
-                <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
+                @if ($user_role == "1-Super Admin")
+                  <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
+                @endif
               </ul>
             <div class="tab-content">
 
@@ -100,13 +104,13 @@
                           <h3 class="box-title">{{ $item->name }}</h3>
 
                           <div class="box-tools pull-right">
-                            <button type="button" id="fullscreen" class="btn btn-box-tool" data-toggle="tooltip"
-                                    title="Full Scree n">
+                            <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
+                                    title="FullScreen" onclick="openFullscreen({{ $item->id }})">
                               <i class="fa fa-arrows-alt"></i></button>
                               <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
                                     title="PDF">
                               <i class="fa fa-file-pdf-o"></i></button>
-                              <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
+                              <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share" data-iddashboard="{{ $item->id }}"
                                     title="Share">
                               <i class="fa fa-share"></i></button>
                               <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
@@ -114,80 +118,10 @@
                               <i class="fa fa-print"></i></button>
                           </div>
                         </div>
-                        <div class="box-body">
-                          <div class="col-md-4 align-self-center">
-                            <!-- Default box -->
-                            <div class="box box-primary">
-                              <div class="box-header with-border">
-                                <h3 class="box-title">Grafik Compare</h3>
 
-                                <div class="box-tools pull-right">
-                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                          title="Share">
-                                    <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                          title="Edit">
-                                    <i class="fa fa-gear"></i></button>
-                                </div>
-                              </div>
-                              <div class="box-body">
-                                  {{-- Grafik Here --}}
-                                  <canvas id="grafik-compare" width="400" height="400"></canvas>
-                              </div>
-                              <!-- /.box-body -->
-                            </div>
-                            <!-- /.box -->
-                          </div>
-                          <!-- /.col-->
-                          <div class="col-md-4 align-self-center">
-                            <!-- Default box -->
-                            <div class="box box-primary">
-                              <div class="box-header with-border">
-                                <h3 class="box-title">Grafik 1</h3>
-
-                                <div class="box-tools pull-right">
-                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                          title="Share">
-                                    <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                          title="Edit">
-                                    <i class="fa fa-gear"></i></button>
-                                </div>
-                              </div>
-                              <div class="box-body">
-                                {{-- Grafik Here --}}
-                                <canvas id="grafik-1" width="400" height="400"></canvas>
-                              </div>
-                              <!-- /.box-body -->
-                            </div>
-                            <!-- /.box -->
-                          </div>
-                          <!-- /.col-->
-                          <div class="col-md-4 align-self-center">
-                            <!-- Default box -->
-                            <div class="box box-primary">
-                              <div class="box-header with-border">
-                                <h3 class="box-title">Grafik 2</h3>
-
-                                <div class="box-tools pull-right">
-                                  <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"
-                                          title="Share">
-                                    <i class="fa fa-share"></i></button>
-                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"
-                                          title="Edit">
-                                    <i class="fa fa-gear"></i></button>
-                                </div>
-                              </div>
-                              <div class="box-body">
-                                {{-- Grafik Here --}}
-                                <canvas id="grafik-2" width="400" height="400"></canvas>
-                              </div>
-                              <!-- /.box-body -->
-                            </div>
-                            <!-- /.box -->
-                          </div>
-                          <!-- /.col-->
-                    </div>
+                        <div class="box-body" id="box-{{ $item->id }}">
+                          
+                        </div>
                         <!-- /.box-body -->
                       </div>
                       <!-- /.box -->
@@ -210,6 +144,7 @@
 @stop
 
 @section('body-modals')
+<!-- modal edit dashboard -->
 <div class="modal fade" id="modal-dashboard-edit">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -230,14 +165,13 @@
           <div class="form-group">
             <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
-                <select class="form-control">
+                <select class="form-control" id="survey_id" name="survey">
                     @foreach ($surveys as $item)
-                      <option name="survey" value="{{ $item->id }}">{{ $item->name }}</option>
+                      <option value="{{ $item->id }}">{{ $item->name }}</option>
                     @endforeach
                 </select>
             </div>
           </div>
-
           <div class="form-group">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
@@ -249,84 +183,46 @@
               </div>
             </div>
           </div>
-
-        </div>
-        <!-- modal-body -->
-
-        <div class="modal-body">
-
-          <div class="row">
-            <div class="col-md-4 align-self-center">
-              <!-- Default box -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <h3 class="box-title">Grafik 6</h3>
-
-                  <div class="box-tools pull-right">
+          <div class="form-group">
+            <div class="row">
+            @if (empty($chart_type))
+              <div class="col-md-12 align-self-center text-center">Data Chart Kosong</div>
+            @else
+              @foreach ($chart_type as $item)
+                <div class="col-md-6 align-self-center">
+                  <div class="box box-primary">
+                    <div class="box-header with-border">
+                      <input type="radio" name="chart" value="{{ $item->chart_type }}"/>
+                      <h3 class="box-title">Grafik {{ $item->name }}</h3>
+                      <div class="box-tools pull-right">
+                      </div>
+                    </div>
+                    @if ($item->chart_type == "1-Batang")
+                      <div class="box-body styled-1">
+                          <canvas id="grafik-batang-edit" width="400" height="400"></canvas>
+                      </div>
+                    @elseif ($item->chart_type == "2-Spider")
+                      <div class="box-body styled-1">
+                          <canvas id="grafik-radar-edit" width="400" height="400"></canvas>
+                      </div>
+                    @endif
                   </div>
+                  <!-- /.box -->
                 </div>
-                <div class="box-body">
-                    <canvas id="chart"></canvas>
-                </div>
-                <!-- /.box-body -->
-              </div>
-              <!-- /.box -->
+                <!-- /.col-->
+              @endforeach
+            @endif
             </div>
-            <!-- /.col-->
-
-            <div class="col-md-4 align-self-center">
-              <!-- Default box -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <h3 class="box-title">Grafik 6</h3>
-
-                  <div class="box-tools pull-right">
-                  </div>
-                </div>
-                <div class="box-body">
-                  Grafik Here2
-                </div>
-                <!-- /.box-body -->
-              </div>
-              <!-- /.box -->
-            </div>
-            <!-- /.col-->
-
-            <div class="col-md-4 align-self-center">
-              <!-- Default box -->
-              <div class="box box-primary">
-                <div class="box-header with-border">
-                  <h3 class="box-title">Grafik 6</h3>
-
-                  <div class="box-tools pull-right">
-                  </div>
-                </div>
-                <div class="box-body">
-                  Grafik Here
-                </div>
-                <!-- /.box-body -->
-              </div>
-              <!-- /.box -->
-            </div>
-            <!-- /.col-->
           </div>
-          <!-- row -->
-
         </div>
-        <!-- modal-body -->
-
         <div class="modal-footer justify-content-between">
           <button type="submit" class="btn btn-primary pull-right">Done</button>
         </div>
       </div>
     </form>
-    <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
   </div>
-  <!-- /.modal-dialog -->
 </div>
-<!-- /.modal -->
 
 <div class="modal fade" id="modal-share" role="dialog">
   <div class="modal-dialog">
@@ -342,6 +238,7 @@
               Share To
             </label>
             <div class="col-sm-9">
+                <input type="hidden" class="form-control" id="id_dashboard" name="id_dashboard">
                 <select id="share_to" name="share_to[]" class="form-control select2" multiple data-placeholder="Tambah Users"
                         style="width: 100%;">
                 </select>
@@ -363,13 +260,13 @@
 <div class="modal fade" id="modal-choose-chart" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="{{ route('dashboard.post.chart') }}" method="post" autocomplete="off" class="form-horizontal">
+      <form action="{{ route('dashboard.post.chart') }}" method="post" autocomplete="off" class="form-horizontal" id="form-modal-survey">
         <div class="modal-header">
             <div class="form-group">
               <label for="inputEmail3" class="col-sm-3 control-label">Survey</label>
               <div class="col-sm-9">
                 <input type="hidden" class="form-control" id="id_dashboard" name="id_dashboard">
-                <input type="text" class="form-control" id="survey" placeholder="Survey" name="name">
+                {{ Form::text('name', '' , ['class'=>'form-control', 'id'=>'survey', 'required'=>'required','placeholder'=>'Nama Survey']) }}
               </div>
             </div>
         </div>
@@ -430,7 +327,7 @@
           <div class="form-group">
             <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
-              <select class="form-control" name="survey">
+              <select class="form-control" name="survey[]">
                 @foreach ($surveys as $item)
                   <option value="{{ $item->id }}">{{ $item->name }}</option>
                 @endforeach
@@ -454,7 +351,7 @@
           <div class="form-group">
             <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
-              <select class="form-control" name="survey2">
+              <select class="form-control select-compare" name="survey[]" disabled>
                   @foreach ($surveys as $item)
                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                   @endforeach
@@ -517,6 +414,391 @@
 
 @section('page-level-scripts')
   <script>
+    $(document).ready(function() {
+        
+        var dashboard_id = $('.btn.btn-dashboard').attr('id');
+        $('#box-' + dashboard_id).empty();
+
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+          $.ajax({
+            type: "POST",
+            url: base_url+'/ajax_get_dashboard',
+            data: { _token: CSRF_TOKEN, id : dashboard_id },
+            dataType: "JSON",
+            success: function (data) {
+              console.log(data);
+              if (data.charts) {
+                data.charts.forEach(element => {
+                  var survey = [];
+                  data.labels.forEach(surveys => {
+                    if (surveys.charts_id==element.id){
+                      survey.push(surveys.surveys_id);
+                    }
+                  });
+                  if (element.chart_type=="1-Batang") {
+                    if (survey.length>1) {
+                      var div_class = '<div class="col-md-12 align-self-center">';
+                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="50" height="50"></canvas>';
+                    } else if (survey.length==1) {
+                      var div_class = '<div class="col-md-4 align-self-center">';
+                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
+                    }
+                  } else if (element.chart_type=="2-Spider") {
+                    if (survey.length>1) {
+                      var div_class = '<div class="col-md-12 align-self-center">';
+                      var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
+                    } else if (survey.length==1) {
+                      var div_class = '<div class="col-md-4 align-self-center">';
+                      var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
+                    }
+                  }
+
+                  $('#box-' + dashboard_id).append(div_class +
+                            '<!-- Default box -->'+
+                            '<div class="box box-primary">'+
+                              '<div class="box-header with-border">'+
+                                '<h3 class="box-title">'+element.name+'</h3>'+
+
+                                '<div class="box-tools pull-right">'+
+                                  '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
+                                          'title="Share">'+
+                                    '<i class="fa fa-share"></i></button>'+
+                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
+                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
+                                    '<i class="fa fa-gear"></i></button>'+
+                                '</div>'+
+                              '</div>'+
+                              '<div class="box-body">'+
+                                  '{{-- Grafik Here --}}'+
+                                  chart_type +
+                              '</div>'+
+                              '<!-- /.box-body -->'+
+                            '</div>'+
+                            '<!-- /.box -->'+
+                          '</div>'+
+                        '<!-- /.col-->'
+                  );
+
+                  if (element.chart_type=="1-Batang") {
+                    var ctx2 = document.getElementById("grafik-batang-"+element.id);
+                    var process_name = [];
+                    var level = [];
+                    var target_level = [];
+                    var percent = [];
+                    var target_percent = [];
+                    var backgroudcolor_target_percent = [];
+                    var bordercolor_target_percent = [];
+                    var backgroudcolor_percent = [];
+                    var bordercolor_percent = [];
+                    
+                    data.process.forEach(process => {
+                      if (process.charts_id===element.id) {
+                        process_name.push(process.process);
+                        level.push(process.level);
+                        target_level.push(process.target_level);
+                        percent.push(process.percent);
+                        target_percent.push(process.target_percent);
+                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                        bordercolor_percent.push('rgba(200,0,0,0.5)');
+                      }
+                    });
+                    
+                    var myChart2 = new Chart(ctx2, {
+                      type: 'bar',
+                      data: {
+                        labels: process_name,
+                        datasets: [{
+                            label: 'Target Percent %',
+                            data: target_percent,
+                            backgroundColor: backgroudcolor_target_percent,
+                            borderColor: bordercolor_target_percent,
+                            borderWidth: 1
+                          },
+                          {
+                            label: 'Pencapaian Target %',
+                            data: percent,
+                            backgroundColor: backgroudcolor_percent,
+                            borderColor: bordercolor_percent,
+                            borderWidth: 1
+                          }
+                        ]
+                      },
+                      options: {
+                        scales: {
+                          yAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }],
+                          xAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }]
+
+                        }
+                      }
+                    });
+                  } else if (element.chart_type=="2-Spider") {
+                    var marksCanvas = document.getElementById("grafik-spider-"+element.id);
+                    var survey_name = [];
+                    var process_name = [];
+                    var level = [];
+                    var target_level = [];
+                    var percent = [];
+                    var target_percent = [];
+                    var backgroudcolor_target_percent = [];
+                    var bordercolor_target_percent = [];
+                    var backgroudcolor_percent = [];
+                    var bordercolor_percent = [];
+                    
+                    data.process.forEach(process => {
+                      if (process.charts_id==element.id) {
+                        survey_name.push(process.name);
+                        process_name.push(process.process);
+                        level.push(process.level);
+                        target_level.push(process.target_level);
+                        percent.push(process.percent);
+                        target_percent.push(process.target_percent);
+                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                        bordercolor_percent.push('rgba(200,0,0,0.5)');
+                      }
+                    });
+
+                    var radarChart = new Chart(marksCanvas, {
+                        type: 'radar',
+                        data: {
+                            labels: process_name,
+                            datasets: [{
+                                backgroundColor: 'rgba(0,0,200,0.5)',
+                                label: 'Target Level',
+                                data: target_level
+                                },
+                                {
+                                backgroundColor: 'rgba(200,0,0,0.5)',
+                                label: 'Pencapaian Level',
+                                data: level
+                                }]
+                        }
+                    });
+
+                    function addData(chart, label, color, data) {
+                        chart.data.datasets.push({
+                          label: label,
+                          backgroundColor: color,
+                          data: data
+                        });
+                        chart.update();
+                    }
+
+                    // // inserting the new dataset after 3 seconds
+                    // setTimeout(function() {
+
+                    //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
+                    // }, 3000);
+
+                  }
+                  
+                });
+            } else {
+                console.log('hide');
+              }
+            }
+          });
+
+      
+      $('.btn.btn-dashboard').click(function (e) { 
+        e.preventDefault();
+        var dashboard_id = $(this).attr('id');
+        $('#box-' + dashboard_id).empty();
+
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+          type: "POST",
+          url: base_url+'/ajax_get_dashboard',
+          data: { _token: CSRF_TOKEN, id : dashboard_id },
+          dataType: "JSON",
+          success: function (data) {
+            console.log(data);
+            if (data.charts) {
+                data.charts.forEach(element => {
+                  if (element.chart_type=="1-Batang") {
+                    var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
+                  } else if (element.chart_type=="2-Spider") {
+                    var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
+                  }
+
+                  $('#box-' + dashboard_id).append('<div class="col-md-4 align-self-center">'+
+                            '<!-- Default box -->'+
+                            '<div class="box box-primary">'+
+                              '<div class="box-header with-border">'+
+                                '<h3 class="box-title">'+element.name+'</h3>'+
+
+                                '<div class="box-tools pull-right">'+
+                                  '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
+                                          'title="Share">'+
+                                    '<i class="fa fa-share"></i></button>'+
+                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
+                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
+                                    '<i class="fa fa-gear"></i></button>'+
+                                '</div>'+
+                              '</div>'+
+                              '<div class="box-body">'+
+                                  '{{-- Grafik Here --}}'+
+                                  chart_type+
+                              '</div>'+
+                              '<!-- /.box-body -->'+
+                            '</div>'+
+                            '<!-- /.box -->'+
+                          '</div>'+
+                        '<!-- /.col-->'
+                  );
+                  
+                  if (element.chart_type=="1-Batang") {
+                    // var marksCanvas = document.getElementById("grafik-batang-"+element.id);
+                    var ctx2 = document.getElementById("grafik-batang-"+element.id);
+                    var process_name = [];
+                    var level = [];
+                    var target_level = [];
+                    var percent = [];
+                    var target_percent = [];
+                    var backgroudcolor_target_percent = [];
+                    var bordercolor_target_percent = [];
+                    var backgroudcolor_percent = [];
+                    var bordercolor_percent = [];
+                    
+                    data.process.forEach(process => {
+                      if (process.charts_id===element.id) {
+                        process_name.push(process.process);
+                        level.push(process.level);
+                        target_level.push(process.target_level);
+                        percent.push(process.percent);
+                        target_percent.push(process.target_percent);
+                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                        bordercolor_percent.push('rgba(200,0,0,0.5)');
+                      }
+                    });
+                    
+                    var myChart2 = new Chart(ctx2, {
+                      type: 'bar',
+                      data: {
+                        labels: process_name,
+                        datasets: [{
+                            label: 'Target Percent %',
+                            data: target_percent,
+                            backgroundColor: backgroudcolor_target_percent,
+                            borderColor: bordercolor_target_percent,
+                            borderWidth: 1
+                          },
+                          {
+                            label: 'Pencapaian Target %',
+                            data: percent,
+                            backgroundColor: backgroudcolor_percent,
+                            borderColor: bordercolor_percent,
+                            borderWidth: 1
+                          }
+                        ]
+                      },
+                      options: {
+                        scales: {
+                          yAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }],
+                          xAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }]
+
+                        }
+                      }
+                    });
+                  } else if (element.chart_type=="2-Spider") {
+                    var marksCanvas = document.getElementById("grafik-spider-"+element.id);
+                    var survey_name = [];
+                    var process_name = [];
+                    var level = [];
+                    var target_level = [];
+                    var percent = [];
+                    var target_percent = [];
+                    var backgroudcolor_target_percent = [];
+                    var bordercolor_target_percent = [];
+                    var backgroudcolor_percent = [];
+                    var bordercolor_percent = [];
+                    
+                    data.process.forEach(process => {
+                      if (process.charts_id==element.id) {
+                        survey_name.push(process.name);
+                        process_name.push(process.process);
+                        level.push(process.level);
+                        target_level.push(process.target_level);
+                        percent.push(process.percent);
+                        target_percent.push(process.target_percent);
+                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                        bordercolor_percent.push('rgba(200,0,0,0.5)');
+                      }
+                    });
+
+                    var radarChart = new Chart(marksCanvas, {
+                        type: 'radar',
+                        data: {
+                            labels: process_name,
+                            datasets: [{
+                                backgroundColor: 'rgba(0,0,200,0.5)',
+                                label: 'Target Level',
+                                data: target_level
+                                },
+                                {
+                                backgroundColor: 'rgba(200,0,0,0.5)',
+                                label: 'Pencapaian Level',
+                                data: level
+                                }]
+                        }
+                    });
+
+                    function addData(chart, label, color, data) {
+                        chart.data.datasets.push({
+                          label: label,
+                          backgroundColor: color,
+                          data: data
+                        });
+                        chart.update();
+                    }
+
+                    // // inserting the new dataset after 3 seconds
+                    // setTimeout(function() {
+
+                    //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
+                    // }, 3000);
+
+                  }
+                });
+            } else {
+                console.log('hide');
+            }
+          }
+        });
+
+      });
+    });
+  </script>
+  
+  <script>
+    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpat di modal
     $('#modal-choose-chart').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget) // Button that triggered the modal
       var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
@@ -525,210 +807,162 @@
       var modal = $(this)
       modal.find('#id_dashboard').val(idDashboard)
     })
+    
+    // script untuk membuat set value edit dashboard
+    $('#modal-dashboard-edit').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+
+      var dashboard_id = button.data('idnya') // Extract info from data-* attributes
+      var title = button.data('title') // Extract info from data-* attributes
+      var chart_type = button.data('chart_type') // Extract info from data-* attributes
+      var survey_id = button.data('surveyid') // Extract info from data-* attributes
+
+      // var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+      // $.ajax({
+      //   type: "POST",
+      //   url: base_url+'/ajax_get_dashboard',
+      //   data: { _token: CSRF_TOKEN, id : dashboard_id },
+      //   dataType: "JSON",
+      //   success: function (data) {
+      //     console.log(data)
+      //   }
+      // });
+
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('#title').val(title)
+      modal.find('#survey_id option[value="'+survey_id+'"]')
+      modal.find("input[name=chart][value=" + chart_type + "]").attr('checked', 'checked');
+    })
   </script>
+
   <script>
-  var marksCanvas = document.getElementById("grafik-compare");
-  var marksData = {
-    labels: @php echo json_encode($labels) @endphp,
-    datasets: [{
-      label: "Survey 1",
-      backgroundColor: "rgba(200,0,0,0.5)",
-      data: @php echo json_encode($level) @endphp
-    },{ label: "Survey 2",
-      backgroundColor: "rgba(200, 209, 29, 0.5)",
-      data: [30, 30, 78, 48, 69, 89]
-    }, {
-      label: "Survey 3",
-      backgroundColor: "rgba(0,0,200,0.5)",
-      data: [54, 65, 60, 70, 70, 75]
-    }]
-  };
+    var batang = document.getElementById("grafik-batang");
+    var myChart = new Chart(batang, {
+                      type: 'bar',
+                      data: {
+                        labels: ["EDM02", "APO01"],
+                        datasets: [{
+                            label: 'Target Percent %',
+                            data: [20, 10],
+                            backgroundColor: 'rgba(0,0,200,0.5)',
+                            borderColor: 'rgba(0,0,200,0.5)',
+                            borderWidth: 1
+                          },
+                          {
+                            label: 'Pencapaian Target %',
+                            data: [20, 10],
+                            backgroundColor: 'rgba(200,0,0,0.5)',
+                            borderColor: 'rgba(200,0,0,0.5)',
+                            borderWidth: 1
+                          }
+                        ]
+                      },
+                      options: {
+                        scales: {
+                          yAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }],
+                          xAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }]
 
-  var radarChart = new Chart(marksCanvas, {
-    type: 'radar',
-    data: marksData
-  });
+                        }
+                      }
+                    });
+      
+    var radar = document.getElementById("grafik-radar");
 
-  var marksCanvas = document.getElementById("grafik-1");
+    var myRadar = new Chart(radar, {
+                        type: 'radar',
+                        data: {
+                            labels: ["EDM01", "EDM02", "EDM03", "EDM04", "APO01", "APO02", "APO03"],
+                            datasets: [{
+                                backgroundColor: 'rgba(0,0,200,0.5)',
+                                label: 'Survey 1',
+                                data: [10, 20, 30, 40, 50, 60, 90]
+                                },
+                                {
+                                backgroundColor: 'rgba(200,0,0,0.5)',
+                                label: 'Survey 2',
+                                data: [40, 50, 60, 30, 20, 10, 70]
+                                }]
+                        }
+                    });
+    
+    // untuk modal edit dashboard
+    var batang = document.getElementById("grafik-batang-edit");
+    var myChart = new Chart(batang, {
+                      type: 'bar',
+                      data: {
+                        labels: ["EDM02", "APO01"],
+                        datasets: [{
+                            label: 'Target Percent %',
+                            data: [20, 10],
+                            backgroundColor: 'rgba(0,0,200,0.5)',
+                            borderColor: 'rgba(0,0,200,0.5)',
+                            borderWidth: 1
+                          },
+                          {
+                            label: 'Pencapaian Target %',
+                            data: [20, 10],
+                            backgroundColor: 'rgba(200,0,0,0.5)',
+                            borderColor: 'rgba(200,0,0,0.5)',
+                            borderWidth: 1
+                          }
+                        ]
+                      },
+                      options: {
+                        scales: {
+                          yAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }],
+                          xAxes: [{
+                            stacked: true,
+                            ticks: {
+                              beginAtZero: true
+                            }
+                          }]
 
-  var marksData = {
-    labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
-    datasets: [{
-      label: "Level",
-      backgroundColor: "rgba(200,0,0,0.5)",
-      data: [65, 75, 70, 80, 60, 80]
-    }, {
-      label: "Target Level",
-      backgroundColor: "rgba(0,0,200,0.5)",
-      data: [54, 65, 60, 70, 70, 75]
-    }]
-  };
+                        }
+                      }
+                    });
+      
+    var radar = document.getElementById("grafik-radar-edit");
 
-  var radarChart = new Chart(marksCanvas, {
-    type: 'radar',
-    data: marksData
-  });
-
-  var ctx = document.getElementById("grafik-2");
-  var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
-      datasets: [{
-          label: '#Target Percent',
-          data: [10, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)'
-          ],
-          borderColor: [
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)'
-          ],
-          borderWidth: 1
-        },
-        {
-          label: '#Percent',
-          data: [15, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)'
-          ],
-          borderColor: [
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)'
-          ],
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          stacked: true,
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        xAxes: [{
-          stacked: true,
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-
-      }
-    }
-  });
-
-  var ctx2 = document.getElementById("grafik-batang");
-  var myChart2 = new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
-      datasets: [{
-          label: '# Target Percent',
-          data: [10, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)'
-          ],
-          borderColor: [
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)',
-            'rgba(0,0,200,0.5)'
-          ],
-          borderWidth: 1
-        },
-        {
-          label: '# Target',
-          data: [15, 19, 3, 5, 2, 3],
-          backgroundColor: [
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)'
-          ],
-          borderColor: [
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)',
-            'rgba(200,0,0,0.5)'
-          ],
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          stacked: true,
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        xAxes: [{
-          stacked: true,
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-
-      }
-    }
-  });
-
-  var marksCanvas2 = document.getElementById("grafik-radar");
-
-  var marksData2 = {
-    labels: ["EDM01", "EDM05", "EDM03", "APO10", "APO12", "APO13"],
-    datasets: [{
-      label: "Level",
-      backgroundColor: "rgba(200,0,0,0.5)",
-      data: [65, 75, 70, 80, 60, 80]
-    }, {
-      label: "Target Level",
-      backgroundColor: "rgba(0,0,200,0.5)",
-      data: [54, 65, 60, 70, 70, 75]
-    }]
-  };
-
-  var radarChart2 = new Chart(marksCanvas2, {
-    type: 'radar',
-    data: marksData2
-  });
+    var myRadar = new Chart(radar, {
+                        type: 'radar',
+                        data: {
+                            labels: ["EDM01", "EDM02", "EDM03", "EDM04", "APO01", "APO02", "APO03"],
+                            datasets: [{
+                                backgroundColor: 'rgba(0,0,200,0.5)',
+                                label: 'Survey 1',
+                                data: [10, 20, 30, 40, 50, 60, 90]
+                                },
+                                {
+                                backgroundColor: 'rgba(200,0,0,0.5)',
+                                label: 'Survey 2',
+                                data: [40, 50, 60, 30, 20, 10, 70]
+                                }]
+                        }
+                    });
+    
+      
   </script>
 
   {{-- Alert Delete Dashboard --}}
   @foreach ($dashboards as $item)
-    <script>
+    <script>   
       var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
       $(document).ready(function(){
         $("#delete-dashboard-{{ $item->id }}").click(function(){
@@ -745,17 +979,17 @@
               $.ajax({
                 type: "POST",
                 url: base_url+'/ajax_delele_dashboard',
-                data: { _token: CSRF_TOKEN, 'dashboard_id': {{ $item->id }} },
+                data: { _token: CSRF_TOKEN, 'dashboard_id': {{ $item->id }}, 'created_by': {{ $item->created_by }} },
                 dataType: "JSON",
                 success: function (response) {
                   if(response==1){
                       Swal(
                       'Deleted!',
-                      'Dashboard has been deleted Successfully!',
+                      '{{ $item->name }} has been deleted Successfully!',
                       'success'
                     )
                     window.location.href = base_url;
-                  } else {
+                  } else if (response==0){
                       Swal(
                         'Failed!',
                         'Dashboard failed to delete!',
@@ -772,47 +1006,54 @@
     </script>
   @endforeach
 
-  @foreach ($dashboards as $item)
-  {{-- Fullscreen Dashboard --}}
+  {{-- @foreach ($dashboards as $item) --}}
   <script>
-    $('#fullscreen').click(function() {
-        $('.box').css({
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 701
-        });
-    });
-  </script>
 
-<script>
-    var userid = [];
-    jQuery(document).ready(function(){
-      jQuery('#ajaxSubmit').click(function(e){
-          e.preventDefault();
-          
-          $.each($("#share_to option:selected"), function(){            
-            userid.push($(this).val());
-          });
-          // console.log(userid);
-          var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-          jQuery.ajax({
-            url: base_url+'/ajax_share_to',
-            method: 'post',
-            data: { "_token" : CSRF_TOKEN,
-                    'userid': $('#share_to').val()
-            },
-            success: function(result){
-                jQuery('.alert').show();
-                jQuery('.alert').html(result.success);
+    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpat di modal
+    $('#modal-share').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
+      
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('#id_dashboard').val(idDashboard)
+    })
+    
+    // ajax proses insert user id ke dashboard_user
+    $(document).ready(function () {
+      $('#ajaxSubmit').click(function (e) { 
+        e.preventDefault();
+
+        $.ajax({
+          type: "POST",
+          url: base_url+'/ajax_share_to',
+          data: { '_token' : CSRF_TOKEN,
+                  'dashboard_id' : $('#id_dashboard').val(),
+                  'iduser' : $('#share_to').val() },
+          dataType: "JSON",
+          success: function (response) {
+            // console.log(response);
+            if (response==1) {
+              Swal(
+                'Berhasil !',
+                'User berhasil di tambahkan ke dashboard!',
+                'success'
+              )
+              window.location.href = base_url;
+            } else {
+              Swal(
+                  'Failed!',
+                  'User Gagal di tambahkan!',
+                  'error'
+              )
             }
-          });
+          }
         });
       });
+    });
   </script>
-  @endforeach
+  {{-- @endforeach --}}
 
   {{-- Show hide comparison --}}
   <script>
@@ -823,23 +1064,25 @@
           if (cb.attr("checked") == "checked") {
             cb.removeAttr("checked");
             $("fieldset").hide();
+            $('.select-compare').attr( "disabled", "disabled" ); // Elements(s) are now disabled.
             console.log('update menjadi unchecked');    
           } else {
             cb.attr("checked", "checked");
             $("fieldset").show();
+            $('.select-compare').prop("disabled", false); // Element(s) are now enabled.
             console.log('update menjadi checked');
           }
         });
       });
   </script>
 
-      {{-- Select Users --}}
-      <script>
-      $(document).ready(function(){
+  {{-- Select Users --}}
+  <script>
+  $(document).ready(function(){
         initialize_select_user("#share_to");
-      });
+  });
     
-      function initialize_select_user(id_element){ 
+  function initialize_select_user(id_element){ 
           $.ajax({
               type: 'GET',
               url: base_url+'/ajax_get_list_user',
@@ -849,7 +1092,7 @@
                   var item = JSON.parse(data);
                   $v_select.empty();
                   $v_select.append("<option value=''></option>");
-                  $.each(item, function(index,valuee) {        
+                  $.each(item, function(index,valuee) {    
                       $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
                   });
     
@@ -858,7 +1101,26 @@
               }
           });
         }
-      </script>
+  </script>
+
+  {{-- Fullscreen Dashboard --}}
+  <script>
+    /* Function to open fullscreen mode */
+    function openFullscreen(id_tab) {
+      /* Get the element you want displayed in fullscreen */ 
+      var elem = document.getElementById("box-"+id_tab);
+      console.log(elem)
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) { /* Firefox */
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        elem.msRequestFullscreen();
+      }
+    };
+  </script>
 @stop
 
 @section('theme-layout-scripts')

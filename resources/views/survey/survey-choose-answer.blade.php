@@ -72,9 +72,13 @@
           @foreach($levels as $index => $level)
             <div class="box box-primary">
               <div class="box-header">
-                <a data-toggle="collapse" href="#question">
+                <a href="#" data-widget="collapse">
                   <h4 style="margin:2px 0px;">Level {{$index}}</h4>
                 </a>
+                <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  </button>
+                </div>
               </div>
 
               <div id="question" class="box-body collapse in form-horizontal">
@@ -161,43 +165,44 @@
 @stop
 
 @section('body-modals')
-<div class="modal fade" id="m_u_file">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+  <div class="modal fade" id="m_u_file">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+        </div>
+        <input type="hidden" id="curWP">
+        <input type="hidden" id="curTyp" value="answer">
+        <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
+          {{ csrf_field() }}
+        <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
+                <thead>
+                  <tr>
+                    <td style="width:100px;">WP ID</td>
+                    <td style="width:350px;">Description</td>
+                    <td>File</td>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
+          <button type="submit" id="i_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
+        </div>
+        </form>
       </div>
-      <input type="hidden" id="curWP">
-      <input type="hidden" id="curTyp" value="answer">
-      <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
-        {{ csrf_field() }}
-      <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
-              <thead>
-                <tr>
-                  <td style="width:100px;">WP ID</td>
-                  <td style="width:350px;">Description</td>
-                  <td>File</td>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
-        <button type="submit" id="i_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
-      </div>
-      </form>
+      <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
+    <!-- /.modal-dialog -->
   </div>
-  <!-- /.modal-dialog -->
-</div>
+  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
@@ -211,6 +216,7 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/pages/survey/answer.js')}}"></script>
+{{ Html::script('js/pages/survey.js')}}
 <script src="/theme/AdminLTE/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
   $(function () {

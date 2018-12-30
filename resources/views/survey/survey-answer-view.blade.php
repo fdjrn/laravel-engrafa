@@ -72,9 +72,13 @@
           @foreach($levels as $index => $level)
             <div class="box box-primary">
               <div class="box-header">
-                <a data-toggle="collapse" href="#question">
+                <a href="#" data-widget="collapse">
                   <h4 style="margin:2px 0px;">Level {{$index}}</h4>
                 </a>
+                <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  </button>
+                </div>
               </div>
 
               <div id="question" class="box-body collapse in form-horizontal">
@@ -97,12 +101,12 @@
                           {{ $survey->outcome }}&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->description }}</span>
                         </div>
                         <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
-                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->comment }}</span>
+                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{ $survey->comment ? $survey->comment : '-' }}</span>
                         </div>
                         <div class="row" style="margin-top: 4px;">
                           <div class="col-sm-3">
                             <div>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked disabled> {{ucfirst($survey->met_criteria)}}
+                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked disabled> {{ $survey->met_criteria ? ucfirst($survey->met_criteria) : '-'}}
                             </div>
                           </div>
                           <div class="col-sm-9">
@@ -156,9 +160,7 @@
           </div>
           <div class="box-body">
             @foreach($survey_members as $survey_member)
-              @if($survey_member->role == '2-Responden')
-                <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
-              @endif
+              <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
             @endforeach
           </div>
           <!-- /.box-body -->
@@ -172,36 +174,37 @@
 @stop
 
 @section('body-modals')
-<div class="modal fade" id="m_u_file">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
-      </div>
-      <input type="hidden" id="curWP">
-      <input type="hidden" id="curTyp" value="view">
-      <div class="modal-body">
-        <div class="table-responsive">
-          <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
-            <thead>
-              <tr>
-                <td style="width:100px;">WP ID</td>
-                <td style="width:350px;">Description</td>
-                <td>File</td>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+  <div class="modal fade" id="m_u_file">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
+        </div>
+        <input type="hidden" id="curWP">
+        <input type="hidden" id="curTyp" value="view">
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
+              <thead>
+                <tr>
+                  <td style="width:100px;">WP ID</td>
+                  <td style="width:350px;">Description</td>
+                  <td>File</td>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      <!-- /.modal-content -->
     </div>
-    <!-- /.modal-content -->
+    <!-- /.modal-dialog -->
   </div>
-  <!-- /.modal-dialog -->
-</div>
+  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
@@ -215,6 +218,7 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/pages/survey/answer.js')}}"></script>
+{{ Html::script('js/pages/survey.js')}}
 <script src="/theme/AdminLTE/plugins/bootstrap-slider/bootstrap-slider.js"></script>
 <script>
   $(function () {
