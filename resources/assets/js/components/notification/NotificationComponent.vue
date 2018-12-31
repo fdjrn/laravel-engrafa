@@ -122,7 +122,7 @@
 						}
 
 						if(this.notifications.length > 0){
-							console.log(this.notifications);
+							
 							var tmp = this.notifications[this.notifications.length-1];
 							this.date = new Date(tmp.created_at);
 						}

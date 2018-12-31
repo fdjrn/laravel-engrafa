@@ -44,7 +44,7 @@
 			});
 		},
 		mounted(){
-			console.log('invitation mounted');
+			
 			axios.get('/chat/getUserAvailable')
 			.then((response) => {
 				this.users = response.data;

@@ -29,7 +29,7 @@
 
 			Echo.private(`ReadNotification.${this.user.id}`)
 				.listen('ReadNotification', e => {
-					console.log('read notification');
+					
 					if(e.readType == 'read'){
 						this.unread--;
 					}else{

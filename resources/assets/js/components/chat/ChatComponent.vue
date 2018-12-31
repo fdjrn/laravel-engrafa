@@ -39,6 +39,9 @@
       }
     },
     mounted() {
+
+      this.changeChatRoom(this.selectedChatRoom);
+
       Echo.private('chat.'+this.user.id)
         .listen('NewMessage', (e) => {
           var chat = e.chat;
@@ -61,6 +64,15 @@
           }else{
 
           }
+      },
+      changeChatRoom(selectedChatRoom){
+        if (selectedChatRoom == null) {return}
+
+        // this.activeChatRoom = selectedChatRoom;
+        axios.get("/chat/getChatHistory/"+selectedChatRoom.chat_room+"/")
+        .then((response) => {
+            this.chats = response.data;
+        });
       }
     },
     component: {
@@ -69,13 +81,7 @@
     },
     watch : {
       selectedChatRoom(selectedChatRoom){
-        if (selectedChatRoom == null) {return}
-
-        // this.activeChatRoom = selectedChatRoom;
-        axios.get("/chat/getChatHistory/"+selectedChatRoom.chat_room+"/")
-        .then((response) => {
-            this.chats = response.data;
-        });
+        this.changeChatRoom(selectedChatRoom);
       }
     }
   }

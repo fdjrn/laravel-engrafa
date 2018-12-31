@@ -76,3 +76,5 @@
   </aside>
 
   @include('layouts.part.nav-right')
+
+  
