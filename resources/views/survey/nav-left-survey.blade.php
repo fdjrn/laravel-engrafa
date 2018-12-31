@@ -9,7 +9,7 @@
       <div class="box-body">
         <ul class="list-group inside-submenu no-margin" data-widget="tree" style="list-style: none;">
           <li class="">
-            <a>
+            <a href="{{route('survey.chat',['id'=> $survey_id])}}">
               <h4><i class="fa fa-comment-o"></i>&nbsp;&nbsp;<span>Chat</span></h4>
             </a>
           </li>
