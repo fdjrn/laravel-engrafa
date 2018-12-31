@@ -51,15 +51,7 @@
 @section('page-level-scripts')
 <!-- <script src="{{ asset('js/app.js')}}"></script> -->
 
-<script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script> <script>
-  $(function () {
-    //Initialize Select2 Elements
-    $('.select2').select2()
-  })
-</script>
-
-<script>
-</script>
+<script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script>
   <!-- select2 -->
 @stop
 
