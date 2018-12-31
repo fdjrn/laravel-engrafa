@@ -91,6 +91,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
 	Route::get('/message', 'Chat\MessageController@index')->name('message');
 	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
+	Route::post('/message/read/all', 'Chat\ChatController@readAllMessages')->name('chat.read.all');
 
 	//notification
 	Route::get('/notification/getNotification/{date?}/','Notification\NotificationController@getNotifications');

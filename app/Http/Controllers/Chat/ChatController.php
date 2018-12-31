@@ -33,38 +33,35 @@ class ChatController extends Controller
         $chat->created_by = Auth::user()->id;
         $chat->save();
 
-        $chatStored = Chat::select(DB::raw('chats.id, chats.chat_text, chats.created_by, chats.created_at, users.name'))
-            ->join('chat_room_members','chat_room_members.id','chats.chat_member')
-            ->join('chat_rooms','chat_rooms.id','chat_room_members.chat_room')
-            ->join('users','users.id','chats.created_by')
-            ->where('chats.id',$chat->id)
-            ->first();
-
         $chatMembers = ChatMember::where('chat_room', $request->chatRoomId)
             ->where('user','<>',Auth::user()->id)
             ->get();
 
-        $notification = new Notifications;
-        $notification->notification_text = $request->message;
-        $notification->modul = '1-Chat';
-        $notification->modul_id = $request->chatRoomId;
-        $notification->created_by = Auth::user()->id;
-        $notification->save();
+        DB::table('chat_room_members')
+            ->where('chat_room',$request->chatRoomId)
+            ->update([
+                'updated_at'=> date('Y-m-d H:i:s'),
+                'unread_messages' => DB::raw('unread_messages+1')
+            ]);
+
+        // $notification = new Notifications;
+        // $notification->notification_text = $request->message;
+        // $notification->modul = '1-Chat';
+        // $notification->modul_id = $request->chatRoomId;
+        // $notification->created_by = Auth::user()->id;
+        // $notification->save();
 
         foreach ($chatMembers as $chatMember) {
-            $notificationReceiver = new NotificationReceivers;
-            $notificationReceiver->notification = $notification->id;
-            $notificationReceiver->receiver = $chatMember->user;
-            $notificationReceiver->is_read = 0;
-            $notificationReceiver->created_by = Auth::user()->id;
-            $notificationReceiver->save();
+            // $notificationReceiver = new NotificationReceivers;
+            // $notificationReceiver->notification = $notification->id;
+            // $notificationReceiver->receiver = $chatMember->user;
+            // $notificationReceiver->is_read = 0;
+            // $notificationReceiver->created_by = Auth::user()->id;
+            // $notificationReceiver->save();
             
-            broadcast(new NewMessage($chatStored, $chatMember));
-            broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
+            broadcast(new NewMessage($chat, $chatMember));
+            // broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
         }
-
-        $chat = new Chat;
-        $chat = $chatStored;
 
         return response()->json($chat);
     }
@@ -111,9 +108,25 @@ class ChatController extends Controller
         $chatMember->user = $request->userId;
         $chatMember->save();
 
+        $notification = new Notifications;
+        $notification->notification_text = 'you are invited to chat with '.Auth::user()->name;
+        $notification->modul = '1-Chat';
+        $notification->modul_id = $chatRoom->id;
+        $notification->created_by = Auth::user()->id;
+        $notification->save();
+
+        $notificationReceiver = new NotificationReceivers;
+        $notificationReceiver->notification = $notification->id;
+        $notificationReceiver->receiver = $chatMember->user;
+        $notificationReceiver->is_read = 0;
+        $notificationReceiver->created_by = Auth::user()->id;
+        $notificationReceiver->save();
+
         $chatRoom->name = $this->castChatRoomName($chatRoom->name);
 
         broadcast(new ChatInvitation($chatRoom, $chatMember));
+        broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
+        
         return response()->json(array(
                     'chatRoom'=> $chatRoom,
                     'exist'=>0
@@ -138,6 +151,13 @@ class ChatController extends Controller
         $chatMember->user = Auth::user()->id;
         $chatMember->save();
 
+        $notification = new Notifications;
+        $notification->notification_text = 'you are invited to group chat '.$chatRoom->name;
+        $notification->modul = '1-Chat';
+        $notification->modul_id = $chatRoom->id;
+        $notification->created_by = Auth::user()->id;
+        $notification->save();
+
         foreach ($request->userId as $user) {
             # code...
             $chatMember = new ChatMember;
@@ -146,8 +166,16 @@ class ChatController extends Controller
             $chatMember->created_by = Auth::user()->id;
             $chatMember->user = (integer) $user;
             $chatMember->save();
-            // dd($chatMember);
+
+            $notificationReceiver = new NotificationReceivers;
+            $notificationReceiver->notification = $notification->id;
+            $notificationReceiver->receiver = $chatMember->user;
+            $notificationReceiver->is_read = 0;
+            $notificationReceiver->created_by = Auth::user()->id;
+            $notificationReceiver->save();
+            
             broadcast(new ChatInvitation($chatRoom, $chatMember));
+            broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
         }
 
         return response()->json(array(
@@ -161,14 +189,18 @@ class ChatController extends Controller
         $chatRooms = null;
         if ($chatRoom) {
             # code...
-            $chatRooms = ChatRoom::join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
+            $chatRooms = ChatRoom::
+            select('chat_rooms.*','chat_room_members.*', 'chat_rooms.updated_at as chat_room_updated_at')
+            ->join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
             ->where('user',Auth::user()->id)
             ->where('chat_type','<>','3-Survey')
             ->whereRaw("lower(name) like '%".$chatRoom."%' ")
             ->orderBy('chat_rooms.updated_at','desc')
             ->get();
         }else{
-            $chatRooms = ChatRoom::join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
+            $chatRooms = ChatRoom::
+            select('chat_rooms.*','chat_room_members.*', 'chat_rooms.updated_at as chat_room_updated_at')
+            ->join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
             ->where('user',Auth::user()->id)
             ->where('chat_type','<>','3-Survey')
             ->orderBy('chat_rooms.updated_at','desc')
@@ -199,6 +231,13 @@ class ChatController extends Controller
             ->get();
         // dd(DB::getQueryLog());
         return response()->json($chats);
+    }
+
+    public function readAllMessages(Request $request){
+        $updated = DB::table('chat_room_members')
+            ->where('id',$request->id)
+            ->update(['unread_messages' => 0]);
+        return response()->json($updated);
     }
 
     public function getUserAvailable(){

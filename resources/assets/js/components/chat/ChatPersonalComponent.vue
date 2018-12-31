@@ -31,6 +31,7 @@
 		methods : {
 			charRoomClicked(selectedChatRoom){
 				this.selectedChatRoom = selectedChatRoom;
+				console.log(this.selectedChatRoom);
 			}
 		}
 	}
