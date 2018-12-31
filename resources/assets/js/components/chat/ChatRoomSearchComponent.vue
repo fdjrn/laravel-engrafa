@@ -18,7 +18,7 @@
 			}
 		},
 		mounted(){
-			console.log("search mounted");
+			
 		},
 		methods : {
 			search(){

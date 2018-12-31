@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 use App\User;
+use App\Models\ChatRoom;
 use App\Models\Files;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
 use App\Models\Survey;
 use App\Models\Task;
+use App\Events\NewNotification;
 
 
 class SurveyController extends Controller
@@ -829,6 +831,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }                
             }
             if($request->get('i_n_client') && $notif_post){
@@ -839,6 +843,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }
             }
 
@@ -942,6 +948,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }
             } 
         }               
@@ -968,6 +976,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }
             }
         }
@@ -1038,6 +1048,8 @@ class SurveyController extends Controller
             $notificationReceivers->created_by = Auth::user()->id;
             $notificationReceivers->save();
 
+            broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;
                 $taskparticipants->task = $id;
@@ -1051,6 +1063,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }
             }
         }
@@ -1122,6 +1136,8 @@ class SurveyController extends Controller
                 $notificationReceivers->is_read = 0;
                 $notificationReceivers->created_by = Auth::user()->id;
                 $notificationReceivers->save();
+
+                broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
             }
 
             foreach ($request->get('i_n_participant') as $participant) {
@@ -1144,6 +1160,8 @@ class SurveyController extends Controller
                     $notificationReceivers->is_read = 0;
                     $notificationReceivers->created_by = Auth::user()->id;
                     $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
                 }
             }
 
@@ -1274,5 +1292,37 @@ class SurveyController extends Controller
         }
 
         return $surveyProcessOutcomes;
+    }
+
+    public function chat($id)
+    {
+        $data['survey_id'] = $id;
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
+
+        $data_survey = DB::table('surveys')
+            ->select('surveys.id','surveys.name')
+            ->where('surveys.id',$id)
+            ->get();
+        
+        $data['survey_name'] = $data_survey->first()->name;
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
+
+        $chatRooms = ChatRoom::
+        select('chat_rooms.*','chat_room_members.*','chat_rooms.updated_at as chat_room_updated_at')
+        ->join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
+        ->where([
+            ['user',Auth::user()->id],
+            ['chat_type','=','3-Survey'],
+            ['survey','=',$id]
+        ])
+        ->orderBy('chat_rooms.updated_at','desc')
+        ->get()->first();
+
+        $data['chatRooms'] = $chatRooms;
+        $data['aUser'] = auth()->user();
+        
+        return view('survey.chat',$data);
     }
 }

@@ -70,6 +70,7 @@
 <!-- ./wrapper -->
 @section('body-modals')
 @show()
+<!-- <script src="{{ asset('js/app.js')}}"></script> -->
 </body>
 </html>
 

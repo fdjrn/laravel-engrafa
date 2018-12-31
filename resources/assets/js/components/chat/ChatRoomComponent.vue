@@ -56,15 +56,14 @@
                 this.chatRoom = {chatRoom : ChatRoom, type : '2-Group'};
             },
             searchRooms(keyword){
-                console.log('search chat room with name ' + keyword);
+                
                 this.searchKeyWord = keyword;
             },
             chatRoomClicked(chatRoom){
                 this.$emit('chatRoomClicked', chatRoom);
             },
             chatRoomInvitation(chatMember){
-                console.log('change name invitation');
-                console.log(chatMember);
+                
             }
         },
         components: {
