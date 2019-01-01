@@ -29,7 +29,7 @@ function initialize_inv_user(id_element,v_check){
   if(s_id){
     $.ajax({
         type: 'GET',
-        url: base_url+'/survey/'+s_id+'/ajax_get_list_user/'+s_id,
+        url: base_url+'/assessment/'+s_id+'/ajax_get_list_user/'+s_id,
         success: function (data) {
             // the next thing you want to do 
             var $v_select = $(id_element);

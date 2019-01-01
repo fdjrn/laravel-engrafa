@@ -16,7 +16,7 @@ function getWP(input){
       responsive: true,
       processing: true,
       ajax: {
-      url: base_url+'/survey/get_process_outcome_wp/'+input,
+      url: base_url+'/assessment/get_process_outcome_wp/'+input,
       method: 'GET',
       },
       columns: [
@@ -55,7 +55,7 @@ function doWp(fileid,doAction){
   console.log(doAction);
   $.ajax({
       type: "GET",
-      url: base_url+'/survey/'+doAction+'/'+fileid,
+      url: base_url+'/assessment/'+doAction+'/'+fileid,
       success: function(data)
       {
         if (data == 1) {
@@ -65,7 +65,7 @@ function doWp(fileid,doAction){
               text: 'File not found!'
             });
         }else{
-            window.location.href = '/survey/'+doAction+'/'+fileid;
+            window.location.href = '/assessment/'+doAction+'/'+fileid;
         }
       }
   });

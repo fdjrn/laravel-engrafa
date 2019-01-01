@@ -18,7 +18,7 @@
 				</a>
 			@foreach($mnsurvey as $survey)
 			<li style="background-color: #2c3b41;">
-				<a href="/survey/{{$survey->id}}">
+				<a href="{{route('survey',['id'=> $survey->id])}}">
 					<span>&nbsp;&nbsp;&nbsp;</span><i class="fa fa-file-text-o"></i><span>{{$survey->name}}</span>
 				</a>
 			@endforeach

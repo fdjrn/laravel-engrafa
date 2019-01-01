@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 	$.ajax({
 	  type : 'GET',
-	  url : '/survey/aggregat/'+surveyId,
+	  url : '/assessment/aggregat/'+surveyId,
 	  cache : false,
 	  contentType : false,
 	  processData : false,

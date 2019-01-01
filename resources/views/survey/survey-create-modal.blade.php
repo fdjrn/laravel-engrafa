@@ -5,7 +5,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Create New Survey</h4>
+        <h4 class="modal-title">Create New Assessment</h4>
       </div>
       <div class="modal-body">
         <form name="form_n_survey" action="{{url('surveyrs')}}" method="post" id="form_n_survey" class="form-horizontal">
@@ -15,7 +15,7 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <div class='input-group'>
-                    <input type="text" id="i_n_name_survey" name="i_n_name_survey" class="form-control" placeholder="New Survey Name" >
+                    <input type="text" id="i_n_name_survey" name="i_n_name_survey" class="form-control" placeholder="New Assessment Name" >
                       <span class="input-group-addon">
                         <select class="colorselector">
                           <option value="A0522D" data-color="#A0522D">sienna</option>
@@ -197,7 +197,7 @@
             </div>
             <div class="col-lg-12">
               <div class="form-group">
-                <label for="i_n_expire" class="col-sm-2 control-label">Survey Expiration</label>
+                <label for="i_n_expire" class="col-sm-2 control-label">Assessment Expiration</label>
 
                 <div class="col-sm-4">
                   <div class='input-group date'>

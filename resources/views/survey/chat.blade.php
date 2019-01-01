@@ -25,11 +25,11 @@
 @stop
 
 @section('page-header') 
-  <h1>Chat</h1>
+  <h1>Assessment</h1>
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{ url('chat')}}"><i class="fa fa-comment"></i> Chat</a></li>
+  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-comment-o"></i> Chat</a></li>
 @stop
 
 
