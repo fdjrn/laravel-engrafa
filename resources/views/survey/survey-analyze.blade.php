@@ -40,11 +40,12 @@
 @stop
 
 @section('page-header') 
-  <h1>Survey</h1>
+  <h1>Assessment</h1>
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{url('/survey/'.$survey_id)}}"><i class="fa fa-files-o"></i> Survey</a></li>
+  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-files-o"></i> Assessment</a></li>
+  <li>Analyze</li>
 @stop
 
 

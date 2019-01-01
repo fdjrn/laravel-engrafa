@@ -14,7 +14,7 @@ function initialize_user_task(id_element,v_check){
   var survey_id = $('#i_n_survey_id').val();
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/'+survey_id+'/ajax_get_list_user/task',
+      url: base_url+'/assessment/'+survey_id+'/ajax_get_list_user/task',
       success: function (data) {
           // the next thing you want to do 
           var $v_select = $(id_element);
@@ -74,14 +74,14 @@ function openModals(type,taskId){
   }else if(type == 'edit'){
     $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-edit"></i>&nbsp;Edit Existing Task');
-    $('#form_n_task').attr('action','/survey/'+survey_id+'/task/update/'+taskId);
+    $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
     $('#m_new_task').modal('show');
     ajax_modal(survey_id,taskId);
   }else{
     $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-eye"></i>&nbsp;View Existing Task');
-    $('#form_n_task').attr('action','/survey/'+survey_id+'/task/update/'+taskId);
+    $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
     $('#m_footer_task').hide();
     $('#m_new_task').modal('show');
@@ -101,7 +101,7 @@ function openModals(type,taskId){
 function ajax_modal(survey_id,taskId){
     $.ajax({
       url:
-        base_url + '/survey/'+survey_id+'/task/'+taskId,
+        base_url + '/assessment/'+survey_id+'/task/'+taskId,
         method: 'get',
       success: function(response) {
         let parse = JSON.parse(response.tasks);

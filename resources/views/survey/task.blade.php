@@ -52,7 +52,7 @@
 @stop
 
 @section('page-header') 
-  <h1>Survey</h1>
+  <h1>Assessment</h1>
 @stop
 
 @section('page-breadcrumb')
