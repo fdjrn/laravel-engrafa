@@ -79,19 +79,19 @@ Route::middleware(['auth','web'])->group(function () {
 
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
 
-    Route::get('index/file-history/{id}','Index\IndexController@showFileHistory');
+    Route::get('/index/file-history/{id}','Index\IndexController@showFileHistory');
 
 
 	// chat
-	Route::get('/chat','Chat\ChatController@index')->name('chat');
-	Route::post('/chat/invite','Chat\ChatController@invite');
-	Route::post('/chat/invite/group','Chat\ChatController@inviteGroup');
-	Route::get('/chat/getChatRoom/{chatRoom?}/','Chat\ChatController@getChatRoom');
-	Route::get('/chat/getChatHistory/{chatRoom?}/','Chat\ChatController@getChatHistory');
-	Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
-	Route::get('/message', 'Chat\MessageController@index')->name('message');
-	Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
-	Route::post('/message/read/all', 'Chat\ChatController@readAllMessages')->name('chat.read.all');
+    Route::get('/chat','Chat\ChatController@index')->name('chat');
+    Route::post('/chat/invite','Chat\ChatController@invite');
+    Route::post('/chat/invite/group','Chat\ChatController@inviteGroup');
+    Route::get('/chat/getChatRoom/{chatRoom?}/','Chat\ChatController@getChatRoom');
+    Route::get('/chat/getChatHistory/{chatRoom?}/','Chat\ChatController@getChatHistory');
+    Route::get('/chat/getUserAvailable','Chat\ChatController@getUserAvailable');
+    Route::get('/message', 'Chat\MessageController@index')->name('message');
+    Route::post('/message', 'Chat\ChatController@store')->name('chat.store');
+    Route::post('/message/read/all', 'Chat\ChatController@readAllMessages')->name('chat.read.all');
 
 	//notification
 	Route::get('/notification/getNotification/{date?}/','Notification\NotificationController@getNotifications');
@@ -140,6 +140,10 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
 	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
 	Route::get("/calendar/{year}/{month}",'Schedule\ScheduleController@schedules_list')->name("calendar.list");
+
+	//bookmark
+    Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
+    Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
 });
 
 //DocumentViewer Library
