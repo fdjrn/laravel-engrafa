@@ -83,7 +83,7 @@
 					url = "/chat/";
 					window.location.href = url;
 				}else if(notification.modul == '2-Survey'){
-					url = "/survey/";
+					url = "/assessment/";
 					window.location.href = url+notification.modul_id;
 				}else if(notification.modul == '3-Quisioner'){
 
