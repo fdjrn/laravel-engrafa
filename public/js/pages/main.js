@@ -78,7 +78,7 @@ function clearNSurveyModal(){
 function init_n_survey_user(id_element,v_check){
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/0/ajax_get_list_user/no',
+      url: base_url+'/assessment/0/ajax_get_list_user/no',
       success: function (data) {
           // the next thing you want to do 
           var $v_select = $(id_element);
@@ -121,7 +121,7 @@ $("#form_n_survey").submit(function(e) {
             swal({
               type: 'success',
               title: 'Berhasil',
-              text: 'Create New Survey Success'
+              text: 'Create New Assessment Success'
             });
             location.href = base_url+parse.messages;
           } else {

@@ -40,11 +40,12 @@
 @stop
 
 @section('page-header') 
-  <h1>Survey</h1>
+  <h1>Assessment</h1>
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{url('/survey/'.$survey_id)}}"><i class="fa fa-files-o"></i> Survey</a></li>
+  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-files-o"></i> Assessment</a></li>
+  <li>Answer</li>
 @stop
 
 
@@ -137,8 +138,8 @@
               </div>
             </div>
           @endforeach
-          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Survey</button></div>
-          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Survey</button></div>
+          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Assessment</button></div>
+          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Assessment</button></div>
           </form>
         @endif
       </div>

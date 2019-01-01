@@ -201,7 +201,7 @@ class SurveyController extends Controller
             ])
             ->update(['status' => $status]);
 
-        return redirect('survey/'.$survey_id);
+        return redirect('assessment/'.$survey_id);
     }
 
 
@@ -327,7 +327,7 @@ class SurveyController extends Controller
         if(!$survey){
             return json_encode([
                 'status' => 0,
-                'messages' => "Upload Files Failed, current Survey not found!"
+                'messages' => "Upload Files Failed, current Assessment not found!"
             ]);
         }
 
@@ -338,15 +338,15 @@ class SurveyController extends Controller
             ]);
         }
 
-        $root_path = "/storage/index/survey/";
+        $root_path = "/storage/index/assessment/";
 
         $root = Files::where('url',$root_path)->first();
         $root_id = "";
         if (!$root) {
-            Storage::makeDirectory('survey');
+            Storage::makeDirectory('assessment');
             $folder = new Files();
             $folder->folder_root = 0;
-            $folder->name = 'survey';
+            $folder->name = 'assessment';
             $folder->url= $root_path;
             $folder->is_file = 0;
             $folder->created_by = Auth::user()->id;
@@ -360,7 +360,7 @@ class SurveyController extends Controller
         $survey_files = Files::where('url',$survey_path)->first();
         $survey_files_id = "";
         if (!$survey_files) {
-            Storage::makeDirectory('survey/'.$survey->name.'/');
+            Storage::makeDirectory('assessment/'.$survey->name.'/');
             $folder = new Files();
             $folder->folder_root = $root_id;
             $folder->name = $survey->name;
@@ -377,7 +377,7 @@ class SurveyController extends Controller
             foreach ($request->file('files') as $wpid => $file) {
                 if ($file->isValid()) {
 
-                    $path = $file->store('survey/'.$survey->name);
+                    $path = $file->store('assessment/'.$survey->name);
 
                     $files = [
                         'folder_root' => $survey_files_id,
@@ -605,7 +605,7 @@ class SurveyController extends Controller
                 'percent' => $percent_tercapai
             ]);
 
-        return redirect('survey/'.$survey_id);
+        return redirect('assessment/'.$survey_id);
     }
 
     public function ajax_get_list_user($id,$condition)
@@ -718,8 +718,8 @@ class SurveyController extends Controller
             'i_itgoal' => 'required'
             ],
             [
-                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
-                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
+                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Assessment Name</span> field is required',
+                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Assessment Name</span> already exists',
                 'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Manager</span> field is required',
                 'i_n_client.required' => '&#8226;The <span class="text-danger">Assessor</span> field is required',
                 // 'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
@@ -816,7 +816,7 @@ class SurveyController extends Controller
             }
 
             $notification = new \App\Models\Notifications;
-            $notification->notification_text = "@".Auth::user()->username." Created New Survey : ".$request->post('i_n_name_survey');
+            $notification->notification_text = "@".Auth::user()->username." Created New Assessment : ".$request->post('i_n_name_survey');
             $notification->modul = '2-Survey';
             $notification->modul_id = $id;
             $notification->created_by = Auth::user()->id;
@@ -887,13 +887,13 @@ class SurveyController extends Controller
 
             return json_encode([
                 'status' => 1,
-                'messages' => '/survey/'.$id
+                'messages' => '/assessment/'.$id
             ]);
         }
 
         return json_encode([
             'status' => 0,
-            'messages' => 'Create Survey Failed'
+            'messages' => 'Create Assessment Failed'
         ]);
     }
 
@@ -917,7 +917,7 @@ class SurveyController extends Controller
         $survey_name = DB::table('surveys')->select('name')->where('id','=',$id)->get()->first()->name;
 
         $notification = new \App\Models\Notifications;
-        $notification->notification_text = "@".Auth::user()->username." Invited you to Survey : ".$survey_name;
+        $notification->notification_text = "@".Auth::user()->username." Invited you to Assessment : ".$survey_name;
         $notification->modul = '2-Survey';
         $notification->modul_id = $id;
         $notification->created_by = Auth::user()->id;
@@ -984,7 +984,7 @@ class SurveyController extends Controller
         
         return json_encode([
             'status' => 1,
-            'messages' => '/survey/'.$id
+            'messages' => '/assessment/'.$id
         ]);
     }
 
@@ -1071,7 +1071,7 @@ class SurveyController extends Controller
 
         return json_encode([
             'status' => 1,
-            'messages' => '/survey/'.$request->post('i_n_survey_id').'/task/'
+            'messages' => '/assessment/'.$request->post('i_n_survey_id').'/task/'
         ]);
     }
 
@@ -1123,7 +1123,7 @@ class SurveyController extends Controller
 
             if($assignee != $request->post('i_n_assignee')){
                 $notification = new \App\Models\Notifications;
-                $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Assignee";
+                $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Assessment : ".$survey_name." as Assignee";
                 $notification->modul = '2-Survey';
                 $notification->modul_id = $request->post('i_n_survey_id');
                 $notification->created_by = Auth::user()->id;
@@ -1147,7 +1147,7 @@ class SurveyController extends Controller
                 ]);
                 if(!$available->first()){
                     $notification = new \App\Models\Notifications;
-                    $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name." as Participant";
+                    $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Assessment : ".$survey_name." as Participant";
                     $notification->modul = '2-Survey';
                     $notification->modul_id = $request->post('i_n_survey_id');
                     $notification->created_by = Auth::user()->id;
@@ -1176,7 +1176,7 @@ class SurveyController extends Controller
 
         return json_encode([
             'status' => 1,
-            'messages' => '/survey/'.$id.'/task/'
+            'messages' => '/assessment/'.$id.'/task/'
         ]);
     }
 

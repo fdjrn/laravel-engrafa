@@ -20,7 +20,7 @@
           </li>
           <li class="">
             <a href="{{route('survey',['id'=> $survey_id])}}">
-              <h4><i class="fa fa-files-o"></i>&nbsp;&nbsp;<span>Survey</span></h4>
+              <h4><i class="fa fa-files-o"></i>&nbsp;&nbsp;<span>Assessment</span></h4>
             </a>
           </li>
           <li class="list_user">
