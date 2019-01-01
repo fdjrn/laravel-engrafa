@@ -43,9 +43,17 @@
     <div class="text-center" style="background-color: #3c8dbc; border-radius: .25em; padding:1px; margin-bottom: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.3); color:#fff;">
       <h4><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;{{ $survey_name }}&nbsp;&nbsp;</h4>
     </div>
-	<div id="app">
-	  <chat-component :user="{{ $aUser }}" :selected-chat-room="{{ $chatRooms->toJson() }}"></chat-component>
-	</div>
+  @if($chatRooms)
+  	<div id="app">
+  	  <chat-component :user="{{ $aUser }}" :selected-chat-room="{{ $chatRooms->toJson() }}"></chat-component>
+  	</div>
+  @else
+    <div class="box box-primary">
+      <div class="box-body text-center">
+        Chat Rooms Unavailable
+      </div>
+    </div>
+  @endif
   </div>
   <!-- <div class="col-md-3">
     @#include('survey.nav-right-survey')
