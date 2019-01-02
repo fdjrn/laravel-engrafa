@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Bookmark;
+use App\Models\Files;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -26,11 +27,13 @@ class NewBookmarks implements ShouldBroadcast
      */
 
     public $bookmark;
+    public $file;
     public $user;
 
-    public function __construct(Bookmark $bookmark, User $user)
+    public function __construct(Bookmark $bookmark, Files $file, User $user)
     {
         $this->bookmark = $bookmark;
+        $this->file = $file;
         $this->user = $user;
     }
 
@@ -47,6 +50,7 @@ class NewBookmarks implements ShouldBroadcast
     public function broadcastWith(){
         return [
             'bookmark' => $this->bookmark,
+            'file' => $this->file,
             'user' => $this->user
         ];
     }

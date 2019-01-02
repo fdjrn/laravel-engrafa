@@ -13,27 +13,22 @@ class BookmarkController extends Controller
     {
         //$bookmark = Bookmark::with('files')->where('user', auth()->id())->get();
 
-        $bookmark = collect(
+        $bookmark =
+            //collect(
             DB::select(
                 " SELECT bookmarks.id, bookmarks.file, bookmarks.created_at, files.name, files.is_file, " .
                 " COALESCE(files.description,'') AS descr " .
                 " FROM bookmarks INNER JOIN files " .
                 " WHERE bookmarks.file  = files.id" .
-                " AND bookmarks.user = ? ", array($id))
-        );
+                " AND bookmarks.user = ? ", array($id));
+        //);
 
-        /*$bookmark = $bookmark->map(function($bookmark) {
-            $dt = Carbon::createFromTimeString($bookmark->created_at);
-
-           $bookmark->added = $dt->diffForHumans();
-        });*/
-
-        $result = $bookmark->map(function ($data) {
+        /*$result = $bookmark->map(function ($data) {
             $data->created_at = Carbon::createFromTimeString($data->created_at)->diffForHumans();
             return $data;
-        });
+        });*/
 
-        return response()->json($result);
+        return response()->json($bookmark);
     }
 
     public function showBookmarkedFiles($id)

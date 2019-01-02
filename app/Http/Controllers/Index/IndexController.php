@@ -280,7 +280,7 @@ class IndexController extends Controller
 
             if ($new_bookmark) {
                 $files = Files::find($new_bookmark->file);
-                broadcast(new NewBookmarks($new_bookmark,Auth::user()));
+                broadcast(new NewBookmarks($new_bookmark, $files, Auth::user()));
             }
 
             return response()->json([

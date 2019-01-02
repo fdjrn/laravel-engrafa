@@ -19,6 +19,7 @@
 
         <ul class="sidebar-menu" data-widget="tree" id="notifToogle">
             <notification-toogle-component :user="{{auth()->user()}}"></notification-toogle-component>
+
             <li data-toggle="control-sidebar">
                 <a href="#control-sidebar-recent-tab" data-toggle="tab">
                     <i class="fa fa-clock-o"></i>
@@ -28,15 +29,9 @@
             </span>
                 </a>
             </li>
-            <li class="treeview" data-toggle="control-sidebar">
-                <a href="#control-sidebar-bookmark-tab" data-toggle="tab">
-                    <i class="fa fa-bookmark"></i>
-                    <span>Bookmark</span>
-                    <span class="pull-right-container">
-              {{--<small class="label pull-right bg-green">2</small>--}}
-            </span>
-                </a>
-            </li>
+
+            <user-bookmark-toggle :user="{{auth()->user()}}"></user-bookmark-toggle>
+
             <!-- search form -->
             <form action="#" method="get" class="sidebar-form">
                 <div class="input-group">
@@ -76,5 +71,3 @@
 </aside>
 
 @include('layouts.part.nav-right')
-
-  

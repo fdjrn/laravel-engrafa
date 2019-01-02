@@ -34,3 +34,8 @@ Broadcast::channel('ReadNotification.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
     // return true;
 });
+
+Broadcast::channel('bookmark.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+    // return true;
+});

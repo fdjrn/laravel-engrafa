@@ -27,19 +27,15 @@
         </form>-->
 
         <ul class="control-sidebar-menu" v-for="bookmark in bookmarks" :key="bookmark.id"
-            @click="gotoBookmarkedFiles(bookmark)" @>
+            @click="gotoBookmarkedFiles(bookmark)">
             <li>
                 <a href="javascript:void(0)" class="text-with">
                     <i class="menu-icon fa fa-folder-o bg-red" v-if="bookmark.is_file == 0"></i>
                     <i class="menu-icon fa fa-file-text bg-red" v-else></i>
                     <div class="menu-info">
-                        <h4 class="control-sidebar-subheading">
-                            {{ bookmark.name }}
-                            <div class="pull-right">
-                                <span>{{ bookmark.created_at}}</span>
-                            </div>
-                        </h4>
-                        <small>{{ bookmark.descr }}</small>
+                        <h4 class="control-sidebar-subheading">{{ bookmark.name }}</h4>
+                        <p>{{ bookmark.descr }}</p>
+                        <small>{{ bookmark.created_at}}</small>
                     </div>
                 </a>
             </li>
@@ -60,16 +56,16 @@
         data() {
             return {
                 bookmarks: [],
-                selectedFiles: null
+                selectedFiles: null,
+                newBookmark: {
+                    type: Object
+                }
             }
         },
         mounted() {
-            Echo.private('bookmark.' + this.user.id )
+            Echo.private('bookmark.' + this.user.id)
                 .listen('NewBookmarks', (e) => {
-
-                    console.log(e);
-
-                    //this.newUserBookmark(e);
+                    this.newUserBookmark(e);
                 });
 
             axios.get('/bookmarks/' + this.user.id)
@@ -78,38 +74,25 @@
                 });
         },
         methods: {
-            newUserBookmark(bookmark) {
-                let bm = {
-                    //created_at: moment(bookmark.created_at, "YYYYMMDD").fromNow(),
-                    created_at: bookmark.created_at,
-                    descr: bookmark.descr,
-                    file: bookmark.file,
-                    id:bookmark.id,
-                    is_file: bookmark.is_file,
-                    name:bookmark.name
-                }
+            newUserBookmark(data) {
+                var bm = {
+                    created_at: data.bookmark.created_at,
+                    descr: data.file.description,
+                    file: data.bookmark.file,
+                    id: data.bookmark.id,
+                    is_file: data.file.is_file,
+                    name: data.file.name
+                };
+
                 this.bookmarks.push(bm);
             },
 
-            gotoBookmarkedFiles(bookmark){
+            gotoBookmarkedFiles(bookmark) {
                 this.selectedFiles = bookmark;
-                if (this.selectedFiles.is_file == 1) {
-                    window.location.href = '/index/detail/' + this.selectedFiles.file;
+                if (this.selectedFiles.is_file === 1) {
+                    return window.location.href = '/index/detail/' + this.selectedFiles.file;
                 } else {
-
-                    let csrf_token = $('meta[name="csrf-token"]').attr('content');
-                    axios.post('/index', {
-                        'folder_id': this.selectedFiles.file,
-                        '_token': csrf_token,
-                        '_method': 'POST'
-                    }).then(response => {
-                        if (response) {
-                            self.$router.push('/index');
-                        }
-                    }).catch(e => {
-                            this.errors.push(e)
-                    });
-
+                    return window.location.href = '/index?folder_id=' + this.selectedFiles.file;
                 }
             }
         }
@@ -118,10 +101,15 @@
 
 <style lang="scss" scoped>
     .menu-info {
-        p, small {
+        p {
             font-weight: normal;
             font-style: italic;
             color: whitesmoke;
+        }
+
+        small {
+            font-weight: normal;
+            /*color: whitesmoke;*/
         }
     }
 </style>
