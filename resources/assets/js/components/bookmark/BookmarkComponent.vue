@@ -26,7 +26,11 @@
             </div>
         </form>-->
 
-        <ul class="control-sidebar-menu" v-for="bookmark in bookmarks" :key="bookmark.id"
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search by name..." v-model="searchText">
+        </div>
+
+        <ul class="control-sidebar-menu" v-for="bookmark in filteredBookmarks" :key="bookmark.id"
             @click="gotoBookmarkedFiles(bookmark)">
             <li>
                 <a href="javascript:void(0)" class="text-with">
@@ -57,10 +61,16 @@
             return {
                 bookmarks: [],
                 selectedFiles: null,
-                newBookmark: {
-                    type: Object
-                }
+                newBookmark: {},
+                searchText: ''
             }
+        },
+        created() {
+            axios.get('/bookmarks/' + this.user.id)
+                .then((response) => {
+                    this.bookmarks = response.data;
+                    // this.filteredBookmarks = response.data;
+                });
         },
         mounted() {
             Echo.private('bookmark.' + this.user.id)
@@ -68,10 +78,7 @@
                     this.newUserBookmark(e);
                 });
 
-            axios.get('/bookmarks/' + this.user.id)
-                .then((response) => {
-                    this.bookmarks = response.data;
-                });
+
         },
         methods: {
             newUserBookmark(data) {
@@ -94,6 +101,19 @@
                 } else {
                     return window.location.href = '/index?folder_id=' + this.selectedFiles.file;
                 }
+            }
+        },
+        computed: {
+            filteredBookmarks: function() {
+                let filtered = this.bookmarks;
+
+                if (this.searchText) {
+                    filtered = this.bookmarks.filter(
+                        b => b.name.toLowerCase().indexOf(this.searchText.toLocaleLowerCase()) > -1
+                    )
+                }
+                return filtered;
+
             }
         }
     }

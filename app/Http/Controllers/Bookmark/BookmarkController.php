@@ -14,19 +14,12 @@ class BookmarkController extends Controller
         //$bookmark = Bookmark::with('files')->where('user', auth()->id())->get();
 
         $bookmark =
-            //collect(
             DB::select(
                 " SELECT bookmarks.id, bookmarks.file, bookmarks.created_at, files.name, files.is_file, " .
                 " COALESCE(files.description,'') AS descr " .
                 " FROM bookmarks INNER JOIN files " .
                 " WHERE bookmarks.file  = files.id" .
                 " AND bookmarks.user = ? ", array($id));
-        //);
-
-        /*$result = $bookmark->map(function ($data) {
-            $data->created_at = Carbon::createFromTimeString($data->created_at)->diffForHumans();
-            return $data;
-        });*/
 
         return response()->json($bookmark);
     }
@@ -43,5 +36,9 @@ class BookmarkController extends Controller
             // if is a file
             return redirect('index/detail/' . $id);
         }
+    }
+
+    public function searchBookmark($searchText) {
+
     }
 }

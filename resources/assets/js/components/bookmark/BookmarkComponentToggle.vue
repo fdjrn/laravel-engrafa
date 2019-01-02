@@ -34,14 +34,6 @@
                 .then((response) => {
                     this.totalBookmark = response.data.length;
                 });
-        },
-        methods: {
-            getUnreadNotification() {
-                axios.get(`/notification/getUnreadNotification`)
-                    .then((response) => {
-                        this.unread = response.data
-                    });
-            }
         }
     }
 </script>
