@@ -84,7 +84,7 @@
 
               <div id="question" class="box-body collapse in form-horizontal">
                 <div class="form-group">
-                  <label for="i_n_surveyor" class="col-sm-2 control-label">Process</label>
+                  <label for="i_n_surveyor" class="col-sm-2 control-label">Objective</label>
 
                   <div class="col-sm-10">
                     <div style="border: solid thin #d2d6de; padding:4px;">

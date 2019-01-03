@@ -120,7 +120,7 @@
                   <div class="box box-default" id="list-itgoal" style="overflow-x:hidden; overflow-y: auto; max-height: 520px;">
                     <div class="box-header">
                       <a href="#" data-widget="collapse">
-                        <h5 style="margin:2px 0px;">List EDM</h5>
+                        <h5 style="margin:2px 0px;">Process List</h5>
                       </a>
                       <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
