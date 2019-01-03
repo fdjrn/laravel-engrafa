@@ -52,7 +52,7 @@
 @stop
 
 @section('page-header') 
-  <h1>Survey</h1>
+  <h1>Assessment</h1>
 @stop
 
 @section('page-breadcrumb')
@@ -69,7 +69,7 @@
   <div class="col-md-9">
     <div class="nav-tabs-custom">
       <ul class="nav nav-tabs pull-right">
-        <li class="crud-button"><a href="#" id="b_create_new_task"><i class="fa fa-plus-circle"></i></a></li>
+        <li class="crud-button"><a href="#" onClick="openModals('create','0')"><i class="fa fa-plus-circle"></i></a></li>
         <li><a href="#tab_2" data-toggle="tab">Completed</a></li>
         <li class="active"><a href="#tab_1" data-toggle="tab">Assigned</a></li>
         <li class="pull-left header">Team Task</li>
@@ -87,7 +87,7 @@
                       </td>
                       <td style="vertical-align: middle; width:70%;">
                         <div class="row">
-                          <div class="col-lg-12"><a href="#"><h4>{{$task->name}}</h4></a></div>
+                          <div class="col-lg-12"><a href="#" onClick="openModals('edit','{{$task->id}}')"><h4>{{$task->name}}</h4></a></div>
                           <div class="col-lg-12"><p><i class="fa fa-calendar-check-o"></i>&nbsp;&nbsp;{{$task->due_dates}}</p></div>
                           <div class="col-lg-12"><p><i class="fa fa-user"></i>&nbsp;&nbsp;{{$task->username}}</p></div>
                         </div>
@@ -116,7 +116,7 @@
                       </td>
                       <td style="vertical-align: middle; width:70%;">
                         <div class="row">
-                          <div class="col-lg-12"><a href="#"><h4>{{$task->name}}</h4></a></div>
+                          <div class="col-lg-12"><a href="#" onClick="openModals('view','{{$task->id}}')"><h4>{{$task->name}}</h4></a></div>
                           <div class="col-lg-12"><p><i class="fa fa-calendar-check-o"></i>&nbsp;&nbsp;{{$task->due_dates}}</p></div>
                           <div class="col-lg-12"><p><i class="fa fa-user"></i>&nbsp;&nbsp;{{$task->username}}</p></div>
                         </div>
@@ -149,19 +149,20 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Create New Task</h4>
+        <h4 class="modal-title" id="m_title_task">Create New Task</h4>
       </div>
       <div class="modal-body">
-        <form name="form_n_task" action="{{route('survey.task.store')}}" method="post" id="form_n_task">
+        <form name="form_n_task" action="" method="post" id="form_n_task">
           {{ csrf_field() }}
           <div class="row">
             <div class="col-lg-12">
               <div class="form-group">
                   <div class='input-group'>
-                    <input type="hidden" name="i_n_survey_id" value="{{$survey_id}}">
+                    <input type="hidden" id="i_type_modal" name="i_type_modal" value="create">
+                    <input type="hidden" id="i_n_survey_id" name="i_n_survey_id" value="{{$survey_id}}">
                     <input type="text" id="i_n_name_task" name="i_n_name_task" class="form-control" placeholder="New Task Name">
                       <span class="input-group-addon">
-                        <select name="i_n_color" class="colorselector">
+                        <select id="i_n_color" name="i_n_color" class="colorselector">
                           <option value="A0522D" data-color="#A0522D">sienna</option>
                           <option value="CD5C5C" data-color="#CD5C5C" selected="selected">indianred</option>
                           <option value="FF4500" data-color="#FF4500">orangered</option>
@@ -172,7 +173,7 @@
                         </select>
                       </span>
                       <div class="pull-right">
-                        <select name="i_n_priority" class="form-control select2">
+                        <select id="i_n_priority" name="i_n_priority" class="form-control select2">
                           <option value="3-Low" selected="selected">!</option>
                           <option value="2-Medium">!!</option>
                           <option value="1-High">!!!</option>
@@ -184,8 +185,8 @@
             <div class="col-lg-12">
               <div class="form-group">
                 <label for="i_n_due_date">Task Due Date</label>
-                <div class='input-group date' id='i_n_due_date'>
-                    <input name="i_n_due_date" type='text' class="form-control" />
+                <div class='input-group date'>
+                    <input id="i_n_due_date" name="i_n_due_date" type='text' class="form-control" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -194,22 +195,33 @@
               <div class="form-group">
                 <label for="i_n_assignee">Assignee</label>
                   <select id="i_n_assignee" name="i_n_assignee" class="form-control select2" data-placeholder="Assign To" style="width: 100%;">
+                    <option value=""></option>
                   </select>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="div_i_n_participant">
                 <label for="i_n_participant">Participants</label>
                 <select id="i_n_participant" name="i_n_participant[]" class="form-control select2" multiple="multiple" data-placeholder="Add Participants" style="width: 100%;">
+                  <option value=""></option>
                 </select>
               </div>
               <div class="form-group">
                 <label for="i_n_detail">Detail</label>
-                <textarea name="i_n_detail" style="width:100%; resize: vertical;"></textarea>
+                <textarea id="i_n_detail" name="i_n_detail" style="width:100%; resize: vertical;"></textarea>
+              </div>
+              <div class="form-group" id="i_n_progress_gr">
+                <label for="i_n_progress">Progress</label>
+                  <select id="i_n_progress" name="i_n_progress" class="form-control select2" data-placeholder="Progress" style="width: 100%;">
+                    <option value=""></option>
+                    @for($i=0;$i <= 100;$i+=5)
+                      <option value="{{$i}}">{{$i}}%</option>
+                    @endfor
+                  </select>
               </div>
             </div>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" id="m_footer_task">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
         <button type="submit" form="form_n_task" class="btn btn-primary"><i class="fa fa-check"></i></button>
       </div>
@@ -218,6 +230,7 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
+  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
@@ -231,6 +244,7 @@
 
 @section('page-level-scripts')
 <script src="{{ asset('js/pages/survey/task.js')}}"></script>
+{{ Html::script('js/pages/survey.js')}}
 <script>
 </script>
 @stop

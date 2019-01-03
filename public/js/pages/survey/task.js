@@ -1,14 +1,171 @@
 $(document).ready(function(){
-  $("#b_create_new_task").click(function(){
-    $('#m_new_task').modal('show');
-  });
-  
+  cleanModal();
   $('#i_n_due_date').datetimepicker({});
   
   initialize_user_task("#i_n_assignee");
-  initialize_user_task("#i_n_participant");
-  
-  $('[data-toggle="tooltip"]').tooltip();
+
+  $('#i_n_assignee').on("select2:selecting", function(e) { 
+    initialize_user_task("#i_n_participant",1);
+    $('#div_i_n_participant').show();
+  });
+});
+
+function initialize_user_task(id_element,v_check){
+  var survey_id = $('#i_n_survey_id').val();
+  $.ajax({
+      type: 'GET',
+      url: base_url+'/assessment/'+survey_id+'/ajax_get_list_user/task',
+      success: function (data) {
+          // the next thing you want to do 
+          var $v_select = $(id_element);
+          var item = JSON.parse(data);
+          $v_select.empty();
+          $v_select.append("<option value=''></option>");
+          if(!v_check){
+            $.each(item, function(index,valuee) {
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+            });
+          }else{
+            $.each(item, function(index,valuee) {
+              if(valuee.id != $("#i_n_assignee").val()){
+                $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
+              }
+            });
+          }
+
+          //manually trigger a change event for the contry so that the change handler will get triggered
+          $v_select.change();
+      }
+  });
+}
+
+function cleanModal(){
+  $('#div_i_n_participant').hide();
+  $('#i_n_name_task').val(null);
+  $('#i_type_modal').val('create');
+  $('#i_n_due_date').val(null);
+  $('#i_n_assignee').val(null).trigger('change');
+  $('#i_n_progress').val(0).trigger('change');
+  $('#i_n_progress_gr').hide();
+  $('#i_n_participant').val([]).trigger('change');
+  $('#i_n_detail').val(null);
+  $('#i_n_color').val('CD5C5C').trigger('change');
+  $('#i_n_priority').val('3-Low').trigger('change');
+  $('#i_n_name_task').attr('readonly', false);
+  $('#i_n_due_date').attr('readonly', false);
+  $('#i_n_assignee').attr('readonly', false);
+  $('#i_n_progress').attr('readonly', false);
+  $('#i_n_progress_gr').attr('readonly', false);
+  $('#i_n_participant').attr('readonly', false);
+  $('#i_n_detail').attr('readonly', false);
+  $('#i_n_color').attr('readonly', false);
+  $('#i_n_priority').attr('readonly', false);
+  $('#m_footer_task').show();
+}
+
+function openModals(type,taskId){
+  cleanModal();
+  var survey_id = $('#i_n_survey_id').val();
+  $('#i_type_modal').val(type);
+  if(type == 'create'){
+    $('#m_title_task').html('<i class="fa fa-plus"></i>&nbsp;Create New Task');
+    $('#form_n_task').attr('action','');
+    $('#m_new_task').modal('show');
+  }else if(type == 'edit'){
+    $('#div_i_n_participant').show();
+    $('#m_title_task').html('<i class="fa fa-edit"></i>&nbsp;Edit Existing Task');
+    $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
+    $('#i_n_progress_gr').show();
+    $('#m_new_task').modal('show');
+    ajax_modal(survey_id,taskId);
+  }else{
+    $('#div_i_n_participant').show();
+    $('#m_title_task').html('<i class="fa fa-eye"></i>&nbsp;View Existing Task');
+    $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
+    $('#i_n_progress_gr').show();
+    $('#m_footer_task').hide();
+    $('#m_new_task').modal('show');
+    $('#i_n_name_task').attr('readonly', true);
+    $('#i_n_due_date').attr('readonly', true);
+    $('#i_n_assignee').attr('readonly', true);
+    $('#i_n_progress').attr('readonly', true);
+    $('#i_n_progress_gr').attr('readonly', true);
+    $('#i_n_participant').attr('readonly', true);
+    $('#i_n_detail').attr('readonly', true);
+    $('#i_n_color').attr('readonly', true);
+    $('#i_n_priority').attr('readonly', true);
+    ajax_modal(survey_id,taskId);
+  }
+}
+
+function ajax_modal(survey_id,taskId){
+    $.ajax({
+      url:
+        base_url + '/assessment/'+survey_id+'/task/'+taskId,
+        method: 'get',
+      success: function(response) {
+        let parse = JSON.parse(response.tasks);
+        let participants = JSON.parse(response.task_participant);
+        $('#i_n_name_task').val(parse.name);
+        $('#i_n_due_date').val(parse.due_dates)
+        $('#i_n_assignee').val(parse.assign).trigger('change');
+        $('#i_n_color').val(parse.color).trigger('change');
+        $('#i_n_priority').val(parse.priority).trigger('change');
+        $('#i_n_progress').val(parse.progress).trigger('change');
+        $.ajax({
+           url:initialize_user_task("#i_n_participant",1),
+           success:function(){
+            for (val in participants){
+              var member = participants[val].team_member;
+              $("#i_n_participant option[value="+member+"]").prop("selected",true).trigger("change")
+            }
+          }
+        });
+        $('#i_n_detail').val(parse.detail);
+      }
+    });
+}
+
+$("#form_n_task").submit(function(e) {
+  e.preventDefault();
+
+  if($('#i_type_modal').val() == 'view'){
+    return;
+  }
+  var form = $(this);
+  var url = form.attr('action');
+  var formData = new FormData(this);
+  var messages = 'Create New Task Success';
+  if(url){
+    messages = 'Edit Task Success';
+  }
+
+  $.ajax({
+         type: "POST",
+         url: url,
+         data: formData, // serializes the form's elements.
+         success: function(data)
+         {
+          let parse = JSON.parse(data);
+          if (parse.status > 0) {
+            swal({
+              type: 'success',
+              title: 'Berhasil',
+              text: messages
+            });
+            location.href = base_url+parse.messages;
+          } else {
+            swal({
+              type: 'error',
+              title: 'Gagal',
+              html: parse.messages
+            });
+          }
+         },
+         cache: false,
+         contentType: false,
+         processData: false
+       });
 });
 
 Chart.pluginService.register({
@@ -104,62 +261,4 @@ $('.pieChart').each(function (index, element) {
     }
   });
 
-});
-
-function initialize_user_task(id_element){
-  $.ajax({
-      type: 'GET',
-      url: base_url+'/survey/ajax_get_list_user/yes',
-      // data: {
-      //     'anakunit': idUnit
-      // },
-      success: function (data) {
-          // the next thing you want to do 
-          var $v_select = $(id_element);
-          var item = JSON.parse(data);
-          $v_select.empty();
-          $v_select.append("<option value=''></option>");
-          $.each(item, function(index,valuee) {        
-              $v_select.append("<option value='"+valuee.id+"'>@"+valuee.username+"</option>");
-          });
-
-          //manually trigger a change event for the contry so that the change handler will get triggered
-          $v_select.change();
-      }
-  });
-}
-
-$("#form_n_task").submit(function(e) {
-  e.preventDefault();
-  var form = $(this);
-  var url = form.attr('action');
-  var formData = new FormData(this);
-
-  $.ajax({
-         type: "POST",
-         url: url,
-         data: formData, // serializes the form's elements.
-         success: function(data)
-         {
-          let parse = JSON.parse(data);
-          if (parse.status > 0) {
-            swal({
-              type: 'success',
-              title: 'Berhasil',
-              text: 'Create New Task Success'
-            });
-            location.href = base_url+parse.messages;
-          } else {
-            swal({
-              type: 'error',
-              title: 'Gagal',
-              html:true,
-              text: parse.messages
-            });
-          }
-         },
-         cache: false,
-         contentType: false,
-         processData: false
-       });
 });

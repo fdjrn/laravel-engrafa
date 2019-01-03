@@ -11,7 +11,7 @@ $(document).ready(function(){
 
 	$.ajax({
 	  type : 'GET',
-	  url : '/survey/aggregat/'+surveyId,
+	  url : '/assessment/aggregat/'+surveyId,
 	  cache : false,
 	  contentType : false,
 	  processData : false,
@@ -81,7 +81,7 @@ $(document).ready(function(){
 
 	function showDetailProgress(){
 		$('#data-detail-process').text('');
-		console.log("show detail");
+		// console.log("show detail");
 		for (var i = 0; i <= surveyProcessOutcomes.length - 1; i++) {
 			var name = surveyProcessOutcomes[i].process+surveyProcessOutcomes[i].it_related_goal;
 			$('#data-detail-process').append(
@@ -105,7 +105,7 @@ $(document).ready(function(){
 	}
 
 	function changeColorByRating(name, rating){
-		console.log("change color : " + name);
+		// console.log("change color : " + name);
 		if (rating == 'N') {
 			$("#"+name).css('background-color','#f39c12');
 		}else if (rating == 'P') {

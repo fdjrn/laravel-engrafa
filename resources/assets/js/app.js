@@ -30,6 +30,9 @@ Vue.component('message-composer-component', require('./components/chat/MessageCo
 Vue.component('notification-component', require('./components/notification/NotificationComponent.vue'));
 Vue.component('notification-toogle-component', require('./components/notification/NotificationToogleComponent.vue'));
 
+Vue.component('user-bookmark', require('./components/bookmark/BookmarkComponent.vue'));
+Vue.component('user-bookmark-toggle', require('./components/bookmark/BookmarkComponentToggle.vue'));
+
 const app = new Vue({
     el: '#app',
 });

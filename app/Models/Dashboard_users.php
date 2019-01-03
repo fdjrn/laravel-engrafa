@@ -9,6 +9,7 @@ class Dashboard_users extends Model
     protected $table = 'dashboard_users';
     protected $fillable = [
         'user',
-        'dashboard'        
+        'dashboard',
+        'created_by'      
     ];
 }

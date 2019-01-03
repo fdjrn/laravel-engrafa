@@ -82,6 +82,11 @@
     }
     .no_available{
       text-align: center; padding: 5px;
+      line-height: 30px;
+      height: 30px;
+    }
+    #tab-content{
+       padding:0; max-height: 308px; overflow-y: auto;
     }
   </style>
 @stop
@@ -97,7 +102,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('setting')}}"><i class="fa fa-users"></i> Users</a></li>
+  <li><a class="active" href="{{route('setting.users')}}"><i class="fa fa-users"></i> Users</a></li>
 @stop
 
 
@@ -125,14 +130,14 @@
             </div>
             <div class="left-content" style="padding-left: 20px; padding-right: 15px; padding-top: 8px; padding-bottom: 8px;">
                 <div class="left-content-row">
-                  <div class="left-content-cell">
+                  <div class="left-content-cell" style="width: 50%;">
                     <select class="select2">
                       @foreach($data_roles as $role)
                       <option value="{{$role->id}}" {{ $role->id === Auth::user()->role ? 'selected' : '' }}>{{$role->name}}</option>
                       @endforeach
                     </select>
                   </div>
-                  <div class="left-content-cell">
+                  <div class="left-content-cell text-right">
                     <i class="fa fa-key"></i>
                   </div>
                 </div>
@@ -141,24 +146,28 @@
                 <div class="left-content-row">
                   <div class="left-content-cell">
                     <h4>Teams</h4>
-                    @if($teams)
+                    @if($teams->first())
                       @foreach($teams as $team)
-                        <button type="button" class="btn bg-olive btn-flat margin">{{$team->name}}</button>
+                        <a href="{{url('/survey/'.$team->id)}}" class="btn bg-olive btn-flat margin">{{$team->name}}</a>
                       @endforeach
+                    @else
+                      <button class="btn btn-block bg-primary btn-flat margin">No Teams Available</button>
                     @endif
                   </div>
                 </div>
             </div>
-            <div class="left-content">
-                <div class="left-content-row">
-                  <div class="left-content-cell">
-                    <button id="o_new_user" type="button" class="btn bg-purple btn-block margin" style="height: 40px;">Create New User</button>
+            @if((explode('-',Auth::user()->role))[0] <= 2)
+              <div class="left-content">
+                  <div class="left-content-row">
+                    <div class="left-content-cell">
+                      <button id="o_new_user" onClick="openModals('create','0')" type="button" class="btn bg-purple btn-block" style="height: 40px;">Create New User</button>
+                    </div>
                   </div>
-                </div>
-            </div>
+              </div>
+            @endif
           </div>
           <div class="col-md-7">
-            <div class="nav-tabs-custom">
+            <div class="nav-tabs-custom nav-tabs-customized">
               <ul class="nav nav-tabs">
                 <li class="active no-margin text-center">
                   <a href="#tab_1" data-toggle="tab">
@@ -169,13 +178,13 @@
                 <li class="no-margin text-center">
                   <a href="#tab_2" data-toggle="tab">
                     <p>Guest</p>
-                    <span>0 users</span>
+                    <span>{{$total_guests}} users</span>
                   </a>
                 </li>
               </ul>
-              <div class="tab-content" style="padding:0;">
+              <div class="tab-content" id="tab-content">
                 <div class="tab-pane active" id="tab_1">
-                  @if($users)
+                  @if($users->first())
                     @foreach($users as $user)
                       <div class="left-content">
                         <div class="left-content-row">
@@ -186,9 +195,11 @@
                             <div class="users-name">{{$user->first_name." ".$user->last_name}}</div>
                             <div style=""><span>{{$user->email}}</span></div>
                           </div>
-                          <div class="left-content-cell" style="text-align: right; padding-right: 5px;">
-                            <a href="#"><i class="fa fa-pencil"></i></a>
-                          </div>
+                          @if((explode('-',Auth::user()->role))[0] <= 2)
+                            <div class="left-content-cell" style="text-align: right; padding-right: 5px;">
+                              <a onClick="openModals('edit','{{$user->id}}')" href="#"><i class="fa fa-pencil"></i></a>
+                            </div>
+                          @endif
                         </div>
                       </div>
                     @endforeach
@@ -197,7 +208,28 @@
                   @endif
                 </div>
                 <div class="tab-pane" id="tab_2">
-                  <p class="no_available">No Guest Available</p>
+                  @if($guests->first())
+                    @foreach($guests as $guest)
+                      <div class="left-content">
+                        <div class="left-content-row">
+                          <div class="left-content-cell" style="vertical-align: middle; text-align: center; width:55px; padding-left: 4px;">
+                            <h1 class="users-image"><i class="fa fa-user"></i></h1>
+                          </div>
+                          <div class="left-content-cell">
+                            <div class="users-name">{{$guest->first_name." ".$guest->last_name}}</div>
+                            <div style=""><span>{{$guest->email}}</span></div>
+                          </div>
+                          @if((explode('-',Auth::user()->role))[0] <= 2)
+                            <div class="left-content-cell" style="text-align: right; padding-right: 5px;">
+                              <a onClick="openModals('edit','{{$guest->id}}')" href="#"><i class="fa fa-pencil"></i></a>
+                            </div>
+                          @endif
+                        </div>
+                      </div>
+                    @endforeach
+                  @else
+                    <p class="no_available">No Guest Available</p>
+                  @endif
                 </div>
               </div>
             </div>
@@ -216,80 +248,40 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Create New User</h4>
+          <h4 class="modal-title" id="m_title_user">Create New User</h4>
       </div>
       <div class="modal-body">
-        <form name="form_n_user" id="form_n_user" method="POST" action="{{route('setting.create_user')}}">
+        <form name="form_n_user" id="form_n_user" method="POST" action="">
           @csrf
-
+          <input type="hidden" name="user_id" id="user_id">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Nama Depan" name="nama_depan" value="{{ old('nama_depan') }}">
-            @if ($errors->has('nama_depan'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('nama_depan') }}</strong>
-                </span>
-            @endif
+            <input type="text" class="form-control" placeholder="Nama Depan" name="nama_depan" id="nama_depan" value="{{ old('nama_depan') }}">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Nama Belakang" name="nama_belakang" value="{{ old('nama_belakang') }}">
-            @if ($errors->has('nama_belakang'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('nama_belakang') }}</strong>
-                </span>
-            @endif
+            <input type="text" class="form-control" placeholder="Nama Belakang" name="nama_belakang" id="nama_belakang" value="{{ old('nama_belakang') }}">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Username" name="username" value="{{ old('username') }}">
-            @if ($errors->has('username'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('username') }}</strong>
-                </span>
-            @endif
+            <input type="text" class="form-control" placeholder="Username" name="username" id="username" value="{{ old('username') }}">
           </div>
           <div class="form-group">
-            <select name="roles" class="select2" style="width: 100%;" data-placeholder="Pilih Role">
+            <select name="roles" id="roles" class="select2" style="width: 100%;" data-placeholder="Pilih Role">
               <option value=""></option>
               @foreach($data_roles as $role)
               <option value="{{$role->id}}">{{$role->name}}</option>
               @endforeach
             </select>
-            @if ($errors->has('roles'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('roles') }}</strong>
-                </span>
-            @endif
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Email" name="email" value="{{ old('email') }}">
-            @if ($errors->has('email'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('email') }}</strong>
-                </span>
-            @endif
+            <input type="text" class="form-control" placeholder="Email" name="email" id="email" value="{{ old('email') }}">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="No. Telepon" name="telepon" value="{{ old('telepon') }}"> 
-            @if ($errors->has('telepon'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('telepon') }}</strong>
-                </span>
-            @endif
+            <input type="text" class="form-control" placeholder="No. Telepon" name="telepon" id="telepon" value="{{ old('telepon') }}"> 
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" placeholder="Password" name="password">
-            @if ($errors->has('password'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('password') }}</strong>
-                </span>
-            @endif
+            <input type="password" class="form-control" placeholder="Password" name="password" id="password">
           </div>
           <div class="form-group">
-            <input type="password" class="form-control" placeholder="Confirm Password" name="password_confirmation">
-            @if ($errors->has('password_confirmation'))
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $errors->first('password_confirmation') }}</strong>
-                </span>
-            @endif
+            <input type="password" class="form-control" placeholder="Confirm Password" name="password_confirmation" id="password_confirmation">
           </div>
         </form>
       </div>

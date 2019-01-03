@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Index;
 
+use App\Events\NewBookmarks;
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Files;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -276,8 +278,10 @@ class IndexController extends Controller
                 'created_by' => auth()->id()
             ]);
 
-            if ($new_bookmark)
+            if ($new_bookmark) {
                 $files = Files::find($new_bookmark->file);
+                broadcast(new NewBookmarks($new_bookmark, $files, Auth::user()));
+            }
 
             return response()->json([
                 "success" => true,

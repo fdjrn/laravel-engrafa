@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\DB;
 use Auth;
+use App\Models\Survey;
 
 class SettingController extends Controller
 {
@@ -28,35 +29,20 @@ class SettingController extends Controller
     {
         $data['users'] = DB::table('users')
             ->select('*')
+            ->whereNotNull('role')
             ->get();
         $data['total_users'] = count($data['users']);
 
-
-        $data['teams'] = DB::table('survey_members')
-            ->select('survey_members.id','surveys.id','surveys.name')
-            ->join('surveys','surveys.id','=','survey_members.survey')
-            ->where('survey_members.user',Auth::user()->id)
+        $data['guests'] = DB::table('users')
+            ->select('*')
+            ->whereNull('role')
             ->get();
-        return view('setting.users',$data);
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    
-    protected function validator(Request $data)
-    {
-        return Validator::make($data, [
-            'nama_depan' => 'required|string|max:255',
-            'nama_belakang' => 'required|string|max:255',
-            'roles' => 'required|string',
-            'username' => 'required|string|max:255',
-            'telepon' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $data['total_guests'] = count($data['guests']);
+
+        $data['teams'] = Survey::mnsurvey();
+
+        return view('setting.users',$data);
     }
 
     /**
@@ -67,6 +53,40 @@ class SettingController extends Controller
      */
     protected function create_user(Request $data)
     {
+
+        $validator = Validator::make(
+            $data->all(), [
+                'nama_depan' => 'required|max:95',
+                'nama_belakang' => 'required|max:95',
+                'username' => 'required|unique:users,username|min:5|max:255',
+                'roles' => 'required',
+                'email' => 'required|email|max:191',
+                'telepon' => 'required|max:191',
+                'password' => 'required|min:6|max:191|confirmed',
+            ],
+            [
+                'nama_depan.required' => '&#8226;The <span class="text-danger">Nama Depan</span> field is required',
+                'nama_belakang.required' => '&#8226;The <span class="text-danger">Nama Belakang</span> field is required',
+                'username.required' => '&#8226;The <span class="text-danger">Username</span> field is required',
+                'username.unique' => '&#8226;The <span class="text-danger">Username</span> already exists',
+                'username.min' => '&#8226;The <span class="text-danger">Username</span> minimum 5 characters',
+                'roles.required' => '&#8226;The <span class="text-danger">Roles</span> field is required',
+                'email.required' => '&#8226;The <span class="text-danger">Email</span> field is required',
+                'email.email' => '&#8226;The <span class="text-danger">Email</span> format is invalid',
+                'telepon.required' => '&#8226;The <span class="text-danger">Telepon</span> field is required',
+                'password.required' => '&#8226;The <span class="text-danger">Password</span> field is required',
+                'password.min' => '&#8226;The <span class="text-danger">Password</span> minimum 5 characters',
+                'password.confirmed' => '&#8226;The <span class="text-danger">Password</span> confirmation does not match.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
         User::create([
             'name' => $data['nama_depan'].' '.$data['nama_belakang'],
             'first_name' => $data['nama_depan'],
@@ -78,7 +98,64 @@ class SettingController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        return redirect('setting/users');
+        return json_encode([
+            'status' => 1,
+            'messages' => '/setting/users'
+        ]);
+    }
+
+    protected function edit_user(Request $data)
+    {
+
+        $validator = Validator::make(
+            $data->all(), [
+                'nama_depan' => 'required|max:95',
+                'nama_belakang' => 'required|max:95',
+                'username' => 'required|min:5|max:255|unique:users,username,'.$data['user_id'],
+                'roles' => 'required',
+                'email' => 'required|email|max:191',
+                'telepon' => 'required|max:191'
+            ],
+            [
+                'nama_depan.required' => '&#8226;The <span class="text-danger">Nama Depan</span> field is required',
+                'nama_belakang.required' => '&#8226;The <span class="text-danger">Nama Belakang</span> field is required',
+                'username.required' => '&#8226;The <span class="text-danger">Username</span> field is required',
+                'username.unique' => '&#8226;The <span class="text-danger">Username</span> already exists',
+                'username.min' => '&#8226;The <span class="text-danger">Username</span> minimum 5 characters',
+                'roles.required' => '&#8226;The <span class="text-danger">Roles</span> field is required',
+                'email.required' => '&#8226;The <span class="text-danger">Email</span> field is required',
+                'email.email' => '&#8226;The <span class="text-danger">Email</span> format is invalid',
+                'telepon.required' => '&#8226;The <span class="text-danger">Telepon</span> field is required'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $User = User::find($data['user_id']);
+
+        $User->name         = $data['nama_depan'].' '.$data['nama_belakang'];
+        $User->first_name   = $data['nama_depan'];
+        $User->last_name    = $data['nama_belakang'];
+        $User->username     = $data['username'];
+        $User->role         = $data['roles'];
+        $User->phone        = $data['telepon'];
+        $User->email        = $data['email'];
+
+        $User->save();
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/setting/users'
+        ]);
+    }
+
+    protected function get_user_by_id($id){
+        echo json_encode(DB::table('users')->where('id','=',$id)->get()->first());
     }
 
     /**

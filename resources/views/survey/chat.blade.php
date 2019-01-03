@@ -14,27 +14,8 @@
 @stop
 
 @section('page-level-styles')
-<style>
-    .example-modal .modal {
-      position: relative;
-      top: auto;
-      bottom: auto;
-      right: auto;
-      left: auto;
-      display: block;
-      z-index: 1;
-    }
-
-    .example-modal .modal {
-      background: transparent !important;
-    }
-    a.adisabled {
-      cursor: default;
-    }
-    span.status_survey{
-      cursor: pointer;
-    }
-  </style>
+<!-- Select2 -->
+  <link rel="stylesheet" href="{{ asset('theme/AdminLTE//bower_components/select2/dist/css/select2.min.css')}}">
 @stop
 
 @section('theme-layout-styles')
@@ -48,7 +29,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-files-o"></i> Assessment</a></li>
+  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-comment-o"></i> Chat</a></li>
 @stop
 
 
@@ -62,20 +43,14 @@
     <div class="text-center" style="background-color: #3c8dbc; border-radius: .25em; padding:1px; margin-bottom: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.3); color:#fff;">
       <h4><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;{{ $survey_name }}&nbsp;&nbsp;</h4>
     </div>
-    @if(explode("-",$status_ownership)[0] < 2)
-      @include('survey.survey-list-creator_surveyor')
-    @else
-      @include('survey.survey-list-responden')
-    @endif
+	<div id="app">
+	  <chat-component :user="{{ $aUser }}" :selected-chat-room="{{ $chatRooms->toJson() }}"></chat-component>
+	</div>
   </div>
   <!-- <div class="col-md-3">
     @#include('survey.nav-right-survey')
   </div> -->
 </div>
-@stop
-
-@section('body-modals')
-  @include('survey.survey-invite-modal')
 @stop
 
 @section('core-plugins')
@@ -88,8 +63,18 @@
 @stop
 
 @section('page-level-scripts')
-{{ Html::script('js/pages/survey.js')}}
-{{ Html::script('js/pages/survey/survey.aggregate.js')}}
+<!-- <script src="{{ asset('js/app.js')}}"></script> -->
+
+<script src="{{ asset('theme/AdminLTE/bower_components/select2/dist/js/select2.full.min.js')}}"></script> <script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+  })
+</script>
+
+<script>
+</script>
+  <!-- select2 -->
 @stop
 
 @section('theme-layout-scripts')

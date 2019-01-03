@@ -11,9 +11,13 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 use App\User;
+use App\Models\ChatRoom;
 use App\Models\Files;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
+use App\Models\Survey;
+use App\Models\Task;
+use App\Events\NewNotification;
 
 
 class SurveyController extends Controller
@@ -23,47 +27,49 @@ class SurveyController extends Controller
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
-            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
-            ->leftJoin('survey_process',function($join){
-                $join->on('survey_process.survey', '=','surveys.id')
-                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
-            })
-            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal')
-            ->where('surveys.id',$id)
+            ->select('created_by')
+            ->where('id',$id)
             ->get();
 
         if(!$data_survey->first()){
             abort(404);
         }
 
-        $status_ownership = "";
-        if ($data_survey->first()->created_by == Auth::user()->id){
-            $status_ownership = "CREATOR";
-        }else{
-            $status_of_surveys = DB::table('survey_members')
-                ->select('role')
-                ->where([
-                    ['survey','=',$id],
-                    ['user','=',Auth::user()->id]
-                ])
+        $data['status_ownership'] = Survey::get_status_ownership($id);
+
+        $query_survey = DB::table('surveys')
+            ->select('surveys.created_by','surveys.name','survey_process.*','it_goal.PP')
+            ->leftJoin('it_related_goal','it_related_goal.survey','=','surveys.id')
+            ->leftJoin('survey_process',function($join){
+                $join->on('survey_process.survey', '=','surveys.id')
+                     ->on('survey_process.it_related_goal', '=','it_related_goal.id');
+            })
+            ->leftJoin('it_goal', 'it_goal.id', '=', 'it_related_goal.it_goal');
+
+
+        $data['survey_name'] = (clone $query_survey)
+            ->where('surveys.id',$id)
+            ->get()->first()->name;
+
+        if(explode("-",$data['status_ownership'])[0] == 2){
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 4")
                 ->get();
-            if($status_of_surveys->first()){
-                $status_ownership = strtoupper(explode("-",$status_of_surveys->first()->role)[1]);
-            }else{
-                abort(404);
-            }
-        }
-
-        $data['status_ownership'] = $status_ownership;
-
-        if($data_survey->first()){
-            $data['surveys'] = $data_survey;
-            $data['survey_name'] = $data_survey->first()->name;
-            return view('survey.survey',$data);
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) > 3")
+                ->get();
         }else{
-            abort(404);
+            $data['surveys'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) < 7")
+                ->get();
+            $data['surveys_done'] = (clone $query_survey)
+                ->whereRaw("surveys.id = $id AND SUBSTRING_INDEX(SUBSTRING_INDEX(survey_process.status, '-', 1), '-', -1) = 7")
+                ->get();
         }
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
+        
+        return view('survey.survey',$data);
     }
 
     public function chooseAnswer($id,$inputans){
@@ -73,6 +79,8 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
 
         $status = DB::table('survey_process')
                     ->select('survey_process.status')
@@ -108,14 +116,7 @@ class SurveyController extends Controller
 
         if($d_surveys->first()){
             if ($d_surveys->first()->created_by != Auth::user()->id){
-                $data['survey_members'] = DB::table('survey_members')
-                    ->select('survey_members.user','users.username')
-                    ->leftJoin('users','users.id','=','survey_members.user')
-                    ->where([
-                        ['survey','=',$id],
-                        ['survey_members.role','=','2-Responden']
-                    ])
-                    ->get();
+                $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
                 $ok = 0;
                 foreach($data['survey_members'] as $surmem){
                     if($surmem->user == Auth::user()->id){
@@ -137,7 +138,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -200,7 +201,7 @@ class SurveyController extends Controller
             ])
             ->update(['status' => $status]);
 
-        return redirect('survey/'.$survey_id);
+        return redirect('assessment/'.$survey_id);
     }
 
 
@@ -211,6 +212,8 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
 
         $d_surveys = DB::table('surveys')
                     ->select('surveys.name','surveys.created_by','survey_process.target_level')
@@ -223,13 +226,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -251,7 +248,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -330,7 +327,7 @@ class SurveyController extends Controller
         if(!$survey){
             return json_encode([
                 'status' => 0,
-                'messages' => "Upload Files Failed, current Survey not found!"
+                'messages' => "Upload Files Failed, current Assessment not found!"
             ]);
         }
 
@@ -341,15 +338,15 @@ class SurveyController extends Controller
             ]);
         }
 
-        $root_path = "/storage/index/survey/";
+        $root_path = "/storage/index/assessment/";
 
         $root = Files::where('url',$root_path)->first();
         $root_id = "";
         if (!$root) {
-            Storage::makeDirectory('survey');
+            Storage::makeDirectory('assessment');
             $folder = new Files();
             $folder->folder_root = 0;
-            $folder->name = 'survey';
+            $folder->name = 'assessment';
             $folder->url= $root_path;
             $folder->is_file = 0;
             $folder->created_by = Auth::user()->id;
@@ -363,7 +360,7 @@ class SurveyController extends Controller
         $survey_files = Files::where('url',$survey_path)->first();
         $survey_files_id = "";
         if (!$survey_files) {
-            Storage::makeDirectory('survey/'.$survey->name.'/');
+            Storage::makeDirectory('assessment/'.$survey->name.'/');
             $folder = new Files();
             $folder->folder_root = $root_id;
             $folder->name = $survey->name;
@@ -380,7 +377,7 @@ class SurveyController extends Controller
             foreach ($request->file('files') as $wpid => $file) {
                 if ($file->isValid()) {
 
-                    $path = $file->store('survey/'.$survey->name);
+                    $path = $file->store('assessment/'.$survey->name);
 
                     $files = [
                         'folder_root' => $survey_files_id,
@@ -439,6 +436,7 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $target_level = "";
+        $data['status_ownership'] = Survey::get_status_ownership($id);
         DB::table('survey_process')
             ->where([
                 ['it_related_goal','=',$it_related_goal],
@@ -458,13 +456,7 @@ class SurveyController extends Controller
                     ->get();
 
         if($d_surveys->first()){
-            $data['survey_members'] = DB::table('survey_members')
-                ->select('survey_members.user','survey_members.role','users.username')
-                ->leftJoin('users','users.id','=','survey_members.user')
-                ->where([
-                    ['survey','=',$id]
-                ])
-                ->get();
+            $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
             $ok = 0;
             foreach($data['survey_members'] as $surmem){
                 if($surmem->user == Auth::user()->id){
@@ -486,7 +478,7 @@ class SurveyController extends Controller
         $levels = DB::table('process_attributes')
             ->select('level')
             ->groupBy('level')
-            ->where('level','<=',$target_level)
+            // ->where('level','<=',$target_level)
             ->get();
 
         $datasurvey = array();
@@ -525,6 +517,8 @@ class SurveyController extends Controller
         $it_related_goal = $inputan[1];
         $process = $inputan[2];
         $typesubmit = $request->post('btnsubmit');
+        
+        $data['status_ownership'] = Survey::get_status_ownership($survey_id);
         
         $status = "";
 
@@ -611,21 +605,50 @@ class SurveyController extends Controller
                 'percent' => $percent_tercapai
             ]);
 
-        return redirect('survey/'.$survey_id);
+        return redirect('assessment/'.$survey_id);
     }
 
-    public function ajax_get_list_user($condition)
+    public function ajax_get_list_user($id,$condition)
     {
         if($condition == 'no'){
             echo json_encode(DB::table('users')->where('id','<>',Auth::user()->id)->get());
-        }else{
+        }elseif($condition == 'all'){
             echo json_encode(DB::table('users')->get());
+        }elseif($condition == 'task'){
+            $users = DB::Select("SELECT a.id, a.username FROM users a
+                                LEFT JOIN surveys b ON b.id = $id
+                                LEFT JOIN survey_members c ON c.survey = b.id
+                                WHERE a.id = b.created_by || a.id = c.user
+                                GROUP BY a.id, a.username");
+            echo json_encode($users);
+        }elseif($condition == 'user_survey'){
+            $survey_members = DB::table('survey_members')
+                ->select('survey_members.user','survey_members.role','users.username')
+                ->leftJoin('users','users.id','=','survey_members.user')
+                ->where([
+                    ['survey','=',$id]
+                ])
+                ->get();
+
+            $survey_creator = DB::table('surveys')
+                ->select('surveys.created_by as user',DB::raw("'0-Creator' as role"),'users.username')
+                ->leftJoin('users','users.id','=','surveys.created_by')
+                ->where([
+                    ['surveys.id','=',$id]
+                ])
+                ->get();
+            return array_merge(json_decode($survey_creator), json_decode($survey_members));
+        }else{
+            $users = DB::Select("SELECT * FROM users where id not in (select user from survey_members where survey = $condition) and id <> (select created_by from surveys where id = $condition)");
+            echo json_encode($users);
         }
     }
 
     public function task($id)
     {
         $data['survey_id'] = $id;
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
 
         $priority = array();
         $priority['1-High'] = "!!!";
@@ -638,6 +661,8 @@ class SurveyController extends Controller
             ->where('surveys.id',$id)
             ->get();
 
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
+
         if($data_survey->first()){
             $data_tasks = DB::table('tasks')
                 ->select('tasks.*','users.username',DB::raw('DATE_FORMAT(tasks.due_date, "%d %b %Y, %H:%i") as due_dates'))
@@ -649,6 +674,28 @@ class SurveyController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function get_task_by_id($id,$task_id){
+        $tasks = DB::table('tasks')
+                ->select("*",DB::raw('DATE_FORMAT(tasks.due_date, "%m/%d/%Y %l:%i %p") as due_dates'))
+                ->where([
+                    ['id','=',$task_id],
+                    ['survey','=',$id]
+                ])
+                ->get()
+                ->first();
+
+        $task_participant = DB::table('task_participant')
+                ->select('team_member')
+                ->where([
+                    ['task','=',$task_id]
+                ])
+                ->get();
+        return response()->json([
+            'tasks' => json_encode($tasks),
+            'task_participant' => json_encode($task_participant)
+        ]);
     }
 
 
@@ -665,16 +712,18 @@ class SurveyController extends Controller
             'i_n_name_survey' => 'required|unique:surveys,name|max:255',
             'i_n_surveyor' => 'required',
             'i_n_client' => 'required',
-            'i_n_survey_type' => 'required',
+            // 'i_n_survey_type' => 'required',
+            'drivers_purpose' => 'required_without:drivers_pain',
             'i_n_expire' => 'required',
             'i_itgoal' => 'required'
             ],
             [
-                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Survey Name</span> field is required',
-                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Survey Name</span> already exists',
-                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Surveyor</span> field is required',
-                'i_n_client.required' => '&#8226;The <span class="text-danger">Client</span> field is required',
-                'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'i_n_name_survey.required' => '&#8226;The <span class="text-danger">New Assessment Name</span> field is required',
+                'i_n_name_survey.unique' => '&#8226;The <span class="text-danger">Assessment Name</span> already exists',
+                'i_n_surveyor.required' => '&#8226;The <span class="text-danger">Manager</span> field is required',
+                'i_n_client.required' => '&#8226;The <span class="text-danger">Assessor</span> field is required',
+                // 'i_n_survey_type.required' => '&#8226;The <span class="text-danger">Survey Type</span> field is required',
+                'drivers_purpose.required_without' => '&#8226;The <span class="text-danger">Drivers</span> field is required',
                 'i_n_expire.required' => '&#8226;The <span class="text-danger">Expire</span> field is required',
                 'i_itgoal.required' => '&#8226;The <span class="text-danger">It Goal</span> is required',
             ]
@@ -686,7 +735,9 @@ class SurveyController extends Controller
                 'messages' => implode("<br>",$validator->messages()->all())
             ]);
         }
-        $survey_type = $request->post('i_n_survey_type');
+        $survey_purpose = $request->post('drivers_purpose');
+        $survey_pain = $request->post('drivers_pain');
+
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
         $survey->expired = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_expire'))->format('Y-m-d H:i');
@@ -695,56 +746,245 @@ class SurveyController extends Controller
 
         if($post){
             $id = $survey->id;
+
             if($request->get('i_n_surveyor')){
                 foreach ($request->get('i_n_surveyor') as $surveyor) {
                     $surveymembers = new \App\Models\SurveyMembers;
                     $surveymembers->user = $surveyor;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "1-Surveyor";
+                    $surveymembers->role = "1-Manager";
                     $surveymembers->save();
                 }                
             }
             if($request->get('i_n_client')){
-                foreach ($request->get('i_n_client') as $surveyor) {
+                foreach ($request->get('i_n_client') as $client) {
                     $surveymembers = new \App\Models\SurveyMembers;
-                    $surveymembers->user = $surveyor;
+                    $surveymembers->user = $client;
                     $surveymembers->survey = $id;
-                    $surveymembers->role = "2-Responden";
+                    $surveymembers->role = "2-Assessor";
                     $surveymembers->save();
                 }
             }
             if($request->get('i_itgoal')){
-                foreach ($request->get('i_itgoal')[$survey_type] as $itgoal){
-                    $id_itgoal = DB::table('it_related_goal')->insertGetId(
-                        [   'it_goal' => $itgoal, 
-                            'survey' => $id
-                        ]
-                    );
-                    if($request->get('i_itgoal_process')[$survey_type]){
-                        foreach($request->get('i_itgoal_process')[$survey_type][$itgoal] as $itgoalprocess){
-                                $survey_process = DB::table('survey_process')->insertGetId(
-                                    [   
-                                        'it_related_goal' => $id_itgoal,
-                                        'process' => $itgoalprocess,
-                                        'survey' => $id,
-                                        'target_level' => $request->get('i_itgoal_process_level')[$survey_type][$itgoal][$itgoalprocess],
-                                        'target_percent' => $request->get('i_itgoal_process_percent')[$survey_type][$itgoal][$itgoalprocess],
-                                        'status' => '1-Waiting'
-                                    ]
-                                );
+                if($survey_purpose){
+                    foreach ($request->get('i_itgoal')[$survey_purpose] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
+                            ]
+                        );
+                        if($request->get('i_itgoal_process')[$survey_purpose]){
+                            foreach($request->get('i_itgoal_process')[$survey_purpose][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
+                        }
+                    }
+                }
+
+                if($survey_pain){
+                    foreach ($request->get('i_itgoal')[$survey_pain] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
+                            ]
+                        );
+                        if($request->get('i_itgoal_process')[$survey_pain]){
+                            foreach($request->get('i_itgoal_process')[$survey_pain][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
                         }
                     }
                 }
             }
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Created New Assessment : ".$request->post('i_n_name_survey');
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $id;
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            if($request->get('i_n_surveyor') && $notif_post){
+                foreach ($request->get('i_n_surveyor') as $surveyor) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }                
+            }
+            if($request->get('i_n_client') && $notif_post){
+                foreach ($request->get('i_n_client') as $client) {
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $client;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }
+            }
+
+            $chatRoom = new \App\Models\ChatRoom;
+            $chatRoom->name = $request->post('i_n_name_survey');
+            $chatRoom->chat_type = '3-Survey';
+            $chatRoom->survey = $id;
+            $chatRoom->created_by = Auth::user()->id;
+            $chatRoom_post = $chatRoom->save();
+
+            if($chatRoom_post){
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chatRoom->id;
+                $chatMember->user = Auth::user()->id;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($request->get('i_n_surveyor')){
+                    foreach ($request->get('i_n_surveyor') as $surveyor) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $surveyor;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }                
+                }
+                if($request->get('i_n_client')){
+                    foreach ($request->get('i_n_client') as $client) {
+                        $chatMember = new \App\Models\ChatMember;
+                        $chatMember->chat_room = $chatRoom->id;
+                        $chatMember->user = $client;
+                        $chatMember->unread_messages = 0;
+                        $chatMember->created_by = Auth::user()->id;
+                        $chatMember->save();
+                    }
+                }
+            }
+
             return json_encode([
                 'status' => 1,
-                'messages' => '/survey/'.$id
+                'messages' => '/assessment/'.$id
             ]);
         }
 
         return json_encode([
             'status' => 0,
-            'messages' => 'Create Survey Failed'
+            'messages' => 'Create Assessment Failed'
+        ]);
+    }
+
+    public function invite($id, Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+                'inv_responden' => 'required_without:inv_surveyor',
+            ],
+            [
+                'inv_responden.required_without' => '&#8226;The <span class="text-danger">Manager or Assessor</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $survey_name = DB::table('surveys')->select('name')->where('id','=',$id)->get()->first()->name;
+
+        $notification = new \App\Models\Notifications;
+        $notification->notification_text = "@".Auth::user()->username." Invited you to Assessment : ".$survey_name;
+        $notification->modul = '2-Survey';
+        $notification->modul_id = $id;
+        $notification->created_by = Auth::user()->id;
+        $notification->notification_start = Carbon::now()->toDateTimeString();
+        $notif_post = $notification->save();
+
+        $chat_rooms_id = DB::table('chat_rooms')->select('id')->where('survey','=',$id)->get()->first()->id;
+
+        if($request->get('inv_surveyor')){
+            foreach ($request->get('inv_surveyor') as $surveyor) {
+                $surveymembers = new \App\Models\SurveyMembers;
+                $surveymembers->user = $surveyor;
+                $surveymembers->survey = $id;
+                $surveymembers->role = "1-Manager";
+                $surveymembers->save();
+
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $surveyor;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $surveyor;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }
+            } 
+        }               
+
+        if($request->get('inv_responden')){
+            foreach ($request->get('inv_responden') as $responden) {
+                $surveymembers = new \App\Models\SurveyMembers;
+                $surveymembers->user = $responden;
+                $surveymembers->survey = $id;
+                $surveymembers->role = "2-Assessor";
+                $surveymembers->save();
+                
+                $chatMember = new \App\Models\ChatMember;
+                $chatMember->chat_room = $chat_rooms_id;
+                $chatMember->user = $responden;
+                $chatMember->unread_messages = 0;
+                $chatMember->created_by = Auth::user()->id;
+                $chatMember->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $responden;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }
+            }
+        }
+        
+        return json_encode([
+            'status' => 1,
+            'messages' => '/assessment/'.$id
         ]);
     }
 
@@ -790,9 +1030,145 @@ class SurveyController extends Controller
         $post = $task->save();
         if($post){
             $id = $task->id;
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            $notification = new \App\Models\Notifications;
+            $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Survey : ".$survey_name;
+            $notification->modul = '2-Survey';
+            $notification->modul_id = $request->post('i_n_survey_id');
+            $notification->created_by = Auth::user()->id;
+            $notification->notification_start = Carbon::now()->toDateTimeString();
+            $notif_post = $notification->save();
+
+            $notificationReceivers = new \App\Models\NotificationReceivers;
+            $notificationReceivers->notification = $notification->id;
+            $notificationReceivers->receiver = $request->post('i_n_assignee');
+            $notificationReceivers->is_read = 0;
+            $notificationReceivers->created_by = Auth::user()->id;
+            $notificationReceivers->save();
+
+            broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+
             foreach ($request->get('i_n_participant') as $participant) {
                 $taskparticipants = new \App\Models\TaskParticipants;
                 $taskparticipants->task = $id;
+                $taskparticipants->team_member = $participant;
+                $taskparticipants->save();
+
+                if($notif_post){
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }
+            }
+        }
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/assessment/'.$request->post('i_n_survey_id').'/task/'
+        ]);
+    }
+
+    public function task_update($id,$task_id,Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+            'i_n_name_task' => 'required|max:255|unique:tasks,name,'.$task_id,
+            'i_n_priority' => 'required',
+            'i_n_due_date' => 'required',
+            'i_n_assignee' => 'required',
+            'i_n_participant' => 'required',
+            'i_n_detail' => 'required'
+            ],
+            [
+                'i_n_name_task.required' => '&#8226;The <span class="text-danger">New Task Name</span> field is required',
+                'i_n_name_task.unique' => '&#8226;The <span class="text-danger">Task Name</span> already exists',
+                'i_n_priority.required' => '&#8226;The <span class="text-danger">Task Priority</span> field is required',
+                'i_n_due_date.required' => '&#8226;The <span class="text-danger">Task Due Date</span> field is required',
+                'i_n_assignee.required' => '&#8226;The <span class="text-danger">Task Assignee</span> field is required',
+                'i_n_participant.required' => '&#8226;The <span class="text-danger">Task Participants</span> field is required',
+                'i_n_detail.required' => '&#8226;The <span class="text-danger">Task Detail</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $task = Task::find($task_id);
+
+        $assignee = $task->assign;
+
+        $task->survey       = $request->post('i_n_survey_id');
+        $task->name         = $request->post('i_n_name_task');
+        $task->assign       = $request->post('i_n_assignee');
+        $task->due_date     = Carbon::createFromFormat('m/d/Y h:i A', $request->post('i_n_due_date'))->format('Y-m-d H:i');
+        $task->detail       = $request->post('i_n_detail');
+        $task->color        = $request->post('i_n_color');
+        $task->progress     = $request->post('i_n_progress');
+        $task->priority     = $request->post('i_n_priority');
+        $task->created_by   = Auth::user()->id;
+        $post               = $task->save();
+        if($post){
+
+            $survey_name = DB::table('surveys')->select('name')->where('id','=',$request->post('i_n_survey_id'))->get()->first()->name;
+
+            if($assignee != $request->post('i_n_assignee')){
+                $notification = new \App\Models\Notifications;
+                $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Assessment : ".$survey_name." as Assignee";
+                $notification->modul = '2-Survey';
+                $notification->modul_id = $request->post('i_n_survey_id');
+                $notification->created_by = Auth::user()->id;
+                $notification->notification_start = Carbon::now()->toDateTimeString();
+                $notif_post = $notification->save();
+
+                $notificationReceivers = new \App\Models\NotificationReceivers;
+                $notificationReceivers->notification = $notification->id;
+                $notificationReceivers->receiver = $request->post('i_n_assignee');
+                $notificationReceivers->is_read = 0;
+                $notificationReceivers->created_by = Auth::user()->id;
+                $notificationReceivers->save();
+
+                broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+            }
+
+            foreach ($request->get('i_n_participant') as $participant) {
+                $available = \App\Models\TaskParticipants::where([
+                    ['task','=',$task_id],
+                    ['team_member','=',$participant]
+                ]);
+                if(!$available->first()){
+                    $notification = new \App\Models\Notifications;
+                    $notification->notification_text = "@".Auth::user()->username." Added you to Task : ".$request->post('i_n_name_task')." on Assessment : ".$survey_name." as Participant";
+                    $notification->modul = '2-Survey';
+                    $notification->modul_id = $request->post('i_n_survey_id');
+                    $notification->created_by = Auth::user()->id;
+                    $notification->notification_start = Carbon::now()->toDateTimeString();
+                    $notif_post = $notification->save();
+
+                    $notificationReceivers = new \App\Models\NotificationReceivers;
+                    $notificationReceivers->notification = $notification->id;
+                    $notificationReceivers->receiver = $participant;
+                    $notificationReceivers->is_read = 0;
+                    $notificationReceivers->created_by = Auth::user()->id;
+                    $notificationReceivers->save();
+
+                    broadcast(new NewNotification($notification, $notificationReceivers, Auth::user()));
+                }
+            }
+
+            $deletedRows = \App\Models\TaskParticipants::where('task', $task_id)->delete();
+            foreach ($request->get('i_n_participant') as $participant) {
+                $taskparticipants = new \App\Models\TaskParticipants;
+                $taskparticipants->task = $task_id;
                 $taskparticipants->team_member = $participant;
                 $taskparticipants->save();
             }
@@ -800,7 +1176,7 @@ class SurveyController extends Controller
 
         return json_encode([
             'status' => 1,
-            'messages' => '/survey/'.$request->post('i_n_survey_id').'/task/'
+            'messages' => '/assessment/'.$id.'/task/'
         ]);
     }
 
@@ -916,5 +1292,37 @@ class SurveyController extends Controller
         }
 
         return $surveyProcessOutcomes;
+    }
+
+    public function chat($id)
+    {
+        $data['survey_id'] = $id;
+
+        $data['status_ownership'] = Survey::get_status_ownership($id);
+
+        $data_survey = DB::table('surveys')
+            ->select('surveys.id','surveys.name')
+            ->where('surveys.id',$id)
+            ->get();
+        
+        $data['survey_name'] = $data_survey->first()->name;
+
+        $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
+
+        $chatRooms = ChatRoom::
+        select('chat_rooms.*','chat_room_members.*','chat_rooms.updated_at as chat_room_updated_at')
+        ->join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
+        ->where([
+            ['user',Auth::user()->id],
+            ['chat_type','=','3-Survey'],
+            ['survey','=',$id]
+        ])
+        ->orderBy('chat_rooms.updated_at','desc')
+        ->get()->first();
+
+        $data['chatRooms'] = $chatRooms;
+        $data['aUser'] = auth()->user();
+        
+        return view('survey.chat',$data);
     }
 }

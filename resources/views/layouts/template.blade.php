@@ -52,7 +52,7 @@
     <section class="content">
       <!-- Small boxes (Stat box) -->
       @section('body-inner-content') @show()
-      @include('modal.index')
+      @include('survey.survey-create-modal')
     </section>
     <!-- /.content -->
   </div>
