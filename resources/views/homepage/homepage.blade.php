@@ -74,7 +74,7 @@
 @stop
 
 @section('page-header')
-        <div class="btn-group dropdown">
+        <div class="btn-group-sm">
             <button type="button" class="btn btn-primary" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">Option
                 <span class="caret"></span>
@@ -96,10 +96,11 @@
                     </a>
                 </li>
             </ul>
+            <span>
+                <a class="pull-right" href="#"><span><i class="fa fa-home"></i> Engrafa</span></a>
+            </span>
         </div>
-        <span>
-            <a class="pull-right" href="#"><span><i class="fa fa-home"></i> Engrafa</span></a>
-        </span>
+
 @stop
 
 @section('page-breadcrumb')

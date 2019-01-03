@@ -116,7 +116,7 @@
 
 
                 <div class="box-footer text-center">
-                    <div class="btn-group dropup btn-block custom-dropdown-btn">
+                    <div class="btn-group-sm btn-block">
                         <button type="button" class="btn btn-primary btn-block" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">My Drive
                             <span class="caret"></span>
