@@ -148,7 +148,7 @@
                     <h4>Teams</h4>
                     @if($teams->first())
                       @foreach($teams as $team)
-                        <a href="{{url('/survey/'.$team->id)}}" class="btn bg-olive btn-flat margin">{{$team->name}}</a>
+                        <a href="{{route('survey',['id'=> $team->id])}}" class="btn bg-olive btn-flat margin">{{$team->name}}</a>
                       @endforeach
                     @else
                       <button class="btn btn-block bg-primary btn-flat margin">No Teams Available</button>
