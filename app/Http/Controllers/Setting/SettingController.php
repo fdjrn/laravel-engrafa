@@ -213,4 +213,108 @@ class SettingController extends Controller
     {
         //
     }
+
+    public function blackwhitelist()
+    {
+        $data['whiteUsers'] = DB::table('users')
+            ->select('*')
+            ->where('is_blacklist', '=', 0)
+            ->get();
+        //$data['total_users'] = count($data['whiteUsers']);
+        $data['blackUsers'] = DB::table('users')
+            ->select('*')
+            ->where('is_blacklist', '=', 1)
+            ->get();
+
+        return view('setting.blackwhitelist',$data);
+    }
+
+    public function update_blackwhitelist(Request $request)
+    {
+        //update blacklist
+        if(!empty($request['dataBlack'])){
+            foreach ($request['dataBlack'] as $blackList) {
+                $updateBlackList = DB::table('users')
+                    ->where('id', $blackList)
+                    ->update(
+                      [
+                        'is_blacklist' => 1
+                      ]
+                );
+            }
+        }
+
+        //update whitelist
+        if(!empty($request['dataWhite'])){
+            foreach ($request['dataWhite'] as $whiteList) {
+                $updateWhiteList = DB::table('users')
+                    ->where('id', $whiteList)
+                    ->update(
+                      [
+                        'is_blacklist' => 0
+                      ]
+                );
+            }
+        }
+
+        $response = array(
+            'status' => 'success'
+        );
+
+        return $response;
+    }
+
+    public function profile_user()
+    {
+        $userId = Auth::id();
+        $data['users'] = DB::table('users')
+            ->select('*')
+            ->where('id', '=', $userId)
+            ->get();
+
+        return view('setting.profile',$data);
+    }
+
+    public function update_profile_user(Request $request)
+    {
+        $userId = Auth::id();
+        $user = DB::table('users')
+            ->select('*')
+            ->where('id', '=', $userId)
+            ->get();
+
+        if($request['password'] != null){
+            $updateUser = DB::table('users')
+                ->where('id', $user[0]->id)
+                ->update(
+                  [
+                    'first_name' => $request['nama_depan'],
+                    'last_name' => $request['nama_belakang'],
+                    'name' => $request['username'],
+                    'role' => $request['roles'],
+                    'email' => $request['email'],
+                    'phone' => $request['telepon'],
+                    'password' => Hash::make($request['password'])
+                    //'updated_at' => $request['username'],
+                  ]
+            );
+        }else{
+            $updateUser = DB::table('users')
+                ->where('id', $user[0]->id)
+                ->update(
+                  [
+                    'first_name' => $request['nama_depan'],
+                    'last_name' => $request['nama_belakang'],
+                    'name' => $request['username'],
+                    'role' => $request['roles'],
+                    'email' => $request['email'],
+                    'phone' => $request['telepon']
+                    //'password' => Hash::make($request['password'])
+                    //'updated_at' => $request['username'],
+                  ]
+            );
+        }
+
+        return view('setting.index');
+    }
 }
