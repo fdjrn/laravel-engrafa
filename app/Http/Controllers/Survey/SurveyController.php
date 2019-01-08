@@ -338,7 +338,7 @@ class SurveyController extends Controller
             ]);
         }
 
-        $root_path = "/storage/index/assessment/";
+        $root_path = "assessment/";
 
         $root = Files::where('url',$root_path)->first();
         $root_id = "";
@@ -382,7 +382,7 @@ class SurveyController extends Controller
                     $files = [
                         'folder_root' => $survey_files_id,
                         'name' => $file->getClientOriginalName(),
-                        'url' => "/storage/index/".$path,
+                        'url' => $path,
                         'is_file' => 1,
                         'version' => 1,
                         'size' => $file->getClientSize(),
