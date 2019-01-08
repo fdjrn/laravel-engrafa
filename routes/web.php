@@ -134,6 +134,10 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
 	Route::get('/setting/users/{id}', 'Setting\SettingController@get_user_by_id');
 	Route::post('/setting/users/edit_user','Setting\SettingController@edit_user')->name('setting.edit_user');
+	Route::get('/setting/blackwhitelist', 'Setting\SettingController@blackwhitelist')->name('setting.blackwhitelist');
+	Route::post('/setting/updateblackwhitelist','Setting\SettingController@update_blackwhitelist')->name('setting.update_blackwhitelist');
+	Route::get('/setting/profile', 'Setting\SettingController@profile_user')->name('setting.profile');
+	Route::post('/setting/update_profile_user','Setting\SettingController@update_profile_user')->name('setting.update_profile_user');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");

@@ -11,8 +11,8 @@
       <div class="box-body">
         <ul class="list-group inside-submenu no-margin" data-widget="tree" style="list-style: none;">
           <li class="">
-            <a href="{{route('setting')}}">
-              <h4>&nbsp;<i class="fa fa-user"></i>&nbsp;&nbsp;<span>Profile</span></h4>
+            <a href="{{route('setting.profile')}}">
+              <h4><i class="fa fa-user"></i>&nbsp;<span>Profile</span></h4>
             </a>
           </li>
           <li class="">
@@ -23,6 +23,11 @@
           <li class="">
             <a href="{{route('setting.users')}}">
               <h4><i class="fa fa-users"></i>&nbsp;&nbsp;<span>Users</span></h4>
+            </a>
+          </li>
+          <li class="">
+            <a href="{{route('setting.blackwhitelist')}}">
+              <h4><i class="fa fa-ban"></i>&nbsp;<span>Blacklist and Whitelist</span></h4>
             </a>
           </li>
           <li class="footer">
