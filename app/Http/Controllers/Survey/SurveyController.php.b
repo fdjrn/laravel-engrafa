@@ -698,29 +698,6 @@ class SurveyController extends Controller
         ]);
     }
 
-    public function get_process_list(Request $request){
-        if(!$request->get('i_itgoal')){
-            return json_encode([
-                'status' => 0
-            ]);
-        }
-
-        $it_goal_to_process = DB::table('it_goal_to_process')
-                    ->select('process')
-                    ->whereIn('it_goal', $request->get('i_itgoal'))
-                    ->groupBy('process')
-                    ->orderBy('id')
-                    ->get();
-
-        $level = DB::table('level')->get();
-
-        return json_encode([
-            'status' => 1,
-            'data' => $it_goal_to_process,
-            'level' => $level
-        ]);
-    }
-
 
     /**
      * Store a newly created resource in storage.
@@ -758,13 +735,8 @@ class SurveyController extends Controller
                 'messages' => implode("<br>",$validator->messages()->all())
             ]);
         }
-        $survey_type = array();
-
-        $request->post('drivers_purpose') && array_push($survey_type,$request->post('drivers_purpose'));
-
-        $request->post('drivers_pain') && array_push($survey_type,$request->post('drivers_pain'));
-        
-        $survey_type = join(",",$survey_type);
+        $survey_purpose = $request->post('drivers_purpose');
+        $survey_pain = $request->post('drivers_pain');
 
         $survey = new \App\Models\Survey;
         $survey->name = $request->post('i_n_name_survey');
@@ -794,18 +766,51 @@ class SurveyController extends Controller
                 }
             }
             if($request->get('i_itgoal')){
-                if($request->get('i_itgoal_process')){
-                    foreach($request->get('i_itgoal_process') as $itgoalprocess){
-                        $survey_process = DB::table('survey_process')->insertGetId(
-                            [   
-                                'type' => $survey_type,
-                                'process' => $itgoalprocess,
-                                'survey' => $id,
-                                'target_level' => $request->get('i_itgoal_process_level')[$itgoalprocess],
-                                'target_percent' => $request->get('i_itgoal_process_percent')[$itgoalprocess],
-                                'status' => '1-Waiting'
+                if($survey_purpose){
+                    foreach ($request->get('i_itgoal')[$survey_purpose] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
                             ]
                         );
+                        if($request->get('i_itgoal_process')[$survey_purpose]){
+                            foreach($request->get('i_itgoal_process')[$survey_purpose][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_purpose][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
+                        }
+                    }
+                }
+
+                if($survey_pain){
+                    foreach ($request->get('i_itgoal')[$survey_pain] as $itgoal){
+                        $id_itgoal = DB::table('it_related_goal')->insertGetId(
+                            [   'it_goal' => $itgoal, 
+                                'survey' => $id
+                            ]
+                        );
+                        if($request->get('i_itgoal_process')[$survey_pain]){
+                            foreach($request->get('i_itgoal_process')[$survey_pain][$itgoal] as $itgoalprocess){
+                                    $survey_process = DB::table('survey_process')->insertGetId(
+                                        [   
+                                            'it_related_goal' => $id_itgoal,
+                                            'process' => $itgoalprocess,
+                                            'survey' => $id,
+                                            'target_level' => $request->get('i_itgoal_process_level')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'target_percent' => $request->get('i_itgoal_process_percent')[$survey_pain][$itgoal][$itgoalprocess],
+                                            'status' => '1-Waiting'
+                                        ]
+                                    );
+                            }
+                        }
                     }
                 }
             }

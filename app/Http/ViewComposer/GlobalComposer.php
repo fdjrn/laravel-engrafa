@@ -10,6 +10,7 @@ use App\Models\Survey;
 use App\Models\Role;
 use App\Models\ItGoal;
 use App\Models\Level;
+use App\Models\Process;
 
 class GlobalComposer {
 
@@ -37,6 +38,8 @@ class GlobalComposer {
                 $view->with('dataItGoalToProcess', $dataItGoalToProcess);
                 $dataLevel = Level::dataLevel();
                 $view->with('dataLevel', $dataLevel);
+                $dataProcess = Process::getDataProcess();
+                $view->with('dataProcess', $dataProcess);
             }
             // dd($menu);
             $view->with('roleMenus',$menu);

@@ -118,6 +118,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/assessment/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::get('/assessment/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/assessment/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
+	Route::post('/assessment/get_process_list', 'Survey\SurveyController@get_process_list');
 
 	Route::get('/assessment/{id}/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/assessment/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
