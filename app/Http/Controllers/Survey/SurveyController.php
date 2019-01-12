@@ -683,7 +683,7 @@ class SurveyController extends Controller
                     ->select('process')
                     ->whereIn('it_goal', $request->get('i_itgoal'))
                     ->groupBy('process')
-                    ->orderBy('id')
+                    // ->orderBy('id')
                     ->get();
 
         $level = DB::table('level')->get();
