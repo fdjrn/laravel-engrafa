@@ -154,12 +154,16 @@
                             <div class="box-footer">
                                 <span class="pull-left">
                                     {{--<a href="#" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>--}}
+                                    @if(substr($loggedUser['role'],0,1) <= '4' )
                                     <a href="" id="edit-file" data-toggle="tooltip" title="edit"><i
                                                 class="fa fa-edit fa-fw"></i></a>
+                                    @endif
                                     <a href="#" data-toggle="tooltip" title="share"><i
                                                 class="fa fa-share fa-fw"></i></a>
+                                    @if(substr($loggedUser['role'],0,1) <= '4' )
                                     <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i
                                                 class="fa fa-trash fa-fw"></i></a>
+                                    @endif
                                 </span>
                             </div>
                         </div>

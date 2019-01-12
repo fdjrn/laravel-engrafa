@@ -114,7 +114,7 @@
                 </div>
                 <!-- /.box-body -->
 
-
+                @if(substr($currentUser['role'],0,1) <= '5' )
                 <div class="box-footer text-center">
                     <div class="btn-group-sm btn-block">
                         <button type="button" class="btn btn-primary btn-block" data-toggle="dropdown"
@@ -126,20 +126,21 @@
                             <li>
                                 <a href="#"><span><i class="fa fa-folder-o"></i></span> Upload Folder</a>
                             </li>
-                            <li>
-                                <a href="#" data-toggle="modal" id="upload_file_btn" data-target="#upload-files-modal">
-                                    <span><i class="fa fa-file-o"></i></span> Upload Files
-                                </a>
-                            </li>
-                            <li role="separator" class="divider"></li>
-                            <li>
-                                <a href="#" data-toggle="modal" data-target="#create-new-folder-modal">
-                                    <span><i class="fa fa-plus-square-o"></i></span> New Folder
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="#" data-toggle="modal" id="upload_file_btn" data-target="#upload-files-modal">
+                                        <span><i class="fa fa-file-o"></i></span> Upload Files
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a href="#" data-toggle="modal" data-target="#create-new-folder-modal">
+                                        <span><i class="fa fa-plus-square-o"></i></span> New Folder
+                                    </a>
+                                </li>
                         </ul>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -209,9 +210,13 @@
                             <div class="box-footer">
                                 <span class="pull-left">
                                     <a href="" id="view-file" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
-                                    <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    @if(substr($currentUser['role'],0,1) <= '4' )
+                                        <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    @endif
                                     <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
-                                    <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    @if(substr($currentUser['role'],0,1) <= '4' )
+                                        <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    @endif
                                 </span>
                             </div>
                         </div>

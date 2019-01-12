@@ -38,7 +38,9 @@ class IndexController extends Controller
     public function index(Request $request)
     {
         $folderIdReq = $request->get('folder_id') ?? 0;
-        return view('index.index')->with('folderID', $folderIdReq);
+        return view('index.index')
+            ->with('folderID', $folderIdReq)
+            ->with('currentUser', Auth::user());
     }
 
     /**
@@ -62,12 +64,22 @@ class IndexController extends Controller
                     '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
                     '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
-                $list = ($file->is_file === 1 ) ?
-                    '<li><a href="/index/detail/'. $file->id .'">View</a></li><li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                    '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
-                    '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>' :
-                    '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
+
+                if ($file->is_file === 1 ) {
+                    if(auth()->user()->role <= '4') {
+                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
+                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
+                            '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
+                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                    } else {
+                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
+                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
+                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                    }
+                } else {
+                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
                     '<li><a href="#">See File Version</a></li>';
+                }
 
                 $newCol =  $newCol . $list .'</ul></div>';
                 return $newCol;
@@ -100,12 +112,24 @@ class IndexController extends Controller
                     '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
                     '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
-                $list = ($file->is_file === 1 ) ?
-                    '<li><a href="/index/detail/'. $file->id .'">View</a></li><li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                    '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>' :
-                    '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>';
 
-                $newCol =  $newCol . $list .'<li><a href="#">See File Version</a></li></ul></div>';
+                if ($file->is_file === 1 ) {
+                    if(auth()->user()->role <= '4') {
+                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
+                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
+                            '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
+                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                    } else {
+                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
+                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
+                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                    }
+                } else {
+                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
+                        '<li><a href="#">See File Version</a></li>';
+                }
+
+                $newCol =  $newCol . $list .'</ul></div>';
                 return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
