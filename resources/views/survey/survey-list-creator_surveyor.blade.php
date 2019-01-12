@@ -28,14 +28,14 @@
                         </td>
                         <td>
                         @if((explode('-',$survey->status))[0] >= 4)
-                          <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah diisi oleh Assessor">{{ explode("-",$survey->PP)[1] }}</span>
+                          <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah diisi oleh Assessor">{{ $survey->type }}</span>
                         @else
-                          <span class="status_survey" data-toggle="tooltip" data-placement="bottom" title="Proses belum diisi oleh Assessor">{{ explode("-",$survey->PP)[1] }}</span>
+                          <span class="status_survey" data-toggle="tooltip" data-placement="bottom" title="Proses belum diisi oleh Assessor">{{ $survey->type }}</span>
                         @endif
                         </td>
                         <td class="text-center">
                         @if((explode('-',$survey->status))[0] >= 4)
-                          <a href="{{route('survey.analyze',['id'=> $survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses bisa dianalisa, sudah diisi oleh Assessor"><i class="fa fa-bar-chart"></i></a>
+                          <a href="{{route('survey.analyze',['id'=> $survey_id,'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses bisa dianalisa, sudah diisi oleh Assessor"><i class="fa fa-bar-chart"></i></a>
                         @else
                           <a class="btn btn-default btn-sm adisabled" data-toggle="tooltip" data-placement="bottom" title="Proses tidak bisa dianalisa, harus diisi oleh Assessor terlebih dahulu"><i class="fa fa-bar-chart"></i></a>
                         @endif
@@ -91,10 +91,10 @@
                         </div>
                       </td>
                       <td>
-                        <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa">{{ explode("-",$survey->PP)[1] }}</span>
+                        <span class="status_survey text-green" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa">{{ $survey->type }}</span>
                       </td>
                       <td class="text-center">
-                        <a href="{{route('survey.analyze.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa"><i class="fa fa-bar-chart"></i></a>
+                        <a href="{{route('survey.analyze.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Proses sudah selesai dianalisa"><i class="fa fa-bar-chart"></i></a>
                       </td>
                       <td class="text-center">
                         <div class="btn-group">

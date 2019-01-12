@@ -20,7 +20,7 @@
                   <tr>
                     <td>
                       <div>
-                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->process ])}}">
                           <p>
                             {{$survey->process}}
                           </p>
@@ -29,11 +29,11 @@
                     </td>
                     <td class="text-center">
                       @if($survey->status == '1-Waiting')
-                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Waiting"><i class="fa fa-play fa-fw"></i></a>
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Waiting"><i class="fa fa-play fa-fw"></i></a>
                       @elseif($survey->status == '2-Process Survey')
-                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Process"><i class="fa fa-ellipsis-h fa-fw"></i></a>
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="Process"><i class="fa fa-ellipsis-h fa-fw"></i></a>
                       @elseif($survey->status == '3-On Save Survey')
-                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="On Save"><i class="fa fa-pause fa-fw"></i></a>
+                        <a href="{{route('survey.answer',['id'=>$survey_id, 'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="On Save"><i class="fa fa-pause fa-fw"></i></a>
                       @endif
                     </td>
                   </tr>
@@ -70,7 +70,7 @@
                     <tr>
                       <td>
                         <div>
-                          <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}">
+                          <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->process ])}}">
                             <p>
                               {{$survey->process}}
                             </p>
@@ -78,7 +78,7 @@
                         </div>
                       </td>
                       <td class="text-center">
-                          <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->it_related_goal.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Process"><i class="fa fa-check fa-fw"></i></a>
+                          <a href="{{route('survey.answer.doneView',['id'=>$survey_id,'inputans'=> $survey_id.'-'.$survey->process ])}}" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Process"><i class="fa fa-check fa-fw"></i></a>
                       </td>
                     </tr>
                   @endforeach

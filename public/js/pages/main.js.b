@@ -7,54 +7,78 @@ $(document).ready(function(){
       });
   });
 
+  clearNSurveyModal();
+
   $("#mn_create_new_team").click(function(){
+    clearNSurveyModal();
     $('#modal-n-survey').modal('show');
     init_n_survey_user("#i_n_surveyor");
     $('#i_n_surveyor').on("change", function(e) { 
       init_n_survey_user("#i_n_client",1);
     });
   });
-    $('#i_n_expire').datetimepicker({});
+  
+  $('#i_n_expire').datetimepicker({});
 
-    if($("#i_n_survey_type").val() !== ""){
-      var stype = $("#i_n_survey_type").val();
-      if(!stype){
-        $('.list-itgoal-purpose').hide();
-        $('.list-itgoal-pain').hide();
-      }else if(stype === '1-Purpose'){
-        $('.list-itgoal-purpose').show();
-        $('.list-itgoal-pain').hide();
-      }else if(stype === '2-Pain'){
-        $('.list-itgoal-pain').show();
-        $('.list-itgoal-purpose').hide();
-      }
+  $("#drivers_purpose").change(function(){
+    if(this.checked){
+      $('.list-itgoal-purpose').show();
     }else{
-      $("#list-itgoal").hide();
+      $('.list-itgoal-purpose').hide();
     }
+  });
 
-    $("#i_n_survey_type").on('change',function(){
-      var stype = $(this).val();
-      if(!stype){
-        $("#list-itgoal").hide();
-        $('.list-itgoal-purpose').hide();
-        $('.list-itgoal-pain').hide();
-      }else if(stype === '1-Purpose'){
-        $("#list-itgoal").show();
-        $('.list-itgoal-purpose').show();
-        $('.list-itgoal-pain').hide();
-      }else if(stype === '2-Pain'){
-        $("#list-itgoal").show();
-        $('.list-itgoal-pain').show();
-        $('.list-itgoal-purpose').hide();
+  $("#drivers_pain").change(function(){
+    if(this.checked){
+      $('.list-itgoal-pain').show();
+    }else{
+      $('.list-itgoal-pain').hide();
+    }
+  });
+
+  $('input[name="i_itgoal[1-Purpose][]"]').each(function (index, element) {
+    $(this).change(function(){
+      var c_id = "#1-Purpose-"+$(this).val();
+      if(this.checked){
+        $(c_id).show();
+      }else{
+        $(c_id).hide();
       }
     });
+  });
+
+  $('input[name="i_itgoal[2-Pain][]"]').each(function (index, element) {
+    $(this).change(function(){
+      var c_id = "#2-Pain-"+$(this).val();
+      if(this.checked){
+        $(c_id).show();
+      }else{
+        $(c_id).hide();
+      }
+    });
+  });
+
+  var ads = '1-Purpose';
+  var vss = '02';
+  $('input[name="testing['+ads+'][]"][value="'+vss+'"]').hide();
 
 });
+
+function clearNSurveyModal(){
+  $('#i_n_name_survey').val(null);
+  $('#i_n_expire').val(null);
+  $('#modal-n-survey').find('input[type=checkbox]:checked').prop('checked', false);
+  $('.list-itgoal-purpose').hide();
+  $('.list-itgoal-pain').hide();
+  $('.list_edm').each(function(){
+    $(this).hide();
+  });
+}
 
 function init_n_survey_user(id_element,v_check){
   $.ajax({
       type: 'GET',
-      url: base_url+'/survey/0/ajax_get_list_user/no',
+      url: base_url+'/assessment/0/ajax_get_list_user/no',
       success: function (data) {
           // the next thing you want to do 
           var $v_select = $(id_element);
@@ -97,7 +121,7 @@ $("#form_n_survey").submit(function(e) {
             swal({
               type: 'success',
               title: 'Berhasil',
-              text: 'Create New Survey Success'
+              text: 'Create New Assessment Success'
             });
             location.href = base_url+parse.messages;
           } else {
