@@ -37,7 +37,7 @@
             </div>
             <div class="modal-footer">
                 {!! Form::button('Close', ['class' => 'btn btn-default','data-dismiss'=>'modal']) !!}
-                {!! Form::button('Create', ['class' => 'btn btn-info','id'=>'btn-create-folder']) !!}
+                {!! Form::submit('Create', ['class' => 'btn btn-info','id'=>'btn-create-folder']) !!}
             </div>
             {{ Form::close() }}
         </div>
