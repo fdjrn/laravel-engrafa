@@ -70,6 +70,21 @@
             font-weight: normal;
         }
 
+        .mini-submenu {
+            display: none;
+            background-color: rgb(60, 141, 188);
+            position: fixed;
+            width: 35px;
+            right: 14px;
+            padding: 0px 13px 10px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .mini-submenu > span:hover{
+            cursor: pointer;
+        }
+
     </style>
 @stop
 
@@ -114,7 +129,7 @@
                 </div>
                 <!-- /.box-body -->
 
-
+                @if(substr($currentUser['role'],0,1) <= '5' )
                 <div class="box-footer text-center">
                     <div class="btn-group-sm btn-block">
                         <button type="button" class="btn btn-primary btn-block" data-toggle="dropdown"
@@ -126,25 +141,26 @@
                             <li>
                                 <a href="#"><span><i class="fa fa-folder-o"></i></span> Upload Folder</a>
                             </li>
-                            <li>
-                                <a href="#" data-toggle="modal" id="upload_file_btn" data-target="#upload-files-modal">
-                                    <span><i class="fa fa-file-o"></i></span> Upload Files
-                                </a>
-                            </li>
-                            <li role="separator" class="divider"></li>
-                            <li>
-                                <a href="#" data-toggle="modal" data-target="#create-new-folder-modal">
-                                    <span><i class="fa fa-plus-square-o"></i></span> New Folder
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="#" data-toggle="modal" id="upload_file_btn" data-target="#upload-files-modal">
+                                        <span><i class="fa fa-file-o"></i></span> Upload Files
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a href="#" data-toggle="modal" data-target="#create-new-folder-modal">
+                                        <span><i class="fa fa-plus-square-o"></i></span> New Folder
+                                    </a>
+                                </li>
                         </ul>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
 
         {{-- Main view (Center) --}}
-        <div class="col-md-6">
+        <div class="col-md-6 main-view">
             <div class="box box-primary ">
 
                 {{-- Header--}}
@@ -154,7 +170,7 @@
                         <label id="root-folder-name" class="header-cursor"></label>
                         <span class="pull-right">
                             <i class="fa fa-list fa-fw"></i>
-                            <i class="fa fa-clone"></i>
+                            <i class="fa fa-clone stretch-main-view" style="cursor: pointer;"></i>
                         </span>
                     </h4>
                 </div>
@@ -183,13 +199,16 @@
 
         {{-- Right Side (File Properties)--}}
         <div class="col-md-3" id="file-properties">
-            <div class="box box-primary">
+
+            <div class="mini-submenu" style="cursor: pointer;">
+                <h4><span class="pull-right"><i class="fa fa-angle-double-left"></i></span></h4>
+            </div>
+
+            <div class="box box-primary file-prop">
                 <div class="box-header with-border">
                     <input type="hidden" id="file-descr-id">
-                    <h4 class="file-descr-name" id="file-descr-name" style="overflow-wrap: break-word"><i class="fa fa-usb fa-fw"></i>
-                        <span class="pull-right">
-                            <i class="fa fa-angle-double-right"></i>
-                        </span>
+                    <h4 class="file-descr-name" id="file-descr-name" style="overflow-wrap: break-word">
+                        <span><i class="fa fa-usb fa-fw"></i></span>
                     </h4>
                 </div>
 
@@ -197,9 +216,10 @@
                     {{-- File Description Part --}}
                     <div class="box box-primary">
                         <div class="box-header with-border" data-toggle="collapse" data-target="#collapseOne">
-                            <h4 class="box-title">
-                                <a data-toggle="collapse" data-target="#collapseOne" data-parent="#file-group"> Description</a>
-                            </h4>
+                            <h4 class="box-title"> <a>Description</a></h4>
+                            <span class="pull-right">
+                                <i class="fa fa-angle-double-right collapse-prop" style="cursor:pointer;"></i>
+                            </span>
                         </div>
 
                         <div id="collapseOne" class="collapse in">
@@ -209,9 +229,13 @@
                             <div class="box-footer">
                                 <span class="pull-left">
                                     <a href="" id="view-file" data-toggle="tooltip" title=""><i class="fa fa-eye fa-fw"></i></a>
-                                    <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    @if(substr($currentUser['role'],0,1) <= '4' )
+                                        <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
+                                    @endif
                                     <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
-                                    <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    @if(substr($currentUser['role'],0,1) <= '4' )
+                                        <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
+                                    @endif
                                 </span>
                             </div>
                         </div>
@@ -232,7 +256,6 @@
 @stop
 
 @section('page-level-plugins')
-    {{--<script src="{{ asset('js/app.js')}}"></script>--}}
 @stop
 
 @section('theme-global-scripts')
