@@ -108,7 +108,6 @@ function seeFileHistory(id){
 }
 
 $(document).ready(function () {
-    var testVar = "yoyoi";
     var rootFolderId = 0;
     var rootFolderName = "";
     var closeModalInterval;
@@ -303,19 +302,13 @@ $(document).ready(function () {
         if (status === true) {
             $('#file-descr-id').val(data.id);
             $('.file-descr-name').html(
-                '<i class="fa fa-usb fa-fw"></i> ' + data.name +
-                '<span class="pull-right">' +
-                '   <i class="fa fa-angle-double-right"></i>' +
-                '</span>'
+                '<i class="fa fa-usb fa-fw"></i> ' + data.name
             );
             $('#file-descr-text').text(data.description);
         } else {
             $('#file-descr-id').val('');
             $('.file-descr-name').html(
-                '<i class="fa fa-usb fa-fw"></i> ' +
-                '<span class="pull-right">' +
-                '   <i class="fa fa-angle-double-right"></i>' +
-                '</span>'
+                '<i class="fa fa-usb fa-fw"></i> '
             );
             $('#file-descr-text').text('');
         }
@@ -379,24 +372,26 @@ $(document).ready(function () {
                     }
                 } else if (data.success) {
                     $('#success-msg').removeClass('hide');
+                    $("#btn-create-folder").attr("disabled", true);
                     getCurrentFolderDetail(rootFolderId);
-                    closeModalInterval = setInterval(function () {
+                    /*closeModalInterval = setInterval(function () {
                         $('#create-new-folder-modal').modal('hide');
-                    }, 1000);
+                    }, 1000);*/
                 }
             }
         });
     });
 
-    $('#create-new-folder-modal').on('shown.bs.modal', function () {
+    /*$('#create-new-folder-modal').on('shown.bs.modal', function () {
         $('#folderName').focus();
-    });
+    });*/
 
     $('#create-new-folder-modal').on('hidden.bs.modal', function () {
         $('#folderName').val("");
         $('#success-msg').addClass('hide');
         $('#folder-name-error').html("");
-        clearInterval(closeModalInterval);
+        $("#btn-create-folder").removeAttr("disabled")
+        /*clearInterval(closeModalInterval);*/
     });
 
     $('#btn-save-comment').on('click', function () {
@@ -554,5 +549,39 @@ $(document).ready(function () {
 
     $('.bs-modal-view-file').on('hidden.bs.modal', function (e) {
         $('#iframe-view-file').attr('src','');
+    });
+
+    $('.collapse-prop').on("click", function (e) {
+        $(this).closest('.file-prop').fadeOut('slide',function(){
+            $('.mini-submenu').fadeIn();
+            $('.main-view').removeClass('col-md-6').addClass('col-md-9');
+            $('#file-properties').removeClass('col-md-3');
+            $('.main-view').css("padding-right","60px");
+            /*$('#file-properties').css("padding-right","60px");*/
+
+        });
+    });
+
+    $('.mini-submenu').on('click',function(){
+        $('.file-prop').fadeIn();
+        $('.mini-submenu').hide();
+        $('#file-properties').addClass('col-md-3');
+        $('.main-view').css("padding-right","0px");
+        $('.main-view').removeClass('col-md-9').addClass('col-md-6');
+
     })
+
+    $('.stretch-main-view').on('click', function (e) {
+        // e.preventDefault();
+
+        $('.file-prop').fadeOut('slide',function(){
+            $('.mini-submenu').fadeIn();
+            $('.main-view').removeClass('col-md-6').addClass('col-md-9');
+            $('#file-properties').removeClass('col-md-3');
+            $('.main-view').css("padding-right","60px");
+
+        });
+
+    })
+
 });
