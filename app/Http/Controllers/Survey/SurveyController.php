@@ -63,6 +63,15 @@ class SurveyController extends Controller
         }
 
         $data['survey_members'] = $this->ajax_get_list_user($id, 'user_survey');
+
+        $data['survey_roles'] = DB::table('survey_roles')
+            ->get();
+
+        $data['levels'] = DB::table('process_attributes')
+            ->select('level')
+            ->groupBy('level')
+            // ->where('level','<=',$target_level)
+            ->get();
         
         return view('survey.survey',$data);
     }
@@ -683,7 +692,7 @@ class SurveyController extends Controller
                     ->select('process')
                     ->whereIn('it_goal', $request->get('i_itgoal'))
                     ->groupBy('process')
-                    // ->orderBy('id')
+                    ->orderBy('process')
                     ->get();
 
         $level = DB::table('level')->get();
@@ -954,6 +963,86 @@ class SurveyController extends Controller
         return json_encode([
             'status' => 1,
             'messages' => '/assessment/'.$id
+        ]);
+    }
+
+    public function editMember($survey_id, Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+                'user_id' => 'required',
+                'i_role' => 'required',
+            ],
+            [
+                'user_id.required' => '&#8226;<span class="text-danger">Unexpected Error</span>',
+                'i_role.required' => '&#8226;The <span class="text-danger">Role</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $surveymembers = \App\Models\SurveyMembers::where([
+                    ['user','=',$request->post('user_id')],
+                    ['survey','=',$survey_id],
+                ])->first();
+
+        $surveymembers->role = $request->post('i_role');
+        $post = $surveymembers->save();
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/assessment/'.$survey_id
+        ]);
+    }
+
+    public function deleteMember($survey_id, $user_id){
+        $surveymembers = \App\Models\SurveyMembers::where([
+                    ['user','=',$user_id],
+                    ['survey','=',$survey_id],
+                ])->first();
+
+        $surveymembers->delete();
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/assessment/'.$survey_id
+        ]);
+    }
+
+    public function editProcessLevel($survey_id, Request $request){
+        $validator = Validator::make(
+            $request->all(), [
+                'i_process' => 'required',
+                'i_target_level' => 'required',
+            ],
+            [
+                'i_process.required' => '&#8226;The <span class="text-danger">Process</span> field is required',
+                'i_target_level.required' => '&#8226;The <span class="text-danger">Target Level</span> field is required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return json_encode([
+                'status' => 0,
+                'messages' => implode("<br>",$validator->messages()->all())
+            ]);
+        }
+
+        $surveyProcess = \App\Models\SurveyProcess::where([
+                    ['process','=',$request->post('i_process')],
+                    ['survey','=',$survey_id],
+                ])->first();
+
+        $surveyProcess->target_level = $request->post('i_target_level');
+        $post = $surveyProcess->save();
+
+        return json_encode([
+            'status' => 1,
+            'messages' => '/assessment/'.$survey_id
         ]);
     }
 
