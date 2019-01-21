@@ -45,7 +45,7 @@
 
 @section('page-breadcrumb')
   <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-files-o"></i> Assessment</a></li>
-  <li>Answer</li>
+  <li>View</li>
 @stop
 
 
@@ -68,9 +68,10 @@
             </div>
           </div>
         @else
-          <form name="form_q_survey" action="" method="post" id="form_q_survey">
+          <form name="form_q_survey">
           {{ csrf_field() }}
           @foreach($levels as $index => $level)
+            @if($levels[$index]['surveys'][0]->met_criteria == "yes")
             <div class="box box-primary collapsed-box">
               <div class="box-header">
                 <a href="#" data-widget="collapse">
@@ -82,7 +83,7 @@
                 </div>
               </div>
 
-              <div id="question" class="box-body collapse in form-horizontal" style="display: none;">
+              <div id="question" style="display: none;" class="box-body collapse in form-horizontal">
                 <div class="form-group">
                   <label for="i_n_surveyor" class="col-sm-2 control-label">Objective</label>
 
@@ -101,15 +102,24 @@
                         <div style="border: solid thin #d2d6de; padding:4px;">
                           {{ $survey->outcome }}&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->description }}</span>
                         </div>
+                        <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
+                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{ $survey->comment ? $survey->comment : '-' }}</span>
+                        </div>
                         <div class="row" style="margin-top: 4px;">
                           <div class="col-sm-3">
                             <div>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="yes" onclick="checkWP('{{ $survey->id }},{{ $survey_id }}')"> Yes<br>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="no"checked> No
+                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="{{$survey->met_criteria}}" checked disabled> {{ $survey->met_criteria ? ucfirst($survey->met_criteria) : '-'}}
                             </div>
                           </div>
                           <div class="col-sm-9">
-                            <div class="clearfix" style="border: solid thin #d2d6de; padding: 8px 12px;">
+                            <div class="pull-left" style="margin-left: 10px; margin-right: 20px; margin-top: 3px;">
+                              @if($survey->acceptance)
+                                <input type="radio" name="acceptance[{{$survey->id}}]" value="{{$survey->acceptance}}" checked disabled> {{ucfirst($survey->acceptance)}}
+                              @else
+                                <input type="radio" name="acceptance[{{$survey->id}}]" value="" disabled> Not Checked Yet
+                              @endif
+                            </div>
+                            <div class="clearfix" style="border: solid thin #d2d6de; padding: 10px 12px; padding-bottom: 4px;">
                               <div class="pull-left">
                                 <h4 style="margin-top: 0; margin-bottom: 0;">
                                   <i class="fa fa-file-pdf-o text-red"></i>&nbsp;&nbsp;
@@ -119,7 +129,7 @@
                                 <h5 style="margin-top: 0; margin-bottom: 0;">Document Support</h5>
                               </div>
                               <div class="pull-right">
-                                <a onclick="getWP('{{ $survey->id }},{{ $survey_id }}')" class="btn btn-default"><i class="fa fa-upload"></i></a>
+                                <a onclick="getWP('{{ $survey->id }},{{ $survey_id }}')" class="btn btn-default"><i class="fa fa-eye"></i></a>
                               </div>
                             </div>
                           </div>
@@ -128,18 +138,19 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <label for="comment" class="col-sm-2 control-label">Comment</label>
+                    <label for="note" class="col-sm-2 control-label">Note</label>
 
                     <div class="col-sm-10">
-                      <textarea name="comment[{{$survey->id}}]" style="width:100%; resize: vertical;"></textarea>
+                        <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
+                          <span style="font-weight: normal;">{{ $survey->note ? $survey->note: '-' }}</span>
+                        </div>
                     </div>
                   </div>
                 @endforeach
               </div>
             </div>
+            @endif
           @endforeach
-          <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Assessment</button></div>
-          <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Assessment</button></div>
           </form>
         @endif
       </div>
@@ -152,7 +163,7 @@
           </div>
           <div class="box-body">
             @foreach($survey_members as $survey_member)
-            <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
+              <p><small class="label bg-green">&nbsp;&nbsp;&nbsp;&nbsp;</small>&nbsp;<span>{{ $survey_member->username }}</span></p>
             @endforeach
           </div>
           <!-- /.box-body -->
@@ -175,29 +186,22 @@
             <h4 class="modal-title"><i class="fa fa-file"></i>&nbsp;Working Product <span id="wp-title" style="font-weight: bold;"></span></h4>
         </div>
         <input type="hidden" id="curWP">
-        <input type="hidden" id="curTyp" value="answer">
-        <form name="form_w_product" action="{{route('survey.answer.uploadWp', ['id' => $survey_id])}}" method="post" id="form_w_product"  enctype="multipart/form-data">
-          {{ csrf_field() }}
+        <input type="hidden" id="curTyp" value="view">
         <div class="modal-body">
-            <div class="table-responsive">
-              <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
-                <thead>
-                  <tr>
-                    <td style="width:100px;">WP ID</td>
-                    <td style="width:350px;">Description</td>
-                    <td>File</td>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover no-margin" id="table-wp" style=" width: 100% !important;">
+              <thead>
+                <tr>
+                  <td style="width:100px;">WP ID</td>
+                  <td style="width:350px;">Description</td>
+                  <td>File</td>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
-          <button type="submit" id="i_w_product" class="btn btn-primary"><i class="fa fa-check"></i></button>
-        </div>
-        </form>
       </div>
       <!-- /.modal-content -->
     </div>

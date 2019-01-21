@@ -109,7 +109,7 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
-	Route::get('/assessment/{id}/analyze/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.analyze.doneView');
+	Route::get('/assessment/{id}/analyze/view/{inputans}', 'Survey\SurveyController@analyzeView')->name('survey.analyze.doneView');
 	Route::post('/assessment/{id}/invite', 'Survey\SurveyController@invite')->name('survey.invite');
 	Route::post('/assessment/{id}/editMember', 'Survey\SurveyController@editMember')->name('survey.editMember');
 	Route::post('/assessment/{id}/deleteMember/{user_id}', 'Survey\SurveyController@deleteMember')->name('survey.deleteMember');

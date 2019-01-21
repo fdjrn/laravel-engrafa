@@ -71,83 +71,85 @@
           <form name="form_q_survey" action="" method="post" id="form_q_survey">
           {{ csrf_field() }}
           @foreach($levels as $index => $level)
-            <div class="box box-primary">
-              <div class="box-header">
-                <a href="#" data-widget="collapse">
-                  <h4 style="margin:2px 0px;">Level {{$index}}</h4>
-                </a>
-                <div class="box-tools pull-right">
-                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div id="question" class="box-body collapse in form-horizontal">
-                <div class="form-group">
-                  <label for="i_n_surveyor" class="col-sm-2 control-label">Objective</label>
-
-                  <div class="col-sm-10">
-                    <div style="border: solid thin #d2d6de; padding:4px;">
-                      <span style="font-weight: normal;">{{ $levels[$index]['surveys']->first()->purpose }}</span>
-                    </div>
+            @if($levels[$index]['surveys'][0]->met_criteria == "yes")
+              <div class="box box-primary">
+                <div class="box-header">
+                  <a href="#" data-widget="collapse">
+                    <h4 style="margin:2px 0px;">Level {{$index}}</h4>
+                  </a>
+                  <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
                   </div>
                 </div>
-                @foreach($level['surveys'] as $idx => $survey)
+
+                <div id="question" class="box-body collapse in form-horizontal">
                   <div class="form-group">
-                    <label for="i_n_surveyor" class="col-sm-2 control-label">Criteria</label>
+                    <label for="i_n_surveyor" class="col-sm-2 control-label">Objective</label>
 
                     <div class="col-sm-10">
-                      <div style="border: solid thin #d2d6de; padding: 6px 12px;">
-                        <div style="border: solid thin #d2d6de; padding:4px;">
-                          {{ $survey->outcome }}&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->description }}</span>
-                        </div>
-                        <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
-                          Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->comment }}</span>
-                        </div>
-                        <div class="row" style="margin-top: 4px;">
-                          <div class="col-sm-3">
-                            <div>
-                              <input type="radio" name="metcriteria[{{$index}}][{{$survey->id}}]" value="{{$survey->met_criteria}}" checked> {{ucfirst($survey->met_criteria)}}
-                            </div>
+                      <div style="border: solid thin #d2d6de; padding:4px;">
+                        <span style="font-weight: normal;">{{ $levels[$index]['surveys']->first()->purpose }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  @foreach($level['surveys'] as $idx => $survey)
+                    <div class="form-group">
+                      <label for="i_n_surveyor" class="col-sm-2 control-label">Criteria</label>
+
+                      <div class="col-sm-10">
+                        <div style="border: solid thin #d2d6de; padding: 6px 12px;">
+                          <div style="border: solid thin #d2d6de; padding:4px;">
+                            {{ $survey->outcome }}&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->description }}</span>
                           </div>
-                          <div class="col-sm-9">
-                            <div class="pull-left" style="margin-left: 10px; margin-right: 20px; margin-top: 3px;">
-                              <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="agree" checked> Agree<br>
-                              <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="disagree"> Disagree
-                            </div>
-                            <div class="clearfix" style="border: solid thin #d2d6de; padding: 10px 12px; padding-bottom: 4px;">
-                              <div class="pull-left">
-                                <h4 style="margin-top: 0; margin-bottom: 0;">
-                                  <i class="fa fa-file-pdf-o text-red"></i>&nbsp;&nbsp;
-                                  <i class="fa fa-file-word-o text-blue"></i>&nbsp;&nbsp;
-                                  <i class="fa fa-file-excel-o text-green"></i>
-                                </h4>
-                                <h5 style="margin-top: 0; margin-bottom: 0;">Document Support</h5>
+                          <div style="border: solid thin #d2d6de; padding:4px; margin-top: 4px; max-height: 100px; overflow-y: auto;">
+                            Comment&nbsp;&nbsp;<span style="font-weight: normal;">{{$survey->comment }}</span>
+                          </div>
+                          <div class="row" style="margin-top: 4px;">
+                            <div class="col-sm-3">
+                              <div>
+                                <input type="radio" name="metcriteria[{{$index}}][{{$survey->id}}]" value="{{$survey->met_criteria}}" checked> {{ucfirst($survey->met_criteria)}}
                               </div>
-                              <div class="pull-right">
-                                <a onclick="getWP('{{ $survey->id }},{{ $survey_id }}')" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                            </div>
+                            <div class="col-sm-9">
+                              <div class="pull-left" style="margin-left: 10px; margin-right: 20px; margin-top: 3px;">
+                                <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="agree" checked> Agree<br>
+                                <input type="radio" name="acceptance[{{$index}}][{{$survey->id}}]" value="disagree"> Disagree
+                              </div>
+                              <div class="clearfix" style="border: solid thin #d2d6de; padding: 10px 12px; padding-bottom: 4px;">
+                                <div class="pull-left">
+                                  <h4 style="margin-top: 0; margin-bottom: 0;">
+                                    <i class="fa fa-file-pdf-o text-red"></i>&nbsp;&nbsp;
+                                    <i class="fa fa-file-word-o text-blue"></i>&nbsp;&nbsp;
+                                    <i class="fa fa-file-excel-o text-green"></i>
+                                  </h4>
+                                  <h5 style="margin-top: 0; margin-bottom: 0;">Document Support</h5>
+                                </div>
+                                <div class="pull-right">
+                                  <a onclick="getWP('{{ $survey->id }},{{ $survey_id }}')" class="btn btn-default"><i class="fa fa-eye"></i></a>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="note" class="col-sm-2 control-label">Note</label>
+                    <div class="form-group">
+                      <label for="note" class="col-sm-2 control-label">Note</label>
 
-                    <div class="col-sm-10">
-                      <textarea name="note[{{$index}}][{{$survey->id}}]" style="width:100%; resize: vertical; font-weight: normal;"></textarea>
+                      <div class="col-sm-10">
+                        <textarea name="note[{{$index}}][{{$survey->id}}]" style="width:100%; resize: vertical; font-weight: normal;"></textarea>
+                      </div>
                     </div>
-                  </div>
-                @endforeach
+                  @endforeach
+                </div>
               </div>
-            </div>
+            @endif
           @endforeach
           <div class="pull-left"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-warning" value="save">Save Analyze</button></div>
           <div class="pull-right"><button name="btnsubmit" type="submit" form="form_q_survey" class="btn btn-primary" value="finish">Finish Analyze</button></div>
           </form>
-        @endif
+          @endif
       </div>
       <div class="col-md-3">
         <div class="box box-primary">
