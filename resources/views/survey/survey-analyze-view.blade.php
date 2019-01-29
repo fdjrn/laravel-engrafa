@@ -71,6 +71,7 @@
           <form name="form_q_survey">
           {{ csrf_field() }}
           @foreach($levels as $index => $level)
+            @if($levels[$index]['surveys'][0]->met_criteria == "yes")
             <div class="box box-primary collapsed-box">
               <div class="box-header">
                 <a href="#" data-widget="collapse">
@@ -148,6 +149,7 @@
                 @endforeach
               </div>
             </div>
+            @endif
           @endforeach
           </form>
         @endif

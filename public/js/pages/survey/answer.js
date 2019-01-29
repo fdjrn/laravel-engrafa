@@ -1,3 +1,32 @@
+function checkWP(input){
+
+  var wp = input.split(",",1);
+
+  $.ajax({
+      type: "GET",
+      url: base_url+'/assessment/get_process_outcome_wp/'+input,
+      success: function(response)
+      {
+        var item = JSON.parse(response);
+        var count = 0;
+        $.each(item.data, function(index,valuee) {
+          if(valuee.file != null){
+            count++;
+          }
+        });
+        if (count == 0) {
+            $('input[name="metcriteria['+wp+']"][value="yes"]').prop('checked',false);
+            $('input[name="metcriteria['+wp+']"][value="no"]').prop('checked',true);
+            swal({
+              type: 'error',
+              title: 'Tidak ada working product terupload ditemukan!',
+              html: 'Anda harus mengupload working product untuk menjawab <b>Yes</b>'
+            });
+        }
+      }
+  });
+}
+
 function getWP(input){
   $('#m_u_file').modal('show');
   $('#curWP').val(input);

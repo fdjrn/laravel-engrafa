@@ -21,7 +21,11 @@ $(document).ready(function(){
 	  	console.log(surveyProcessOutcomes);
 	  	for (var i = data.surveyProcess.length - 1; i >= 0; i--) {
 	  		labels.push(data.surveyProcess[i].process);
-	  		levelTercapai.push(data.surveyProcess[i].level);
+	  		if(data.surveyProcess[i].level == null){
+	  			levelTercapai.push(-1);
+	  		}else{
+	  			levelTercapai.push(data.surveyProcess[i].level);
+	  		}
 	  		targetLevel.push(data.surveyProcess[i].target_level);
 	  	}
 
@@ -60,7 +64,25 @@ $(document).ready(function(){
 			        label : 'Level Tercapai',
 			        data: levelTercapai
 			    }]
-			}
+			},
+		    options: {
+		      tooltips: {
+		          enabled: true,
+		          mode: 'single',
+		          callbacks: {
+		            title: function(tooltipItem, data) {
+		              return data['labels'][tooltipItem[0]['index']];
+		            },
+		            label: function(tooltipItem, data) {
+			            if(data['datasets'][tooltipItem.datasetIndex]['data'][tooltipItem['index']] >= 0){
+			              return data['datasets'][tooltipItem.datasetIndex]['label']+': '+data['datasets'][tooltipItem.datasetIndex]['data'][tooltipItem['index']];
+			            }else{
+			              return data['datasets'][tooltipItem.datasetIndex]['label']+': -';
+			            }
+		            },
+		          }
+		      }
+		    }
 		});
 	}
 
@@ -74,9 +96,12 @@ $(document).ready(function(){
 			}
 		}
 
+		var percentTercapai = Math.round(jmlhProcessTercapai/labels.length*100);
+		var percentBelumTercapai = 100 - percentTercapai;
+
 		$('#totalProcess').text(labels.length);
-		$('#processCapaiTarget').text(jmlhProcessTercapai);
-		$('#processBelumCapaiTarget').text(jmlhProcessBelumTercapai);
+		$('#processCapaiTarget').text(jmlhProcessTercapai+" ("+percentTercapai+"%)");
+		$('#processBelumCapaiTarget').text(jmlhProcessBelumTercapai+" ("+percentBelumTercapai+"%)");
 	}
 
 	function showDetailProgress(){
@@ -88,11 +113,11 @@ $(document).ready(function(){
 				' <tr>'
 		          +'<td>'+(i+1)+'</td>'
 		          +'<td>'+surveyProcessOutcomes[i].process+'</td>'
-		          +'<td id="'+name+'1">'+surveyProcessOutcomes[i].percentLevel1+' ('+surveyProcessOutcomes[i].ratingLevel1+')</td>'
-		          +'<td id="'+name+'2">'+surveyProcessOutcomes[i].percentLevel2+' ('+surveyProcessOutcomes[i].ratingLevel2+')</td>'
-		          +'<td id="'+name+'3">'+surveyProcessOutcomes[i].percentLevel3+' ('+surveyProcessOutcomes[i].ratingLevel3+')</td>'
-		          +'<td id="'+name+'4">'+surveyProcessOutcomes[i].percentLevel4+' ('+surveyProcessOutcomes[i].ratingLevel4+')</td>'
-		          +'<td id="'+name+'5">'+surveyProcessOutcomes[i].percentLevel5+' ('+surveyProcessOutcomes[i].ratingLevel5+')</td>'
+		          +'<td id="'+name+'1">'+surveyProcessOutcomes[i].percentLevel1+'% ('+surveyProcessOutcomes[i].ratingLevel1+')</td>'
+		          +'<td id="'+name+'2">'+surveyProcessOutcomes[i].percentLevel2+'% ('+surveyProcessOutcomes[i].ratingLevel2+')</td>'
+		          +'<td id="'+name+'3">'+surveyProcessOutcomes[i].percentLevel3+'% ('+surveyProcessOutcomes[i].ratingLevel3+')</td>'
+		          +'<td id="'+name+'4">'+surveyProcessOutcomes[i].percentLevel4+'% ('+surveyProcessOutcomes[i].ratingLevel4+')</td>'
+		          +'<td id="'+name+'5">'+surveyProcessOutcomes[i].percentLevel5+'% ('+surveyProcessOutcomes[i].ratingLevel5+')</td>'
 		        +'</tr>'
 			)
 
