@@ -25,11 +25,13 @@
               <h4><i class="fa fa-users"></i>&nbsp;&nbsp;<span>Users</span></h4>
             </a>
           </li>
-          <li class="">
-            <a href="{{route('setting.blackwhitelist')}}">
-              <h4><i class="fa fa-ban"></i>&nbsp;<span>Blacklist and Whitelist</span></h4>
-            </a>
-          </li>
+          @if ($user_role[0]->role == '1-Super Admin' or $user_role[0]->role == '2-Admin')
+            <li class="">
+              <a href="{{route('setting.blackwhitelist')}}">
+                <h4><i class="fa fa-ban"></i>&nbsp;<span>Blacklist and Whitelist</span></h4>
+              </a>
+            </li>
+          @endif
           <li class="footer">
             <div class="footer-tools">
               <a href="#">
