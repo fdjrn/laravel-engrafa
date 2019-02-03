@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\DB;
 
 trait AuthenticatesUsers
 {
@@ -38,17 +37,12 @@ trait AuthenticatesUsers
         // the IP address of the client making these requests into this application.
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            $this->setUserBlacklist($request);
 
             return $this->sendLockoutResponse($request);
         }
 
-        if($this->getUserBlacklist($request)->count() > 0){
-            return $this->sendBlackListLoginResponse($request);
-        }else{
-            if ($this->attemptLogin($request)) {
-                return $this->sendLoginResponse($request);
-            }
+        if ($this->attemptLogin($request)) {
+            return $this->sendLoginResponse($request);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -184,42 +178,5 @@ trait AuthenticatesUsers
     protected function guard()
     {
         return Auth::guard();
-    }
-
-    /**
-     * Get user blacklist status.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
-    protected function getUserBlacklist(Request $request)
-    {
-        $user = DB::table('users')
-            ->select('*')
-            ->where('email', '=', $request['email'])
-            ->where('is_blacklist', '=', 1)
-            ->get();
-
-        return $user;
-    }
-
-    protected function setUserBlacklist(Request $request)
-    {
-        $updateUser = DB::table('users')
-                    ->where('email', '=', $request['email'])
-                    ->update(
-                      [
-                        'is_blacklist' => 1
-                      ]
-                );
-
-        return $updateUser;
-    }
-
-    protected function sendBlackListLoginResponse(Request $request)
-    {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('This user was blacklisted.')],
-        ]);
     }
 }

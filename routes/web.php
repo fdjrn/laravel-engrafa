@@ -28,7 +28,6 @@ Auth::routes();
 
 Route::middleware(['auth','web'])->group(function () {
 
-
 	Route::get('/', 'Homepage\HomepageController@index');
 
 	// dashboard
@@ -38,8 +37,14 @@ Route::middleware(['auth','web'])->group(function () {
 
 	Route::get('/ajax_get_list_user', 'Dashboard\DashboardController@ajax_get_list_user');
 	Route::post('/ajax_delele_dashboard', 'Dashboard\DashboardController@ajax_delele_dashboard');
+	Route::post('/ajax_delete_survey', 'Dashboard\DashboardController@ajax_delete_survey');
 	Route::post('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
-	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard'); 
+	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard');
+	Route::post('/ajax_get_charts', 'Dashboard\DashboardController@ajax_get_charts');
+	Route::post('/ajax_get_id_surveys', 'Dashboard\DashboardController@ajax_get_id_surveys');
+	Route::post('/ajax_get_data_survey', 'Dashboard\DashboardController@ajax_get_data_survey');
+
+	Route::get('/ajax/edit-survey/{id}', 'Dashboard\DashboardController@ajax_edit_survey');
 
 	// index & file explorer/homepages
     Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
@@ -142,6 +147,8 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/setting/updateblackwhitelist','Setting\SettingController@update_blackwhitelist')->name('setting.update_blackwhitelist');
 	Route::get('/setting/profile', 'Setting\SettingController@profile_user')->name('setting.profile');
 	Route::post('/setting/update_profile_user','Setting\SettingController@update_profile_user')->name('setting.update_profile_user');
+
+	Route::get('/setting/backuprestore', 'Setting\SettingController@backuprestore')->name('setting.backuprestore');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");

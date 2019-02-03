@@ -317,4 +317,9 @@ class SettingController extends Controller
 
         return view('setting.index');
     }
+
+    public function backuprestore()
+    {
+        return view('setting.backuprestore');
+    }
 }
