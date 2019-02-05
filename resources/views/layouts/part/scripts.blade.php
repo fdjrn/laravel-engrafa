@@ -6,6 +6,8 @@
 
 <!-- BEGIN CORE PLUGINS -->
 
+
+<script src="{{ asset('js/app.js')}}"></script>
 <!-- jQuery 3 -->
 <script src="{{ asset('theme/AdminLTE/bower_components/jquery/dist/jquery.min.js')}}"></script>
 <!-- jQuery UI 1.11.4 -->
@@ -43,22 +45,21 @@
 <script src="{{ asset('theme/AdminLTE/dist/js/adminlte.min.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 {{-- <script src="{{ asset('theme/AdminLTE/dist/js/pages/dashboard.js')}}"></script> --}}
-{{--<script src="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/js/bootstrap-colorselector.js')}}"></script>--}}
+<script src="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/js/bootstrap-colorselector.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/dataTables.buttons.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
 {{ Html::script( asset('js/sweetalert2.all.js')) }}
-<script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
-<script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
+{{-- <script src="{{ asset('theme/AdminLTE/plugins/validate/jquery.validate.min.js')}}"></script>
+<script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script> --}}
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
 
-<script src="{{ asset('js/app.js')}}"></script>
 
-
-{{--<script>
+<script>
     $('.colorselector').colorselector();
-</script>--}}
+</script>
 <script>
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();

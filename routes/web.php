@@ -109,8 +109,11 @@ Route::middleware(['auth','web'])->group(function () {
 	// survey creator/surveyor
 	Route::get('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
 	Route::post('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
-	Route::get('/assessment/{id}/analyze/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.analyze.doneView');
+	Route::get('/assessment/{id}/analyze/view/{inputans}', 'Survey\SurveyController@analyzeView')->name('survey.analyze.doneView');
 	Route::post('/assessment/{id}/invite', 'Survey\SurveyController@invite')->name('survey.invite');
+	Route::post('/assessment/{id}/editMember', 'Survey\SurveyController@editMember')->name('survey.editMember');
+	Route::post('/assessment/{id}/deleteMember/{user_id}', 'Survey\SurveyController@deleteMember')->name('survey.deleteMember');
+	Route::post('/assessment/{id}/editProcessLevel', 'Survey\SurveyController@editProcessLevel')->name('survey.editProcessLevel');
 	// survey agregation
 	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
 	Route::get("/assessment/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");
@@ -118,6 +121,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/assessment/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::get('/assessment/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
 	Route::get('/assessment/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
+	Route::post('/assessment/get_process_list', 'Survey\SurveyController@get_process_list');
 
 	Route::get('/assessment/{id}/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
 	Route::get('/assessment/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
@@ -134,6 +138,10 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/setting/users','Setting\SettingController@create_user')->name('setting.create_user');
 	Route::get('/setting/users/{id}', 'Setting\SettingController@get_user_by_id');
 	Route::post('/setting/users/edit_user','Setting\SettingController@edit_user')->name('setting.edit_user');
+	Route::get('/setting/blackwhitelist', 'Setting\SettingController@blackwhitelist')->name('setting.blackwhitelist');
+	Route::post('/setting/updateblackwhitelist','Setting\SettingController@update_blackwhitelist')->name('setting.update_blackwhitelist');
+	Route::get('/setting/profile', 'Setting\SettingController@profile_user')->name('setting.profile');
+	Route::post('/setting/update_profile_user','Setting\SettingController@update_profile_user')->name('setting.update_profile_user');
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");

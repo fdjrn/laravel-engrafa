@@ -58,9 +58,9 @@
                 <label for="i_n_survey_type" class="col-sm-2 control-label">Drivers</label>
 
                 <div class="col-sm-2">
-                  <input name="drivers_purpose" id="drivers_purpose" value="1-Purpose" style="vertical-align:middle" type="checkbox">&nbsp;Purpose
+                  <input name="drivers_purpose" id="drivers_purpose" value="Purpose" style="vertical-align:middle" type="checkbox">&nbsp;Purpose
                   <br>
-                  <input name="drivers_pain" id="drivers_pain" value="2-Pain" style="vertical-align:middle" type="checkbox">&nbsp;Pain Point
+                  <input name="drivers_pain" id="drivers_pain" value="Pain Point" style="vertical-align:middle" type="checkbox">&nbsp;Pain Point
                   <!-- <select id="i_n_survey_type" name="i_n_survey_type" class="form-control select2" data-placeholder="Drivers"
                           style="width: 100%;" >
                     <option value=""></option>
@@ -84,7 +84,7 @@
                         @if($datait->pp == '1-Purpose')
                           <div class="list-itgoal-purpose">
                             <label style="display:block">
-                              <input name="i_itgoal[1-Purpose][]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox" >
+                              <input name="i_itgoal[]" class="c_itgoal" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox" >
                               <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
                             </label>
                           </div>
@@ -107,7 +107,7 @@
                         @if($datait->pp == '2-Pain')
                           <div class="list-itgoal-pain">
                             <label style="display:block">
-                              <input name="i_itgoal[2-Pain][]" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox">
+                              <input name="i_itgoal[]" class="c_itgoal" value="{{$datait->id}}" style="vertical-align:middle" type="checkbox">
                               <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
                             </label>
                           </div>
@@ -120,7 +120,7 @@
                   <div class="box box-default" id="list-itgoal" style="overflow-x:hidden; overflow-y: auto; max-height: 520px;">
                     <div class="box-header">
                       <a href="#" data-widget="collapse">
-                        <h5 style="margin:2px 0px;">List EDM</h5>
+                        <h5 style="margin:2px 0px;">Process List</h5>
                       </a>
                       <div class="box-tools pull-right">
                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -128,68 +128,9 @@
                       </div>
                     </div>
                     <div class="box-body">
-                      @foreach($dataItGoal as $datait)
-                        @if($datait->pp == '1-Purpose')
-                          <div class="list-itgoal-purpose" style="padding-right: 9px;">
-                            <div id="1-Purpose-{{$datait->id}}" class="list_edm" style="display: none;">
-                              <label style="display:block">
-                                <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
-                              </label>
-                              @foreach($dataItGoalToProcess as $dataitprocess)
-                                @if($dataitprocess->it_goal == $datait->id)
-                                <div class="form-group">
-                                  <label class="col-sm-6 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
-                                  <input type="hidden" name="i_itgoal_process[1-Purpose][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
-                                  <div class="col-sm-6" style="padding-left: 2px; padding-right: 2px;">
-                                    <select name="i_itgoal_process_level[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
-                                      @foreach($dataLevel as $key => $level)
-                                      <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
-                                      @endforeach
-                                    </select>
-                                    <input name="i_itgoal_process_percent[1-Purpose][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='hidden' class="form-control" />
-                                    <!-- <span class="input-group-addon">%</span> -->
-                                  </div>
-                                  <!-- <div class="col-sm-3" style="padding-left:1px;">
-                                    <div class='input-group' id='i_itgoal_process_percent'>
-                                    </div>
-                                  </div> -->
-                                </div>
-                                @endif
-                              @endforeach
-                            </div>
-                          </div>
-                        @endif
-                        @if($datait->pp == '2-Pain')
-                          <div class="list-itgoal-pain" style="padding-right: 9px;">
-                            <div id="2-Pain-{{$datait->id}}" class="list_edm" style="display: none;">
-                              <label style="display:block">
-                                <span  style="vertical-align:middle; padding-top: 4px;">{{$datait->name}}</span>
-                              </label>
-                              @foreach($dataItGoalToProcess as $dataitprocess)
-                                @if($dataitprocess->it_goal == $datait->id)
-                                <div class="form-group">
-                                  <label class="col-sm-6 control-label" for="sName"  style="padding-right:1px;">{{$dataitprocess->process}}&nbsp;&nbsp;Target : </label>
-                                  <input type="hidden" name="i_itgoal_process[2-Pain][{{$datait->id}}][]" value="{{$dataitprocess->process}}">
-                                  <div class="col-sm-6" style="padding-left: 2px; padding-right: 2px;">
-                                    <select name="i_itgoal_process_level[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" class="form-control select2" id="sName" data-placeholder="Select Level">
-                                      @foreach($dataLevel as $key => $level)
-                                      <option value="{{$level->level}}" {{ $key === 0 ? 'selected' : '' }}>Level&nbsp;{{$level->level}}</option>
-                                      @endforeach
-                                    </select>
-                                    <input name="i_itgoal_process_percent[2-Pain][{{$datait->id}}][{{$dataitprocess->process}}]" value="100" type='hidden' class="form-control" />
-                                    <!-- <span class="input-group-addon">%</span> -->
-                                  </div>
-                                  <!-- <div class="col-sm-3" style="padding-left:1px;">
-                                    <div class='input-group' id='i_itgoal_process_percent'>
-                                    </div>
-                                  </div> -->
-                                </div>
-                                @endif
-                              @endforeach
-                            </div>
-                          </div>
-                        @endif
-                      @endforeach
+                      <p class="l_process_list text-center">Loading...</p>
+                      <div id="d_process_list">
+                      </div>
                     </div>
                   </div>
                 </div>

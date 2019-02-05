@@ -71,20 +71,20 @@
           <form name="form_q_survey" action="" method="post" id="form_q_survey">
           {{ csrf_field() }}
           @foreach($levels as $index => $level)
-            <div class="box box-primary">
+            <div class="box box-primary collapsed-box">
               <div class="box-header">
                 <a href="#" data-widget="collapse">
                   <h4 style="margin:2px 0px;">Level {{$index}}</h4>
                 </a>
                 <div class="box-tools pull-right">
-                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                   </button>
                 </div>
               </div>
 
-              <div id="question" class="box-body collapse in form-horizontal">
+              <div id="question" class="box-body collapse in form-horizontal" style="display: none;">
                 <div class="form-group">
-                  <label for="i_n_surveyor" class="col-sm-2 control-label">Process</label>
+                  <label for="i_n_surveyor" class="col-sm-2 control-label">Objective</label>
 
                   <div class="col-sm-10">
                     <div style="border: solid thin #d2d6de; padding:4px;">
@@ -104,8 +104,8 @@
                         <div class="row" style="margin-top: 4px;">
                           <div class="col-sm-3">
                             <div>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="yes" checked> Yes<br>
-                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="no"> No
+                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="yes" onclick="checkWP('{{ $survey->id }},{{ $survey_id }}')"> Yes<br>
+                              <input type="radio" name="metcriteria[{{$survey->id}}]" value="no"checked> No
                             </div>
                           </div>
                           <div class="col-sm-9">

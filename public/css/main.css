@@ -191,3 +191,8 @@ select[readonly].select2 + .select2-container {
     display: none;
   }
 }
+
+div.dt-buttons {
+  float: right;
+  margin-left:10px;
+}
