@@ -27,8 +27,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::middleware(['auth','web'])->group(function () {
+	// Route::get('/home', 'HomeController@index')->name('home');
 
-	Route::get('/', 'Homepage\HomepageController@index');
+	// Route::get('/', 'HomeController@index');
 
 	// dashboard
 	Route::get('/','Dashboard\DashboardController@index')->name('dashboard');
@@ -55,6 +56,15 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/index','Index\IndexController@index')->name('index');
     Route::post('/index','Index\IndexController@index')->name('index.last.folder');
     Route::get('/index/list-all/{id}','Index\IndexController@getListAll');
+	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard'); 
+	Route::get('/ajax/edit-survey/{id}', 'Dashboard\DashboardController@ajax_edit_survey');
+	
+
+	// index & file explorer
+	Route::get('/index','Index\IndexController@index')->name('index');
+	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
+    Route::get('/index/list-all','Index\IndexController@getListAll');
+    Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');
     Route::get('/index/list-all-previous/{id}','Index\IndexController@getListAllPrevious');
     Route::get('/index/list-folder/{id}','Index\IndexController@getListAllFolder');
     Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
@@ -85,6 +95,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/file-history/{id}','Index\IndexController@showFileHistory');
 
+	Route::get('/fileexplorer','FileExplorer\FileExplorerController@index');
 
 	// chat
     Route::get('/chat','Chat\ChatController@index')->name('chat');
@@ -104,37 +115,15 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/notification/read/all','Notification\NotificationController@readAll');
 
 	// survey
-	Route::get('/assessment/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
-	// survey responden
-	Route::get('/assessment/{id}/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
-	Route::post('/assessment/{id}/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
-	Route::post('/assessment/answer/uploadWp/{id}','Survey\SurveyController@uploadWp')->name('survey.answer.uploadWp');
-	Route::get('/assessment/{id}/answer/view/{inputans}', 'Survey\SurveyController@doneView')->name('survey.answer.doneView');
-
-	// survey creator/surveyor
-	Route::get('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyze')->name('survey.analyze');
-	Route::post('/assessment/{id}/analyze/{inputans}', 'Survey\SurveyController@analyzePost')->name('survey.analyze.post');
-	Route::get('/assessment/{id}/analyze/view/{inputans}', 'Survey\SurveyController@analyzeView')->name('survey.analyze.doneView');
-	Route::post('/assessment/{id}/invite', 'Survey\SurveyController@invite')->name('survey.invite');
-	Route::post('/assessment/{id}/editMember', 'Survey\SurveyController@editMember')->name('survey.editMember');
-	Route::post('/assessment/{id}/deleteMember/{user_id}', 'Survey\SurveyController@deleteMember')->name('survey.deleteMember');
-	Route::post('/assessment/{id}/editProcessLevel', 'Survey\SurveyController@editProcessLevel')->name('survey.editProcessLevel');
-	// survey agregation
-	// Route::get("/aggregation/{surveyid}","Survey\AggregationDummyController@index")->name("survey.agregation");
-	Route::get("/assessment/aggregat/{surveyid}","Survey\SurveyController@getData")->name("survey.get.agregation");
-	// survey common
-	Route::get('/assessment/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
-	Route::get('/assessment/viewWp/{file}', 'Survey\SurveyController@viewWp')->name('survey.file.viewWp');
-	Route::get('/assessment/downloadWp/{file}', 'Survey\SurveyController@downloadWp')->name('survey.file.downloadWp');
-	Route::post('/assessment/get_process_list', 'Survey\SurveyController@get_process_list');
-
-	Route::get('/assessment/{id}/ajax_get_list_user/{condition}', 'Survey\SurveyController@ajax_get_list_user');
-	Route::get('/assessment/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
-	Route::post('/assessment/{id}/task','Survey\SurveyController@task_store')->name('survey.task.store');
-	Route::post('/assessment/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');
-	Route::get('/assessment/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
-
-	Route::get('/assessment/{id}/chat','Survey\SurveyController@chat')->where('id', '[0-9]+')->name('survey.chat');
+	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
+	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
+	Route::get('/survey/add/question/test','Survey\SurveyController@test');
+	Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
+	Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
+	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
+	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
+	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
+	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 
 	//setting
