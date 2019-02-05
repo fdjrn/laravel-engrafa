@@ -199,7 +199,7 @@
                       @if($blackUsers->count() > 0)
                         @foreach($blackUsers as $user)
                           <tr>
-                            <td><i class="fa fa-check-circle-o"></i></td>
+                            <td><i class="fa fa-ban"></i></td>
                             <td>{{$user->name}}</td>
                             <td style="text-align:right;">
                               <label class="switch">
