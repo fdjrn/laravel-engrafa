@@ -101,33 +101,74 @@ class DashboardController extends Controller
     {
         $input = $request->all();
         
-        $input_dashboard_chart = [
-            'dashboard' => $input['id_dashboard'],
-            'name' => $input['name'],
-            'chart_type' => $input['chart']
-        ];
+        if(isset($input['id'])){
+            // dd($input);
+            $input_dashboard_chart_update = [
+                'name' => $input['title'],
+                'chart_type' => $input['chart']
+            ];
 
-        $userid = Auth::user()->id;
+            $userid = Auth::user()->id;
+            $edit_charts = Dashboard_charts::find($input['id']);
+            $edit_charts->update($input_dashboard_chart_update);
 
-        $charts = Dashboard_charts::create($input_dashboard_chart);
-        if ($charts) {
-            $count_survey = count($input['survey']);
-            for ($i=0; $i < $count_survey; $i++) { 
-                $input_dashboard_survey = [
-                    'survey' => $input['survey'][$i],
-                    'chart' => $charts->id // get last insert id from charts 
-                ];
-                
-                $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+            if($edit_charts){
+                $count_survey = count($input['survey']);
+                $count_dashboard_survey_id = count($input['dashboard_survey_id']);
+
+                for ($i=0, $k=0; $i < $count_survey; $i++, $k++) { 
+                    $edit_dashboard_survey = Dashboard_survey::find($input['dashboard_survey_id'][$k]);
+                    $edit_dashboard_survey->update(['survey' => $input['survey'][$i]]);
+                }
+
+                if ($edit_dashboard_survey) {
+                    if(isset($input['survey_new'])){
+                        $count_survey = count($input['survey_new']);
+                        for ($i=0; $i < $count_survey; $i++) { 
+                            $input_dashboard_survey = [
+                                'survey' => $input['survey_new'][$i],
+                                'chart' => $input['id'] // get last insert id from charts 
+                            ];
+                            $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+                        }
+                    }
+                    return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil di rubah']);
+                } else {
+                    return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal edit ke tabel Dashboard Survey']);
+                }
+            }else{
+                return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal merubah chart']);
             }
 
-            if ($dashboard_survey) {
-                return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil ditambahkan']);
+        }else{
+            $input_dashboard_chart = [
+                'dashboard' => $input['id_dashboard'],
+                'name' => $input['name'],
+                'chart_type' => $input['chart']
+            ];
+    
+            $userid = Auth::user()->id;
+    
+            $charts = Dashboard_charts::create($input_dashboard_chart);
+            if ($charts) {
+                $count_survey = count($input['survey']);
+                for ($i=0; $i < $count_survey; $i++) { 
+                    $input_dashboard_survey = [
+                        'survey' => $input['survey'][$i],
+                        'chart' => $charts->id // get last insert id from charts 
+                    ];
+                    
+                    $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+                }
+    
+                if ($dashboard_survey) {
+                    return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil ditambahkan']);
+                } else {
+                    return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Dashboard Survey']);
+                }
             } else {
-                return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Dashboard Survey']);
+                return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Survey']);
             }
-        } else {
-            return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal input ke tabel Survey']);
         }
     }
 
@@ -216,6 +257,19 @@ class DashboardController extends Controller
         return response()->json($response);
     }
 
+    public function ajax_delete_survey(Request $request)
+    {
+        $delete_survey = Dashboard_survey::destroy($request->dashboard_survey_id);
+        // jika berhasil di delete kasih response
+        if ($delete_survey) {
+            $response = 1;
+        } else {
+            $response = 0;
+        }
+
+        return response()->json($response);
+    }
+
     public function ajax_share_to(Request $request) {
         $userid = Auth::user()->id;
 
@@ -238,5 +292,14 @@ class DashboardController extends Controller
         }
 
         return response()->json($response);
+    }
+    public function ajax_edit_survey($chart_id){
+        $data = DB::table("charts")
+                ->select('charts.id as charts_id', 'charts.name', 'charts.chart_type', 'surveys.id as surveys_id', 'dashboard_surveys.id as dashboard_survey_id')
+                ->leftJoin('dashboard_surveys','charts.id','dashboard_surveys.chart')
+                ->leftJoin('surveys','dashboard_surveys.survey','surveys.id')
+                ->where('dashboard_surveys.chart', $chart_id)
+                ->get();
+        return response()->json($data);
     }
 }

@@ -28,8 +28,7 @@ Auth::routes();
 
 Route::middleware(['auth','web'])->group(function () {
 
-
-	Route::get('/', 'Homepage\HomepageController@index');
+	// Route::get('/', 'HomeController@index');
 
 	// dashboard
 	Route::get('/','Dashboard\DashboardController@index')->name('dashboard');
@@ -38,8 +37,11 @@ Route::middleware(['auth','web'])->group(function () {
 
 	Route::get('/ajax_get_list_user', 'Dashboard\DashboardController@ajax_get_list_user');
 	Route::post('/ajax_delele_dashboard', 'Dashboard\DashboardController@ajax_delele_dashboard');
+	Route::post('/ajax_delete_survey', 'Dashboard\DashboardController@ajax_delete_survey');
 	Route::post('/ajax_share_to', 'Dashboard\DashboardController@ajax_share_to');
 	Route::post('/ajax_get_dashboard', 'Dashboard\DashboardController@ajax_get_dashboard'); 
+	Route::get('/ajax/edit-survey/{id}', 'Dashboard\DashboardController@ajax_edit_survey');
+	
 
 	// index & file explorer/homepages
     Route::get('/homepage','Homepage\HomepageController@index')->name('homepage');
@@ -50,6 +52,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get('/index','Index\IndexController@index')->name('index');
     Route::post('/index','Index\IndexController@index')->name('index.last.folder');
     Route::get('/index/list-all/{id}','Index\IndexController@getListAll');
+
     Route::get('/index/list-all-previous/{id}','Index\IndexController@getListAllPrevious');
     Route::get('/index/list-folder/{id}','Index\IndexController@getListAllFolder');
     Route::get('/index/list-folder-previous/{id}','Index\IndexController@getListPreviousFolder');
@@ -79,7 +82,6 @@ Route::middleware(['auth','web'])->group(function () {
 
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/file-history/{id}','Index\IndexController@showFileHistory');
-
 
 	// chat
     Route::get('/chat','Chat\ChatController@index')->name('chat');
@@ -142,6 +144,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/setting/updateblackwhitelist','Setting\SettingController@update_blackwhitelist')->name('setting.update_blackwhitelist');
 	Route::get('/setting/profile', 'Setting\SettingController@profile_user')->name('setting.profile');
 	Route::post('/setting/update_profile_user','Setting\SettingController@update_profile_user')->name('setting.update_profile_user');
+
 
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");

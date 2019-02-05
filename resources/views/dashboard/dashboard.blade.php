@@ -153,36 +153,31 @@
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Survey</h4>
       </div>
-      <form class="form-horizontal">
+      <form class="form-horizontal" method="POST" action="{{ route('dashboard.post.chart') }}">
+        <!-- menyisipkan field id -->
+        <input type="hidden" class="form-control" id="id" name="id">
+
         <div class="modal-body">
           <div class="form-group">
             <label class="control-label col-sm-3">Title</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control" id="title" placeholder="Title">
+              <!-- menyisipkan field dashboard_survey_id -->
+              <input type="text" class="form-control" id="title" placeholder="Title" name="title">
             </div>
           </div>
+
           <!-- select -->
-          <div class="form-group">
-            <label class="control-label col-sm-3">Pilih Survey</label>
-            <div class="col-sm-9">
-                <select class="form-control" id="survey_id" name="survey">
-                    @foreach ($surveys as $item)
-                      <option value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-          </div>
+          <div id="select-container"></div>
+
           <div class="form-group">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
               <div class="checkbox">
-                <label>
-                  <input type="checkbox">
-                  Comparison
-                </label>
+                <a href="#" class="btn btn-success" id="add-compare"><i class="fa fa-plus"> Add Comparison</i></a>
               </div>
             </div>
           </div>
+
           <div class="form-group">
             <div class="row">
             @if (empty($chart_type))
@@ -216,6 +211,7 @@
           </div>
         </div>
         <div class="modal-footer justify-content-between">
+          {{ Form::token() }}
           <button type="submit" class="btn btn-primary pull-right">Done</button>
         </div>
       </div>
@@ -464,7 +460,7 @@
                                           'title="Share">'+
                                     '<i class="fa fa-share"></i></button>'+
                                     '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
-                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
+                                          'title="Edit" data-chart_id="'+element.id+'" data-dashboard_id="'+dashboard_id+'">'+
                                     '<i class="fa fa-gear"></i></button>'+
                                 '</div>'+
                               '</div>'+
@@ -606,7 +602,7 @@
                   }
                   
                 });
-            } else {
+              } else {
                 console.log('hide');
               }
             }
@@ -645,7 +641,7 @@
                                           'title="Share">'+
                                     '<i class="fa fa-share"></i></button>'+
                                     '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
-                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
+                                          'title="Edit" data-chart_id="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
                                     '<i class="fa fa-gear"></i></button>'+
                                 '</div>'+
                               '</div>'+
@@ -798,7 +794,7 @@
   </script>
   
   <script>
-    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpat di modal
+    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpan di modal
     $('#modal-choose-chart').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget) // Button that triggered the modal
       var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
@@ -810,31 +806,97 @@
     
     // script untuk membuat set value edit dashboard
     $('#modal-dashboard-edit').on('show.bs.modal', function (event) {
+      var $modal = $(this)  
+
+      // clear dulu isi modalnya
+      $modal.find('input[name="title"]').val('');
+      $modal.find('#select-container').html('');
+      $modal.find("input[name=chart]").removeAttr("checked");
+      $('#ck-comparison2').prop('checked', false);
+      $modal.find("input[name=comparison]").removeAttr('checked');
+
+      // hide comparison field
+      $(".fieldset-edit").hide();
+      $('.select-compare').attr( "disabled", "disabled" ); // Elements(s) are now disabled.
+
+      var cb = $('#ck-comparison2')
       var button = $(event.relatedTarget) // Button that triggered the modal
+      var chart_id = button.data('chart_id') // Extract info from data-* attributes
 
-      var dashboard_id = button.data('idnya') // Extract info from data-* attributes
-      var title = button.data('title') // Extract info from data-* attributes
-      var chart_type = button.data('chart_type') // Extract info from data-* attributes
-      var survey_id = button.data('surveyid') // Extract info from data-* attributes
+      $modal.find('#id').val(chart_id);
+      
+      $.get(base_url + "/ajax/edit-survey/" + chart_id, function(oResp) {
+        console.log(oResp)
+        oResp.forEach(function (element, index) {
+          // 1. append dulu select nya
+          // 2. set id nya berdasarkan foreach nya
+          $("#select-container").append(
+            '<div class="form-group" id="row_survey_'+element.dashboard_survey_id+'">'+
+              '<label class="control-label col-sm-3">Pilih Survey</label>'+
+              '<input type="hidden" value="'+element.dashboard_survey_id+'" name="dashboard_survey_id[]">'+
+              '<div class="col-sm-7">'+
+                '<select class="form-control" id="survey_id_'+index+'" name="survey[]">'+
+                      '@foreach ($surveys as $item)'+
+                        '<option value="{{ $item->id }}">{{ $item->name }}</option>'+
+                      '@endforeach'+
+                  '</select>'+
+              '</div>'+
+              '<div class="col-sm-2">'+
+                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+              '</div>'+
+            '</div>'
+          );
+          // 3. sudah di append dom nya baru di set value nya berdasarkan id for nya
+          $modal.find('input[name="title"]').val(element.name);
+          $modal.find('#survey_id_'+index).val(element.surveys_id);
+          $modal.find("input[name=chart][value=" + element.chart_type + "]").attr('checked', 'checked');
+        });
+      });
 
-      // var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-      // $.ajax({
-      //   type: "POST",
-      //   url: base_url+'/ajax_get_dashboard',
-      //   data: { _token: CSRF_TOKEN, id : dashboard_id },
-      //   dataType: "JSON",
-      //   success: function (data) {
-      //     console.log(data)
-      //   }
-      // });
-
-      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-      var modal = $(this)
-      modal.find('#title').val(title)
-      modal.find('#survey_id option[value="'+survey_id+'"]')
-      modal.find("input[name=chart][value=" + chart_type + "]").attr('checked', 'checked');
     })
+
+    /**
+    * hapusSurvey()
+    * For deleting survey on edit form
+     */
+    function hapusSurvey(dashboard_survey_id){
+      Swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+            type: "POST",
+            url: base_url+'/ajax_delete_survey',
+            data: { _token: CSRF_TOKEN, 'dashboard_survey_id': dashboard_survey_id },
+            dataType: "JSON",
+            success: function (response) {
+              if(response==1){
+                  Swal(
+                  'Deleted!',
+                  'Survey has been deleted Successfully!',
+                  'success'
+                )
+                // window.location.href = base_url;
+                $('#row_survey_'+dashboard_survey_id).remove()
+
+              } else {
+                  Swal(
+                    'Failed!',
+                    'Dashboard failed to delete!',
+                    'error'
+                )
+              }
+            }
+          });
+        }
+      });
+    }
   </script>
 
   <script>
@@ -1073,7 +1135,43 @@
             console.log('update menjadi checked');
           }
         });
+
+        // fungsi untuk menambahkan select survey
+        var cb2 = $('#add-compare');
+        // set global variabel untuk count append survey dimulai dari 0
+        var count_cb2 = 0;
+
+        cb2.on("click", function() {
+          // mengambil id select terakhir
+          var last_id_select = $('input[name*="survey"]').length;
+          console.log(this)
+          $("#select-container").append(
+            '<div class="form-group" id="count-cb2-'+count_cb2+'">'+
+              '<div class="survey_new">'+
+                '<label class="control-label col-sm-3">Pilih Survey</label>'+
+                '<div class="col-sm-7">'+
+                  '<select class="form-control" id="survey_id_'+last_id_select+'" name="survey_new[]">'+
+                        '@foreach ($surveys as $item)'+
+                          '<option value="{{ $item->id }}">{{ $item->name }}</option>'+
+                        '@endforeach'+
+                    '</select>'+
+                '</div>'+
+                '<div class="col-sm-2">'+
+                  '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="removeNewSurvey('+count_cb2+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+                '</div>'+
+              '</div>'+
+            '</div>'
+          );
+          count_cb2++;
+
+        });
+
       });
+
+      function removeNewSurvey(counter){
+        $("#count-cb2-"+counter).remove()
+      }
+
   </script>
 
   {{-- Select Users --}}
