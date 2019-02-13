@@ -66,7 +66,7 @@ class IndexController extends Controller
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
 
                 if ($file->is_file === 1 ) {
-                    if(auth()->user()->role <= '4') {
+                    if(auth()->user()->role <= 4) {
                         $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
                             '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
                             '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.

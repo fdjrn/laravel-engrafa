@@ -424,6 +424,7 @@
                         // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
                       }
                     }
+
                     $('#box-' + dashboard_id).append(div_class +
                               '<!-- Default box -->'+
                               '<div class="box box-primary">'+
@@ -659,6 +660,7 @@
                         // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
                       }
                     }
+
                     $('#box-' + dashboard_id).append(div_class +
                               '<!-- Default box -->'+
                               '<div class="box box-primary">'+
@@ -1181,6 +1183,7 @@
 
   {{-- Show hide comparison --}}
   <script>
+
     $(document).ready(function() {
       var cb = $('#ck-comparison');
 
@@ -1233,6 +1236,7 @@
     function removeNewSurvey(counter){
       $("#count-cb2-"+counter).remove()
     }
+
 
   </script>
 
