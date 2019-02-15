@@ -30,6 +30,11 @@
               <h4><i class="fa fa-ban"></i>&nbsp;<span>Blacklist and Whitelist</span></h4>
             </a>
           </li>
+          <li class="">
+            <a href="{{route('setting.backuprestore')}}">
+              <h4><i class="fa fa-database"></i>&nbsp;<span>Backup and Restore</span></h4>
+            </a>
+          </li>
           <li class="footer">
             <div class="footer-tools">
               <a href="#">

@@ -21,12 +21,23 @@ class SettingController extends Controller
      */
     public function index()
     {
-        //
+        $userId = Auth::id();
+        $data['user_role'] = DB::table('users')
+            ->select('role')
+            ->where('id', '=', $userId)
+            ->get();
+
         return view('setting.index');  
     }
 
     public function users()
     {
+        $userId = Auth::id();
+        $data['user_role'] = DB::table('users')
+            ->select('role')
+            ->where('id', '=', $userId)
+            ->get();
+            
         $data['users'] = DB::table('users')
             ->select('*')
             ->whereNotNull('role')
@@ -216,6 +227,12 @@ class SettingController extends Controller
 
     public function blackwhitelist()
     {
+        $userId = Auth::id();
+        $data['user_role'] = DB::table('users')
+            ->select('role')
+            ->where('id', '=', $userId)
+            ->get();
+
         $data['whiteUsers'] = DB::table('users')
             ->select('*')
             ->where('is_blacklist', '=', 0)
@@ -267,6 +284,12 @@ class SettingController extends Controller
     public function profile_user()
     {
         $userId = Auth::id();
+
+        $data['user_role'] = DB::table('users')
+            ->select('role')
+            ->where('id', '=', $userId)
+            ->get();
+
         $data['users'] = DB::table('users')
             ->select('*')
             ->where('id', '=', $userId)
@@ -315,6 +338,12 @@ class SettingController extends Controller
             );
         }
 
-        return view('setting.index');
+        return redirect()->action('Setting\SettingController@profile_user');
+
+    }
+
+    public function backuprestore()
+    {
+        return view('setting.backuprestore');
     }
 }

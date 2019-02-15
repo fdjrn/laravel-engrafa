@@ -99,7 +99,7 @@
             @endif
           </div>
           <div class="form-group">
-            <select name="roles" class="select2" style="width: 100%;" data-placeholder="Pilih Role">
+            <select name="roles" class="select2" style="width: 100%;" data-placeholder="Pilih Role" readonly="true">
               <option value=""></option>
               @foreach($data_roles as $role)
               <option value="{{$role->id}}" {{ $role->id == $users[0]->role ? 'selected' : ''}}>{{$role->name}}</option>
