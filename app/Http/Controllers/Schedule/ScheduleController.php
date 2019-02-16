@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Schedules;
 
@@ -16,6 +17,12 @@ class ScheduleController extends Controller
     }
 
     public function schedules_list($year, $month){
+
+    	if (strlen($month) == 1) {
+    		# code...
+    		$month = '0'.$month;
+    	}
+
     	$schedules = Schedules::where('date_from','like',$year."-".$month."%")->get();
     	return json_encode($schedules);
     }
