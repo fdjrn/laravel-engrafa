@@ -65,7 +65,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/index','Index\IndexController@index')->name('index');
 	Route::get('/index/detail','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/list-all','Index\IndexController@getListAll');
-    Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');
+    // Route::get('/index/list-all/{id}','Index\IndexController@getListDetail');
 
     Route::get('/index/list-all-previous/{id}','Index\IndexController@getListAllPrevious');
     Route::get('/index/list-folder/{id}','Index\IndexController@getListAllFolder');
