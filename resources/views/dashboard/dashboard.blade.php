@@ -153,36 +153,31 @@
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Survey</h4>
       </div>
-      <form class="form-horizontal">
+      <form class="form-horizontal" method="POST" action="{{ route('dashboard.post.chart') }}">
+        <!-- menyisipkan field id -->
+        <input type="hidden" class="form-control" id="id" name="id">
+
         <div class="modal-body">
           <div class="form-group">
             <label class="control-label col-sm-3">Title</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control" id="title" placeholder="Title">
+              <!-- menyisipkan field dashboard_survey_id -->
+              <input type="text" class="form-control" id="title" placeholder="Title" name="title">
             </div>
           </div>
+
           <!-- select -->
-          <div class="form-group">
-            <label class="control-label col-sm-3">Pilih Survey</label>
-            <div class="col-sm-9">
-                <select class="form-control" id="survey_id" name="survey">
-                    @foreach ($surveys as $item)
-                      <option value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-          </div>
+          <div id="select-container"></div>
+
           <div class="form-group">
             <div class="col-sm-3"></div>
             <div class="col-sm-9">
               <div class="checkbox">
-                <label>
-                  <input type="checkbox">
-                  Comparison
-                </label>
+                <a href="#" class="btn btn-success" id="add-compare"><i class="fa fa-plus"> Add Comparison</i></a>
               </div>
             </div>
           </div>
+
           <div class="form-group">
             <div class="row">
             @if (empty($chart_type))
@@ -216,6 +211,7 @@
           </div>
         </div>
         <div class="modal-footer justify-content-between">
+          {{ Form::token() }}
           <button type="submit" class="btn btn-primary pull-right">Done</button>
         </div>
       </div>
@@ -324,7 +320,7 @@
 
         <div class="modal-body">
           <!-- select -->
-          <div class="form-group">
+          <div class="form-group" id="select-container">
             <label class="control-label col-sm-3">Pilih Survey</label>
             <div class="col-sm-9">
               <select class="form-control" name="survey[]">
@@ -334,31 +330,6 @@
               </select>
             </div>
           </div>
-
-          <div class="form-group">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-9">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" id="ck-comparison">
-                    Comparison
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <fieldset style="display:none">
-          <div class="form-group">
-            <label class="control-label col-sm-3">Pilih Survey</label>
-            <div class="col-sm-9">
-              <select class="form-control select-compare" name="survey[]" disabled>
-                  @foreach ($surveys as $item)
-                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                  @endforeach
-              </select>
-            </div>
-          </div>
-          </fieldset>
           
         </div>
 
@@ -406,7 +377,6 @@
 @section('page-level-plugins')
   <script src="{{ asset('js/pages/dashboard/Chart.js')}}"></script>
   {{--<script src="{{ asset('js/pages/dashboard/sweetalert2.all.min.js')}}"></script> dipindah ke global theme plugin --}}
-
 @stop
 
 @section('theme-global-scripts')
@@ -417,6 +387,264 @@
     $(document).ready(function() {
         
         var dashboard_id = $('.btn.btn-dashboard').attr('id');
+
+        $('#box-' + dashboard_id).empty();
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+          $.ajax({
+            type: "POST",
+            url: base_url+'/ajax_get_dashboard',
+            data: { _token: CSRF_TOKEN, id : dashboard_id },
+            dataType: "JSON",
+            success: function (data_dashboard) {
+              // console.log(data_dashboard)
+              // console.log(data_dashboard.dashboard[0].id_dashboard)
+              $.ajax({
+                type: "POST",
+                url: base_url+'/ajax_get_charts',
+                data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard },
+                dataType: "JSON",
+                success: function (data_chart) {
+                  // console.log(data_chart);
+                  data_chart.charts.forEach(element_data_chart => {
+                    // menampilkan data chart chart nya
+                    // start 1
+                    if (element_data_chart.chart_type=="1-Batang") {
+                      if (element_data_chart.total_survey > 1) {
+                        var div_class = '<div class="col-md-12 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-batang-'+element_data_chart.id+'" width="50" height="50"></canvas>';
+                      } else if (element_data_chart.total_survey == 1) {
+                        var div_class = '<div class="col-md-4 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-batang-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      }
+                    } else if (element_data_chart.chart_type=="2-Spider") {
+                      if (element_data_chart.total_survey > 1) {
+                        var div_class = '<div class="col-md-12 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      } else if (element_data_chart.total_survey == 1) {
+                        var div_class = '<div class="col-md-4 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      }
+                    }
+
+                    $('#box-' + dashboard_id).append(div_class +
+                              '<!-- Default box -->'+
+                              '<div class="box box-primary">'+
+                                '<div class="box-header with-border">'+
+                                  '<h3 class="box-title">'+element_data_chart.name+'</h3>'+
+
+                                  '<div class="box-tools pull-right">'+
+                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
+                                            'title="Share">'+
+                                      '<i class="fa fa-share"></i></button>'+
+                                      '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
+                                            'title="Edit" data-chart_id="'+element_data_chart.id+'" data-dashboard_id="'+dashboard_id+'">'+
+                                      '<i class="fa fa-gear"></i></button>'+
+                                  '</div>'+
+                                '</div>'+
+                                '<div class="box-body">'+
+                                    '{{-- Grafik Here --}}'+
+                                    '<div class="box">'+
+                                      '<div class="box-body">'+
+                                        '<div id="chart-div-'+element_data_chart.id+'"></div>'+
+                                      '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<!-- /.box-body -->'+
+                              '</div>'+
+                              '<!-- /.box -->'+
+                            '</div>'+
+                          '<!-- /.col-->'
+                    );
+                    // end 1
+                    
+                    // console.log(element_data_chart)
+                    $.ajax({
+                      type: "POST",
+                      url: base_url+'/ajax_get_id_surveys',
+                      data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard, id_chart : element_data_chart.id },
+                      dataType: "JSON",
+                      success: function (data_id_survey) {
+                        // namiplin data survey setiap chart nya
+                        // console.log(data_id_survey)
+                        var chart_type = "";
+                        data_id_survey.id_surveys.forEach(function(element_id_survey, i) {
+                          // nampilin data surveynya ada apa aja
+                          // console.log(i)
+                          // console.log(element_id_survey)
+
+                          // menampilkan chartnya ada berapa aja
+                          if(element_id_survey.chart_type == "1-Batang"){
+                            if (element_data_chart.total_survey > 1) {
+                              chart_type += '<div class="col-lg-4">'+
+                                              '<canvas id="grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                                            '</div>';
+                            }else{
+                              chart_type += '<canvas id="grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                            }
+                          }else if(element_id_survey.chart_type == "2-Spider"){
+                            if (element_data_chart.total_survey > 1) {
+                              chart_type += '<div class="col-lg-4">'+
+                                              '<canvas id="grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                                            '</div>';
+                            }else{
+                              chart_type += '<canvas id="grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                            }
+                          }
+                          $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
+
+                          $.ajax({
+                            type: "POST",
+                            url: base_url+'/ajax_get_data_survey',
+                            data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard, id_survey : element_id_survey.survey },
+                            dataType: "JSON",
+                            success: function (data_survey) {
+                              // console.log(data_survey)
+                              // nampilin data grafiknya
+                              if (element_data_chart.chart_type == "1-Batang") {
+                                if (element_data_chart.total_survey > 1) {
+                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id+"-"+i);
+                                }else{
+                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id);
+                                }
+                                var process_name = [];
+                                var level = [];
+                                var target_level = [];
+                                var percent = [];
+                                var target_percent = [];
+                                var backgroudcolor_target_percent = [];
+                                var bordercolor_target_percent = [];
+                                var backgroudcolor_percent = [];
+                                var bordercolor_percent = [];
+                                
+                                data_survey.surveys.forEach(process => {
+                                  if (element_id_survey.id_charts===element_data_chart.id) {
+                                    process_name.push(process.process);
+                                    level.push(process.level);
+                                    target_level.push(process.target_level);
+                                    percent.push(process.percent);
+                                    target_percent.push(process.target_percent);
+                                    backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                                    bordercolor_percent.push('rgba(200,0,0,0.5)');
+                                  }
+                                });
+                                
+                                var myChart2 = new Chart(ctx2, {
+                                  type: 'bar',
+                                  data: {
+                                    labels: process_name,
+                                    datasets: [{
+                                        label: 'Target Percent %',
+                                        data: target_percent,
+                                        backgroundColor: backgroudcolor_target_percent,
+                                        borderColor: bordercolor_target_percent,
+                                        borderWidth: 1
+                                      },
+                                      {
+                                        label: 'Pencapaian Target %',
+                                        data: percent,
+                                        backgroundColor: backgroudcolor_percent,
+                                        borderColor: bordercolor_percent,
+                                        borderWidth: 1
+                                      }
+                                    ]
+                                  },
+                                  options: {
+                                    scales: {
+                                      yAxes: [{
+                                        stacked: true,
+                                        ticks: {
+                                          beginAtZero: true
+                                        }
+                                      }],
+                                      xAxes: [{
+                                        stacked: true,
+                                        ticks: {
+                                          beginAtZero: true
+                                        }
+                                      }]
+
+                                    }
+                                  }
+                                });
+                              } else if (element_data_chart.chart_type == "2-Spider") {
+                                if (element_data_chart.total_survey > 1) {
+                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id+"-"+i);
+                                }else{
+                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id);
+                                }
+                                var process_name = [];
+                                var level = [];
+                                var target_level = [];
+                                var percent = [];
+                                var target_percent = [];
+                                var backgroudcolor_target_percent = [];
+                                var bordercolor_target_percent = [];
+                                var backgroudcolor_percent = [];
+                                var bordercolor_percent = [];
+                                
+                                data_survey.surveys.forEach(process => {
+                                  if (element_id_survey.id_charts===element_data_chart.id) {
+                                    process_name.push(process.process);
+                                    level.push(process.level);
+                                    target_level.push(process.target_level);
+                                    percent.push(process.percent);
+                                    target_percent.push(process.target_percent);
+                                    backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                                    bordercolor_percent.push('rgba(200,0,0,0.5)');
+                                  }
+                                });
+
+                                var radarChart = new Chart(marksCanvas, {
+                                    type: 'radar',
+                                    data: {
+                                        labels: process_name,
+                                        datasets: [{
+                                            backgroundColor: 'rgba(0,0,200,0.5)',
+                                            label: 'Target Level',
+                                            data: target_level
+                                            },
+                                            {
+                                            backgroundColor: 'rgba(200,0,0,0.5)',
+                                            label: 'Pencapaian Level',
+                                            data: level
+                                            }]
+                                    }
+                                });
+
+                                function addData(chart, label, color, data) {
+                                    chart.data.datasets.push({
+                                      label: label,
+                                      backgroundColor: color,
+                                      data: data
+                                    });
+                                    chart.update();
+                                }
+
+                                // // inserting the new dataset after 3 seconds
+                                // setTimeout(function() {
+
+                                //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
+                                // }, 3000);
+
+                              }
+                            }
+                          }); // tutup ajax keempat
+                        }); // tutup foreach data_id_survey
+                      } // tutup success data id_surveys
+                    });// tutup ajax ketiga
+                  }); // tutup foreach data_chart
+                }
+              }); // tutup ajax kedua
+            } // tutup success data_dashboard
+          }); // tutup ajax paling pertama
+      
+      $('.btn.btn-dashboard').click(function (e) { 
+        e.preventDefault();
+        var dashboard_id = $(this).attr('id');
         $('#box-' + dashboard_id).empty();
 
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
@@ -425,380 +653,259 @@
             url: base_url+'/ajax_get_dashboard',
             data: { _token: CSRF_TOKEN, id : dashboard_id },
             dataType: "JSON",
-            success: function (data) {
-              console.log(data);
-              if (data.charts) {
-                data.charts.forEach(element => {
-                  var survey = [];
-                  data.labels.forEach(surveys => {
-                    if (surveys.charts_id==element.id){
-                      survey.push(surveys.surveys_id);
+            success: function (data_dashboard) {
+              // console.log(data_dashboard)
+              // console.log(data_dashboard.dashboard[0].id_dashboard)
+              $.ajax({
+                type: "POST",
+                url: base_url+'/ajax_get_charts',
+                data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard },
+                dataType: "JSON",
+                success: function (data_chart) {
+                  // console.log(data_chart);
+                  data_chart.charts.forEach(element_data_chart => {
+                    // menampilkan data chart chart nya
+                    // start 1
+                    if (element_data_chart.chart_type=="1-Batang") {
+                      if (element_data_chart.total_survey > 1) {
+                        var div_class = '<div class="col-md-12 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-batang-'+element_data_chart.id+'" width="50" height="50"></canvas>';
+                      } else if (element_data_chart.total_survey == 1) {
+                        var div_class = '<div class="col-md-4 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-batang-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      }
+                    } else if (element_data_chart.chart_type=="2-Spider") {
+                      if (element_data_chart.total_survey > 1) {
+                        var div_class = '<div class="col-md-12 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      } else if (element_data_chart.total_survey == 1) {
+                        var div_class = '<div class="col-md-4 align-self-center">';
+                        // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
+                      }
                     }
-                  });
-                  if (element.chart_type=="1-Batang") {
-                    if (survey.length>1) {
-                      var div_class = '<div class="col-md-12 align-self-center">';
-                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="50" height="50"></canvas>';
-                    } else if (survey.length==1) {
-                      var div_class = '<div class="col-md-4 align-self-center">';
-                      var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
-                    }
-                  } else if (element.chart_type=="2-Spider") {
-                    if (survey.length>1) {
-                      var div_class = '<div class="col-md-12 align-self-center">';
-                      var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
-                    } else if (survey.length==1) {
-                      var div_class = '<div class="col-md-4 align-self-center">';
-                      var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
-                    }
-                  }
 
-                  $('#box-' + dashboard_id).append(div_class +
-                            '<!-- Default box -->'+
-                            '<div class="box box-primary">'+
-                              '<div class="box-header with-border">'+
-                                '<h3 class="box-title">'+element.name+'</h3>'+
+                    $('#box-' + dashboard_id).append(div_class +
+                              '<!-- Default box -->'+
+                              '<div class="box box-primary">'+
+                                '<div class="box-header with-border">'+
+                                  '<h3 class="box-title">'+element_data_chart.name+'</h3>'+
 
-                                '<div class="box-tools pull-right">'+
-                                  '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
-                                          'title="Share">'+
-                                    '<i class="fa fa-share"></i></button>'+
-                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
-                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
-                                    '<i class="fa fa-gear"></i></button>'+
+                                  '<div class="box-tools pull-right">'+
+                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
+                                            'title="Share">'+
+                                      '<i class="fa fa-share"></i></button>'+
+                                      '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
+                                            'title="Edit" data-chart_id="'+element_data_chart.id+'" data-dashboard_id="'+dashboard_id+'">'+
+                                      '<i class="fa fa-gear"></i></button>'+
+                                  '</div>'+
                                 '</div>'+
-                              '</div>'+
-                              '<div class="box-body">'+
-                                  '{{-- Grafik Here --}}'+
-                                  chart_type +
-                              '</div>'+
-                              '<!-- /.box-body -->'+
-                            '</div>'+
-                            '<!-- /.box -->'+
-                          '</div>'+
-                        '<!-- /.col-->'
-                  );
-
-                  if (element.chart_type=="1-Batang") {
-                    var ctx2 = document.getElementById("grafik-batang-"+element.id);
-                    var process_name = [];
-                    var level = [];
-                    var target_level = [];
-                    var percent = [];
-                    var target_percent = [];
-                    var backgroudcolor_target_percent = [];
-                    var bordercolor_target_percent = [];
-                    var backgroudcolor_percent = [];
-                    var bordercolor_percent = [];
-                    
-                    data.process.forEach(process => {
-                      if (process.charts_id===element.id) {
-                        process_name.push(process.process);
-                        level.push(process.level);
-                        target_level.push(process.target_level);
-                        percent.push(process.percent);
-                        target_percent.push(process.target_percent);
-                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
-                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
-                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
-                        bordercolor_percent.push('rgba(200,0,0,0.5)');
-                      }
-                    });
-                    
-                    var myChart2 = new Chart(ctx2, {
-                      type: 'bar',
-                      data: {
-                        labels: process_name,
-                        datasets: [{
-                            label: 'Target Percent %',
-                            data: target_percent,
-                            backgroundColor: backgroudcolor_target_percent,
-                            borderColor: bordercolor_target_percent,
-                            borderWidth: 1
-                          },
-                          {
-                            label: 'Pencapaian Target %',
-                            data: percent,
-                            backgroundColor: backgroudcolor_percent,
-                            borderColor: bordercolor_percent,
-                            borderWidth: 1
-                          }
-                        ]
-                      },
-                      options: {
-                        scales: {
-                          yAxes: [{
-                            stacked: true,
-                            ticks: {
-                              beginAtZero: true
-                            }
-                          }],
-                          xAxes: [{
-                            stacked: true,
-                            ticks: {
-                              beginAtZero: true
-                            }
-                          }]
-
-                        }
-                      }
-                    });
-                  } else if (element.chart_type=="2-Spider") {
-                    var marksCanvas = document.getElementById("grafik-spider-"+element.id);
-                    var survey_name = [];
-                    var process_name = [];
-                    var level = [];
-                    var target_level = [];
-                    var percent = [];
-                    var target_percent = [];
-                    var backgroudcolor_target_percent = [];
-                    var bordercolor_target_percent = [];
-                    var backgroudcolor_percent = [];
-                    var bordercolor_percent = [];
-                    
-                    data.process.forEach(process => {
-                      if (process.charts_id==element.id) {
-                        survey_name.push(process.name);
-                        process_name.push(process.process);
-                        level.push(process.level);
-                        target_level.push(process.target_level);
-                        percent.push(process.percent);
-                        target_percent.push(process.target_percent);
-                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
-                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
-                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
-                        bordercolor_percent.push('rgba(200,0,0,0.5)');
-                      }
-                    });
-
-                    var radarChart = new Chart(marksCanvas, {
-                        type: 'radar',
-                        data: {
-                            labels: process_name,
-                            datasets: [{
-                                backgroundColor: 'rgba(0,0,200,0.5)',
-                                label: 'Target Level',
-                                data: target_level
-                                },
-                                {
-                                backgroundColor: 'rgba(200,0,0,0.5)',
-                                label: 'Pencapaian Level',
-                                data: level
-                                }]
-                        }
-                    });
-
-                    function addData(chart, label, color, data) {
-                        chart.data.datasets.push({
-                          label: label,
-                          backgroundColor: color,
-                          data: data
-                        });
-                        chart.update();
-                    }
-
-                    // // inserting the new dataset after 3 seconds
-                    // setTimeout(function() {
-
-                    //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
-                    // }, 3000);
-
-                  }
-                  
-                });
-            } else {
-                console.log('hide');
-              }
-            }
-          });
-
-      
-      $('.btn.btn-dashboard').click(function (e) { 
-        e.preventDefault();
-        var dashboard_id = $(this).attr('id');
-        $('#box-' + dashboard_id).empty();
-
-        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $.ajax({
-          type: "POST",
-          url: base_url+'/ajax_get_dashboard',
-          data: { _token: CSRF_TOKEN, id : dashboard_id },
-          dataType: "JSON",
-          success: function (data) {
-            console.log(data);
-            if (data.charts) {
-                data.charts.forEach(element => {
-                  if (element.chart_type=="1-Batang") {
-                    var chart_type = '<canvas id="grafik-batang-'+element.id+'" width="400" height="400"></canvas>';
-                  } else if (element.chart_type=="2-Spider") {
-                    var chart_type = '<canvas id="grafik-spider-'+element.id+'" width="400" height="400"></canvas>';
-                  }
-
-                  $('#box-' + dashboard_id).append('<div class="col-md-4 align-self-center">'+
-                            '<!-- Default box -->'+
-                            '<div class="box box-primary">'+
-                              '<div class="box-header with-border">'+
-                                '<h3 class="box-title">'+element.name+'</h3>'+
-
-                                '<div class="box-tools pull-right">'+
-                                  '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-share"'+
-                                          'title="Share">'+
-                                    '<i class="fa fa-share"></i></button>'+
-                                    '<button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#modal-dashboard-edit"'+
-                                          'title="Edit" data-idnya="'+element.id+'" data-title="'+element.name+'" data-surveyid="'+element.surveys_id+'" data-chart_type="'+element.chart_type+'">'+
-                                    '<i class="fa fa-gear"></i></button>'+
+                                '<div class="box-body">'+
+                                    '{{-- Grafik Here --}}'+
+                                    '<div class="box">'+
+                                      '<div class="box-body">'+
+                                        '<div id="chart-div-'+element_data_chart.id+'"></div>'+
+                                      '</div>'+
+                                    '</div>'+
                                 '</div>'+
+                                '<!-- /.box-body -->'+
                               '</div>'+
-                              '<div class="box-body">'+
-                                  '{{-- Grafik Here --}}'+
-                                  chart_type+
-                              '</div>'+
-                              '<!-- /.box-body -->'+
+                              '<!-- /.box -->'+
                             '</div>'+
-                            '<!-- /.box -->'+
-                          '</div>'+
-                        '<!-- /.col-->'
-                  );
-                  
-                  if (element.chart_type=="1-Batang") {
-                    // var marksCanvas = document.getElementById("grafik-batang-"+element.id);
-                    var ctx2 = document.getElementById("grafik-batang-"+element.id);
-                    var process_name = [];
-                    var level = [];
-                    var target_level = [];
-                    var percent = [];
-                    var target_percent = [];
-                    var backgroudcolor_target_percent = [];
-                    var bordercolor_target_percent = [];
-                    var backgroudcolor_percent = [];
-                    var bordercolor_percent = [];
+                          '<!-- /.col-->'
+                    );
+                    // end 1
                     
-                    data.process.forEach(process => {
-                      if (process.charts_id===element.id) {
-                        process_name.push(process.process);
-                        level.push(process.level);
-                        target_level.push(process.target_level);
-                        percent.push(process.percent);
-                        target_percent.push(process.target_percent);
-                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
-                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
-                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
-                        bordercolor_percent.push('rgba(200,0,0,0.5)');
-                      }
-                    });
-                    
-                    var myChart2 = new Chart(ctx2, {
-                      type: 'bar',
-                      data: {
-                        labels: process_name,
-                        datasets: [{
-                            label: 'Target Percent %',
-                            data: target_percent,
-                            backgroundColor: backgroudcolor_target_percent,
-                            borderColor: bordercolor_target_percent,
-                            borderWidth: 1
-                          },
-                          {
-                            label: 'Pencapaian Target %',
-                            data: percent,
-                            backgroundColor: backgroudcolor_percent,
-                            borderColor: bordercolor_percent,
-                            borderWidth: 1
+                    // console.log(element_data_chart)
+                    $.ajax({
+                      type: "POST",
+                      url: base_url+'/ajax_get_id_surveys',
+                      data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard, id_chart : element_data_chart.id },
+                      dataType: "JSON",
+                      success: function (data_id_survey) {
+                        // namiplin data survey setiap chart nya
+                        // console.log(data_id_survey)
+                        var chart_type = "";
+                        data_id_survey.id_surveys.forEach(function(element_id_survey, i) {
+                          // nampilin data surveynya ada apa aja
+                          // console.log(i)
+                          // console.log(element_id_survey)
+
+                          // menampilkan chartnya ada berapa aja
+                          if(element_id_survey.chart_type == "1-Batang"){
+                            if (element_data_chart.total_survey > 1) {
+                              chart_type += '<div class="col-lg-4">'+
+                                              '<canvas id="grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                                            '</div>';
+                            }else{
+                              chart_type += '<canvas id="grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                            }
+                          }else if(element_id_survey.chart_type == "2-Spider"){
+                            if (element_data_chart.total_survey > 1) {
+                              chart_type += '<div class="col-lg-4">'+
+                                              '<canvas id="grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                                            '</div>';
+                            }else{
+                              chart_type += '<canvas id="grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                            }
                           }
-                        ]
-                      },
-                      options: {
-                        scales: {
-                          yAxes: [{
-                            stacked: true,
-                            ticks: {
-                              beginAtZero: true
+                          $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
+
+                          $.ajax({
+                            type: "POST",
+                            url: base_url+'/ajax_get_data_survey',
+                            data: { _token: CSRF_TOKEN, id : data_dashboard.dashboard[0].id_dashboard, id_survey : element_id_survey.survey },
+                            dataType: "JSON",
+                            success: function (data_survey) {
+                              // console.log(data_survey)
+                              // nampilin data grafiknya
+                              if (element_data_chart.chart_type == "1-Batang") {
+                                if (element_data_chart.total_survey > 1) {
+                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id+"-"+i);
+                                }else{
+                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id);
+                                }
+                                var process_name = [];
+                                var level = [];
+                                var target_level = [];
+                                var percent = [];
+                                var target_percent = [];
+                                var backgroudcolor_target_percent = [];
+                                var bordercolor_target_percent = [];
+                                var backgroudcolor_percent = [];
+                                var bordercolor_percent = [];
+                                
+                                data_survey.surveys.forEach(process => {
+                                  if (element_id_survey.id_charts===element_data_chart.id) {
+                                    process_name.push(process.process);
+                                    level.push(process.level);
+                                    target_level.push(process.target_level);
+                                    percent.push(process.percent);
+                                    target_percent.push(process.target_percent);
+                                    backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                                    bordercolor_percent.push('rgba(200,0,0,0.5)');
+                                  }
+                                });
+                                
+                                var myChart2 = new Chart(ctx2, {
+                                  type: 'bar',
+                                  data: {
+                                    labels: process_name,
+                                    datasets: [{
+                                        label: 'Target Percent %',
+                                        data: target_percent,
+                                        backgroundColor: backgroudcolor_target_percent,
+                                        borderColor: bordercolor_target_percent,
+                                        borderWidth: 1
+                                      },
+                                      {
+                                        label: 'Pencapaian Target %',
+                                        data: percent,
+                                        backgroundColor: backgroudcolor_percent,
+                                        borderColor: bordercolor_percent,
+                                        borderWidth: 1
+                                      }
+                                    ]
+                                  },
+                                  options: {
+                                    scales: {
+                                      yAxes: [{
+                                        stacked: true,
+                                        ticks: {
+                                          beginAtZero: true
+                                        }
+                                      }],
+                                      xAxes: [{
+                                        stacked: true,
+                                        ticks: {
+                                          beginAtZero: true
+                                        }
+                                      }]
+
+                                    }
+                                  }
+                                });
+                              } else if (element_data_chart.chart_type == "2-Spider") {
+                                if (element_data_chart.total_survey > 1) {
+                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id+"-"+i);
+                                }else{
+                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id);
+                                }
+                                var process_name = [];
+                                var level = [];
+                                var target_level = [];
+                                var percent = [];
+                                var target_percent = [];
+                                var backgroudcolor_target_percent = [];
+                                var bordercolor_target_percent = [];
+                                var backgroudcolor_percent = [];
+                                var bordercolor_percent = [];
+                                
+                                data_survey.surveys.forEach(process => {
+                                  if (element_id_survey.id_charts===element_data_chart.id) {
+                                    process_name.push(process.process);
+                                    level.push(process.level);
+                                    target_level.push(process.target_level);
+                                    percent.push(process.percent);
+                                    target_percent.push(process.target_percent);
+                                    backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    bordercolor_target_percent.push('rgba(0,0,200,0.5)');
+                                    backgroudcolor_percent.push('rgba(200,0,0,0.5)');
+                                    bordercolor_percent.push('rgba(200,0,0,0.5)');
+                                  }
+                                });
+
+                                var radarChart = new Chart(marksCanvas, {
+                                    type: 'radar',
+                                    data: {
+                                        labels: process_name,
+                                        datasets: [{
+                                            backgroundColor: 'rgba(0,0,200,0.5)',
+                                            label: 'Target Level',
+                                            data: target_level
+                                            },
+                                            {
+                                            backgroundColor: 'rgba(200,0,0,0.5)',
+                                            label: 'Pencapaian Level',
+                                            data: level
+                                            }]
+                                    }
+                                });
+
+                                function addData(chart, label, color, data) {
+                                    chart.data.datasets.push({
+                                      label: label,
+                                      backgroundColor: color,
+                                      data: data
+                                    });
+                                    chart.update();
+                                }
+
+                                // // inserting the new dataset after 3 seconds
+                                // setTimeout(function() {
+
+                                //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
+                                // }, 3000);
+
+                              }
                             }
-                          }],
-                          xAxes: [{
-                            stacked: true,
-                            ticks: {
-                              beginAtZero: true
-                            }
-                          }]
-
-                        }
-                      }
-                    });
-                  } else if (element.chart_type=="2-Spider") {
-                    var marksCanvas = document.getElementById("grafik-spider-"+element.id);
-                    var survey_name = [];
-                    var process_name = [];
-                    var level = [];
-                    var target_level = [];
-                    var percent = [];
-                    var target_percent = [];
-                    var backgroudcolor_target_percent = [];
-                    var bordercolor_target_percent = [];
-                    var backgroudcolor_percent = [];
-                    var bordercolor_percent = [];
-                    
-                    data.process.forEach(process => {
-                      if (process.charts_id==element.id) {
-                        survey_name.push(process.name);
-                        process_name.push(process.process);
-                        level.push(process.level);
-                        target_level.push(process.target_level);
-                        percent.push(process.percent);
-                        target_percent.push(process.target_percent);
-                        backgroudcolor_target_percent.push('rgba(0,0,200,0.5)');
-                        bordercolor_target_percent.push('rgba(0,0,200,0.5)');
-                        backgroudcolor_percent.push('rgba(200,0,0,0.5)');
-                        bordercolor_percent.push('rgba(200,0,0,0.5)');
-                      }
-                    });
-
-                    var radarChart = new Chart(marksCanvas, {
-                        type: 'radar',
-                        data: {
-                            labels: process_name,
-                            datasets: [{
-                                backgroundColor: 'rgba(0,0,200,0.5)',
-                                label: 'Target Level',
-                                data: target_level
-                                },
-                                {
-                                backgroundColor: 'rgba(200,0,0,0.5)',
-                                label: 'Pencapaian Level',
-                                data: level
-                                }]
-                        }
-                    });
-
-                    function addData(chart, label, color, data) {
-                        chart.data.datasets.push({
-                          label: label,
-                          backgroundColor: color,
-                          data: data
-                        });
-                        chart.update();
-                    }
-
-                    // // inserting the new dataset after 3 seconds
-                    // setTimeout(function() {
-
-                    //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
-                    // }, 3000);
-
-                  }
-                });
-            } else {
-                console.log('hide');
-            }
-          }
-        });
+                          }); // tutup ajax keempat
+                        }); // tutup foreach data_id_survey
+                      } // tutup success data id_surveys
+                    });// tutup ajax ketiga
+                  }); // tutup foreach data_chart
+                }
+              }); // tutup ajax kedua
+            } // tutup success data_dashboard
+          }); // tutup ajax paling pertama
 
       });
     });
   </script>
   
   <script>
-    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpat di modal
+    // script untuk melempar value dari button untuk mengeluarkan modal dan value nya di ambil untuk di simpan di modal
     $('#modal-choose-chart').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget) // Button that triggered the modal
       var idDashboard = button.data('iddashboard') // Extract info from data-* attributes
@@ -810,31 +917,97 @@
     
     // script untuk membuat set value edit dashboard
     $('#modal-dashboard-edit').on('show.bs.modal', function (event) {
+      var $modal = $(this)  
+
+      // clear dulu isi modalnya
+      $modal.find('input[name="title"]').val('');
+      $modal.find('#select-container').html('');
+      $modal.find("input[name=chart]").removeAttr("checked");
+      $('#ck-comparison2').prop('checked', false);
+      $modal.find("input[name=comparison]").removeAttr('checked');
+
+      // hide comparison field
+      $(".fieldset-edit").hide();
+      $('.select-compare').attr( "disabled", "disabled" ); // Elements(s) are now disabled.
+
+      var cb = $('#ck-comparison2')
       var button = $(event.relatedTarget) // Button that triggered the modal
+      var chart_id = button.data('chart_id') // Extract info from data-* attributes
 
-      var dashboard_id = button.data('idnya') // Extract info from data-* attributes
-      var title = button.data('title') // Extract info from data-* attributes
-      var chart_type = button.data('chart_type') // Extract info from data-* attributes
-      var survey_id = button.data('surveyid') // Extract info from data-* attributes
+      $modal.find('#id').val(chart_id);
+      
+      $.get(base_url + "/ajax/edit-survey/" + chart_id, function(oResp) {
+        console.log(oResp)
+        oResp.forEach(function (element, index) {
+          // 1. append dulu select nya
+          // 2. set id nya berdasarkan foreach nya
+          $("#select-container").append(
+            '<div class="form-group" id="row_survey_'+element.dashboard_survey_id+'">'+
+              '<label class="control-label col-sm-3">Pilih Survey</label>'+
+              '<input type="hidden" value="'+element.dashboard_survey_id+'" name="dashboard_survey_id[]">'+
+              '<div class="col-sm-7">'+
+                '<select class="form-control" id="survey_id_'+index+'" name="survey[]">'+
+                      '@foreach ($surveys as $item)'+
+                        '<option value="{{ $item->id }}">{{ $item->name }}</option>'+
+                      '@endforeach'+
+                  '</select>'+
+              '</div>'+
+              '<div class="col-sm-2">'+
+                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+              '</div>'+
+            '</div>'
+          );
+          // 3. sudah di append dom nya baru di set value nya berdasarkan id for nya
+          $modal.find('input[name="title"]').val(element.name);
+          $modal.find('#survey_id_'+index).val(element.surveys_id);
+          $modal.find("input[name=chart][value=" + element.chart_type + "]").attr('checked', 'checked');
+        });
+      });
 
-      // var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-      // $.ajax({
-      //   type: "POST",
-      //   url: base_url+'/ajax_get_dashboard',
-      //   data: { _token: CSRF_TOKEN, id : dashboard_id },
-      //   dataType: "JSON",
-      //   success: function (data) {
-      //     console.log(data)
-      //   }
-      // });
-
-      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-      var modal = $(this)
-      modal.find('#title').val(title)
-      modal.find('#survey_id option[value="'+survey_id+'"]')
-      modal.find("input[name=chart][value=" + chart_type + "]").attr('checked', 'checked');
     })
+
+    /**
+    * hapusSurvey()
+    * For deleting survey on edit form
+     */
+    function hapusSurvey(dashboard_survey_id){
+      Swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+          $.ajax({
+            type: "POST",
+            url: base_url+'/ajax_delete_survey',
+            data: { _token: CSRF_TOKEN, 'dashboard_survey_id': dashboard_survey_id },
+            dataType: "JSON",
+            success: function (response) {
+              if(response==1){
+                  Swal(
+                  'Deleted!',
+                  'Survey has been deleted Successfully!',
+                  'success'
+                )
+                // window.location.href = base_url;
+                $('#row_survey_'+dashboard_survey_id).remove()
+
+              } else {
+                  Swal(
+                    'Failed!',
+                    'Dashboard failed to delete!',
+                    'error'
+                )
+              }
+            }
+          });
+        }
+      });
+    }
   </script>
 
   <script>
@@ -1057,23 +1230,61 @@
 
   {{-- Show hide comparison --}}
   <script>
-      $(document).ready(function() {
-        var cb = $('#ck-comparison');
-  
-        cb.on("click", function() {
-          if (cb.attr("checked") == "checked") {
-            cb.removeAttr("checked");
-            $("fieldset").hide();
-            $('.select-compare').attr( "disabled", "disabled" ); // Elements(s) are now disabled.
-            console.log('update menjadi unchecked');    
-          } else {
-            cb.attr("checked", "checked");
-            $("fieldset").show();
-            $('.select-compare').prop("disabled", false); // Element(s) are now enabled.
-            console.log('update menjadi checked');
-          }
-        });
+
+    $(document).ready(function() {
+      var cb = $('#ck-comparison');
+
+      cb.on("click", function() {
+        if (cb.attr("checked") == "checked") {
+          cb.removeAttr("checked");
+          $("fieldset").hide();
+          $('.select-compare').attr( "disabled", "disabled" ); // Elements(s) are now disabled.
+          console.log('update menjadi unchecked');    
+        } else {
+          cb.attr("checked", "checked");
+          $("fieldset").show();
+          $('.select-compare').prop("disabled", false); // Element(s) are now enabled.
+          console.log('update menjadi checked');
+        }
       });
+
+      // fungsi untuk menambahkan select survey
+      var cb2 = $('#add-compare');
+      // set global variabel untuk count append survey dimulai dari 0
+      var count_cb2 = 0;
+
+      cb2.on("click", function() {
+        // mengambil id select terakhir
+        var last_id_select = $('input[name*="survey"]').length;
+        console.log(this)
+        $("#select-container").append(
+          '<div class="form-group" id="count-cb2-'+count_cb2+'">'+
+            '<div class="survey_new">'+
+              '<label class="control-label col-sm-3">Pilih Survey</label>'+
+              '<div class="col-sm-7">'+
+                '<select class="form-control" id="survey_id_'+last_id_select+'" name="survey_new[]">'+
+                      '@foreach ($surveys as $item)'+
+                        '<option value="{{ $item->id }}">{{ $item->name }}</option>'+
+                      '@endforeach'+
+                  '</select>'+
+              '</div>'+
+              '<div class="col-sm-2">'+
+                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="removeNewSurvey('+count_cb2+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+              '</div>'+
+            '</div>'+
+          '</div>'
+        );
+        count_cb2++;
+
+      });
+
+    });
+
+    function removeNewSurvey(counter){
+      $("#count-cb2-"+counter).remove()
+    }
+
+
   </script>
 
   {{-- Select Users --}}

@@ -10,7 +10,7 @@
 @section('page-level-plugin-styles')
 <!-- fullCalendar -->
   {{Html::style('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.css')}}
-  {{Html::style('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.print.min.css')}}
+  {{Html::style('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.print.min.css', array('media' => 'print'))}}
 <!-- Bootstrap time Picker -->
   {{Html::style('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.css')}}
 <!-- bootstrap datepicker -->
@@ -242,14 +242,13 @@
 @stop
 
 @section('page-level-plugins')
+  {{ Html::script('js/pages/schedule/calendar.min.js') }}
   <!-- fullCalendar -->
   {{ Html::script('theme/AdminLTE/bower_components/moment/moment.js')}}
   {{ Html::script('theme/AdminLTE/bower_components/fullcalendar/dist/fullcalendar.min.js')}}"
 
   <!-- bootstrap time picker -->
   {{Html::script('theme/AdminLTE/plugins/timepicker/bootstrap-timepicker.min.js')}}"
-
-  {{ Html::script('js/pages/schedule/calendar.min.js') }}
 @stop
 
 @section('theme-global-scripts')

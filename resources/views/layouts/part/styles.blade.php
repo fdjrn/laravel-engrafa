@@ -1,5 +1,9 @@
 <!-- BEGIN GLOBAL MANDATORY STYLES -->
 
+<style>
+  body { padding-right: 0px !important;}
+</style>
+
 <!-- iTAX FONT ICON -->
 @section('global-mandatory-styles')
 @show()
