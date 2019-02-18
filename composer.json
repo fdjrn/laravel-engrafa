@@ -13,7 +13,8 @@
         "maatwebsite/excel": "^3.1",
         "phpoffice/phpspreadsheet": "^1.5",
         "pusher/pusher-php-server": "^3.2",
-        "yajra/laravel-datatables": "^1.4"
+        "yajra/laravel-datatables": "^1.4",
+        "yoeunes/toastr": "^1.1"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

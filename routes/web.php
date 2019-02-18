@@ -151,6 +151,13 @@ Route::middleware(['auth','web'])->group(function () {
 	//bookmark
     Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
     Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
+
+    //kuesioner
+	Route::get('/quisioner', 'Questioner\QuestionerController@index')->name('quisioner.list');
+	Route::get('/quisioner/list-all','Questioner\QuestionerController@get_list_all');
+	Route::get('/quisioner/create-new','Questioner\QuestionerController@create_new_questioner')->name('quisioner.create-new');
+	Route::get('/quisioner/view/{id}','Questioner\QuestionerController@view_questioner')->name('quisioner.view');
+	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
 });
 
 //DocumentViewer Library
