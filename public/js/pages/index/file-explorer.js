@@ -229,17 +229,35 @@ $(document).ready(function () {
         //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
         addRemoveLinks: true,
         dictFileTooBig: 'Max file size is 25MB',
-        dictMaxFilesExceeded: 'Max files uploaded is 4',
-        success: function () {
-            getCurrentMainFolderDetail(filesId);
-        }
+        dictMaxFilesExceeded: 'Max files uploaded is 4'
     });
 
     dzUploadFile.on("sending", function (file, xhr, formData) {
         formData.append("folderId", filesId);
     });
 
-    dzUploadFile.on("complete", function (file) {
+    dzUploadFile.on("complete", function (file, xhr) {
+        //console.log(file,xhr);
+        if (file.status === "error") {
+            swal({
+                title: 'Error!',
+                text: "Upload Files failed, please try again or refresh page ",
+                type: 'error',
+                timer: '2000'
+            });
+        } else {
+            swal({
+                title: 'Success!',
+                text: "File uploaded",
+                type: 'success',
+                timer: '1500'
+            });
+            getCurrentMainFolderDetail(filesId);
+        }
+        dzUploadFile.removeFile(file);
+    });
+
+    dzUploadFile.on("canceled", function (file) {
         dzUploadFile.removeFile(file);
     });
 
@@ -259,16 +277,16 @@ $(document).ready(function () {
         //acceptedFiles: '.txt, .doc, .docx, .xls, .xlsx, .png, .jpeg, .jpg, .bmp, .pdf',
         addRemoveLinks: true,
         dictFileTooBig: 'Max file size is 25MB',
-        dictMaxFilesExceeded: 'Only 1 files allowed upload',
-        success: function () {
+        dictMaxFilesExceeded: 'Only 1 files allowed upload'
+        /*success: function () {
             getCurrentMainFolderDetail(filesId);
-        }
+        }*/
     });
 
     $('#upload-files-new-version-modal').on('show', function () {
         let rootFileName = $('#file-descr-name').text();
         $('#rootFileName').text(rootFileName);
-    })
+    });
 
 
     dzUploadNewFile.on("sending", function (file, xhr, formData) {
@@ -276,11 +294,27 @@ $(document).ready(function () {
         formData.append("folderId", filesId);
     });
 
-    dzUploadNewFile.on("complete", function (file) {
+    dzUploadNewFile.on("canceled", function (file) {
         dzUploadNewFile.removeFile(file);
     });
 
-    dzUploadNewFile.on("canceled", function (file) {
+    dzUploadNewFile.on("complete", function (file, xhr) {
+        if (file.status === "error") {
+            swal({
+                title: 'Error!',
+                text: "Failed to upload new version, please try again or refresh page ",
+                type: 'error',
+                timer: '1500'
+            });
+        } else {
+            swal({
+                title: 'Success!',
+                text: "New file version uploaded",
+                type: 'success',
+                timer: '2000'
+            });
+            getCurrentMainFolderDetail(filesId);
+        }
         dzUploadNewFile.removeFile(file);
     });
 

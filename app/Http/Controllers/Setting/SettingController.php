@@ -341,4 +341,9 @@ class SettingController extends Controller
         return redirect()->action('Setting\SettingController@profile_user');
 
     }
+
+    public function backuprestore()
+    {
+        return view('setting.backuprestore');
+    }
 }
