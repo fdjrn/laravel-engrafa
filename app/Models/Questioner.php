@@ -53,7 +53,7 @@ class Questioner extends Model
     public static function getQuestionAll($id){
       $data = DB::table('question')
             ->join('question_types', 'question.id_question_type', '=', 'question_types.id')
-            ->select('question.*', 'question_types.name as question_type_name',)
+            ->select('question.*', 'question_types.name as question_type_name')
             ->where('question.id_quisioner','=',$id)
             ->get();
       
