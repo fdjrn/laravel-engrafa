@@ -151,7 +151,14 @@ Route::middleware(['auth','web'])->group(function () {
 
 	//bookmark
     Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
-    Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
+	Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
+	
+	//backup
+	Route::get('/setting/backup', 'Setting\SettingController@backup_index')->name('setting.backups');
+	Route::get('/setting/backup/create', 'Setting\SettingController@backup_create')->name('setting.backups');
+	Route::get('/setting/backup/download/{file_name}', 'Setting\SettingController@backup_download')->name('setting.backups');
+	Route::get('/setting/backup/delete/{file_name}', 'Setting\SettingController@backup_delete')->name('setting.backups');
+
 });
 
 //DocumentViewer Library
