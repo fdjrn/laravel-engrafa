@@ -169,6 +169,14 @@ Route::middleware(['auth','web'])->group(function () {
 
 	//bookmark
     Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
+  
+	//backup
+	Route::get('/setting/backup', 'Setting\SettingController@backup_index')->name('setting.backups');
+	Route::get('/setting/backup/create', 'Setting\SettingController@backup_create')->name('setting.backups');
+	Route::get('/setting/backup/download/{file_name}', 'Setting\SettingController@backup_download')->name('setting.backups');
+	Route::get('/setting/backup/delete/{file_name}', 'Setting\SettingController@backup_delete')->name('setting.backups');
+
+
     Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
 
     //kuesioner
@@ -178,8 +186,9 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/quisioner/view/{id}','Questioner\QuestionerController@view_questioner')->name('quisioner.view');
 	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
 
+
 	Route::post('/quisioner/answer','Questioner\QuestionerController@question_answer')->name('quisioner.answer');
-	
+
 });
 
 //DocumentViewer Library
