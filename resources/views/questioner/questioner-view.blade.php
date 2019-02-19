@@ -73,7 +73,7 @@
         }
 
         .slider .slider-track-low {
-	        background: red !important;
+            background: red !important;
         }
 
         .rating {
@@ -189,68 +189,64 @@
                     <div class="box-body" id="box-body">
                         @php ($i = 1)
                         @foreach($questioner->question as $question)
-                            <div class="form-group">
+                            <div class="form-group mt-checkbox-inline">
                                 <label>{{ $i.'. '.$question->question }}</label>
 
                                 
                                 @if($question->id_question_type==1)
                                     @php($j = 1)
                                     @foreach ($question->choise_asking as $item)
-                                        <div class="form-group">
                                             <div class="control-group">
                                                 <div class="controls">
                                                     <div class="input-append">
-                                                        <input type="radio" id="field_asking_{{ $i-1 }}_{{ $j-1 }}" name="answer_asking[{{ $question->id }}]" value="{{ $item->id  }}"  style="margin-right:7px;" >
+                                                        <input type="radio" class="custom-control" id="field_asking_{{ $i-1 }}_{{ $j-1 }}" name="answer_asking[{{ $question->id }}]" value="{{ $item->id  }}"  style="margin-right:7px;" >
                                                         <label for="field_asking_{{ $i-1 }}_{{ $j-1 }}">{{ $item->question_asking_answer }}</label>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         @php( $j++ )
                                     @endforeach
                                 @endif
                                 @if($question->id_question_type==2)
-                                    <div class="form-group">
-                                        <input class="slider" name="answer_slider[{{ $question->id }}]" type="text" data-slider-min="{{ $question->slider->min_value }}" data-slider-max="{{ $question->slider->max_value }}" data-slider-step="1" data-slider-value="0"/>
-                                    </div>
+                                    <br/>
+                                    <input class="slider form-control"  name="answer_slider[{{ $question->id }}]" type="text" data-slider-min="{{ $question->slider->min_value }}" data-slider-max="{{ $question->slider->max_value }}" data-slider-step="1" data-slider-value="0"/>
                                 @endif
 
                                 @if($question->id_question_type==3)
-                                    <div class="form-group">
-                                        <div class="rating">
-                                            @for($j=0; $j<$question->rating->number_of_stars; $j++)
-                                                <label>
-                                                    <input type="radio" name="answer_rating[{{ $question->id }}]" value="{{ $j+1 }}" />
-                                                    @for($k=0; $k<$j+1; $k++)
-                                                        <span class="icon">★</span>
-                                                    @endfor
-                                                </label>
-                                            @endfor
-                                        </div>
+                                    <br/>
+                                    <div class="rating">
+                                        @for($j=0; $j<$question->rating->number_of_stars; $j++)
+                                            <label>
+                                                <input type="radio" class="form-control" name="answer_rating[{{ $question->id }}]" value="{{ $j+1 }}" />
+                                                @for($k=0; $k<$j+1; $k++)
+                                                    <span class="icon">★</span>
+                                                @endfor
+                                            </label>
+                                        @endfor
                                     </div>
                                 @endif
 
                                 @if($question->id_question_type==4)
                                     @php($j = 1)
                                     @foreach ($question->choise_checkbox as $item)
-                                        <div class="form-group">
-                                            <div class="control-group">
-                                                <div class="controls">
-                                                    <div class="input-append">
-                                                        <input type="checkbox" id="field_checkbox_{{ $i-1 }}_{{ $j-1 }}" name="answer_asking[{{ $question->id }}][]" value="{{ $item->id  }}"  style="margin-right:7px;" >
-                                                        <label for="field_checbox_{{ $i-1 }}_{{ $j-1 }}">{{ $item->question_checkbox_answer }}</label>
-                                                    </div>
+                                        <div class="control-group">
+                                            <div class="controls">
+                                                <div class="input-append">
+                                                    <input type="checkbox" class="custom-control" id="field_checkbox_{{ $i-1 }}_{{ $j-1 }}" name="answer_checkbox[{{ $question->id }}][]" value="{{ $item->id  }}"  style="margin-right:7px;" >
+                                                    <label for="field_checbox_{{ $i-1 }}_{{ $j-1 }}">{{ $item->question_checkbox_answer }}</label>
                                                 </div>
                                             </div>
                                         </div>
                                         @php( $j++ )
                                     @endforeach
                                 @endif
-
+                                <span class="help-block"></span>
+                                <input type="hidden" name="question_id[{{ $i-1 }}]" value="{{ $question->id }}"/>
+                                <input type="hidden" name="id_question_type[{{ $i-1 }}]" value="{{ $question->id_question_type }}"/>
                             </div>
                             @php ($i++)
                         @endforeach
-                        
+                        <input type="hidden" name="id" value="{{ $questioner->id }}"/>
                         
                     </div>
 
