@@ -177,6 +177,9 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/quisioner/create-new','Questioner\QuestionerController@create_new_questioner')->name('quisioner.create-new');
 	Route::get('/quisioner/view/{id}','Questioner\QuestionerController@view_questioner')->name('quisioner.view');
 	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
+
+	Route::post('/quisioner/answer','Questioner\QuestionerController@question_answer')->name('quisioner.answer');
+	
 });
 
 //DocumentViewer Library

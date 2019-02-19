@@ -7,36 +7,37 @@ $(document).ready(function(){
   var next = 1;
   var countQuis = 0;
   var formId = '#form_create_questioner';
+  var formId2 = '#form_answer_questioner';
 
   $(q_asking).hide();
   $(".error").remove();
 
   $(formId).validate({
       doNotHideMessage: true, //this option enables to show the error/success messages on tab switch.
-			errorElement: 'span', //default input error message container
+      errorElement: 'span', //default input error message container
       errorClass: 'help-block help-block-error', // default input error message class
       focusInvalid: true, // do not focus the last invalid input
-			rules : {
-				c_questioner_name: {
+      rules : {
+        c_questioner_name: {
           required: true,
-				},
-				c_questioner_category: {
+        },
+        c_questioner_category: {
           required: true,
-				},
-			},
+        },
+      },
 
-			messages : {
-				c_quesioner_name: {
+      messages : {
+        c_quesioner_name: {
           required: "Questioner name is required",
-				},
-				c_quesioner_category: {
+        },
+        c_quesioner_category: {
           required: "Questioner category is required",
-				},
-			},
+        },
+      },
 
-			highlight: function (element) { // hightlight error inputs
+      highlight: function (element) { // hightlight error inputs
                 $(element)
-					.closest('.form-group').removeClass('has-success').addClass('has-error'); // set error class to the control group
+          .closest('.form-group').removeClass('has-success').addClass('has-error'); // set error class to the control group
       },
 
       unhighlight: function (element) { // revert the change done by hightlight
@@ -81,7 +82,7 @@ $(document).ready(function(){
       }]
   });
 
-	//main modal create quisioner
+  //main modal create quisioner
   $("#mn_create_new_questioner").click(function(){
     $(".error").remove();
     $('#modal-n-questioner').modal('show');
@@ -364,8 +365,128 @@ $(document).ready(function(){
       
   }
 
+  var handlingProccessAnswer = function(form){
 
+    var base_url = window.location.origin;
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      url: base_url+"/quisioner/answer",
+      type: "POST",
+      dataType: 'json', // what type of data do we expect back from the server
+      encode: true,
+      data: form.serialize(),
+      success: function (response) {
+        if(response.status == 1){
+          window.location.href = base_url+'/quisioner';
+        }else{
+          toastr.error(response.message,'Error');
+        }
+        $("#btn_save_new_quisioner").button('reset');
+        $('.form-control').removeAttr('disabled');
+        $('.custom-control').removeAttr('disabled');
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+          toastr.error("Internal Server Error",'Error');
+          $("#btn_save_new_quisioner").button('reset');
+          $('.form-control').removeAttr('disabled');
+          $('.custom-control').removeAttr('disabled');
+      }
+    });
+
+  }
+
+  $(formId2).submit(function(e){
+    if($(this).valid()){
+      $("btn_save_answer_quisioner").button('loading');
+      handlingProccessAnswer($(this));
+      $('.form-control').attr('disabled','disabled');
+      $('.custom-control').attr('disabled','disabled');
+
+    }
+    e.preventDefault();
+  });
+
+  var validateQuestionerQuestion = function(){
+
+    $(formId2).validate({
+      doNotHideMessage: true, //this option enables to show the error/success messages on tab switch.
+      errorElement: 'span', //default input error message container
+      errorClass: 'help-block help-block-error', // default input error message class
+      focusInvalid: true, // do not focus the last invalid input
+      highlight: function (element) { // hightlight error inputs
+        $(element)
+          .closest('.form-group').removeClass('has-success').addClass('has-error'); // set error class to the control group
+      },
+      errorPlacement: function (error, element) { // render error placement for each input type               
+                
+        if (element.parents('.mt-checkbox-inline')[0]) {
+            error.appendTo(element.parents('.mt-checkbox-inline')[0]);
+        }
+        else if (element.parents('.mt-radio-inline')[0]) {
+            error.appendTo(element.parents('.mt-radio-inline')[0]);
+        }
+        else if (element.parents('.file-upload')[0]) {
+            error.appendTo(element.parents('.file-upload')[0]);
+        }
+        else if (element.attr("data-error-container")) { 
+            error.appendTo(element.attr("data-error-container"));
+        } 
+        else{
+            error.insertAfter(element); // for other inputs, just perform default behavior
+        }
+      },
+      unhighlight: function (element) { // revert the change done by hightlight
+          $(element)
+            .closest('.form-group').removeClass('has-error'); // set error class to the control group
+      }
+    });
+
+    $('[name^="answer_asking"]').each(function(){
+      $(this).rules('add', {
+        required: true,
+        messages: {
+            required: "Please choise this answer",
+        }
+      });
+    });
+
+    $('[name^="answer_slider"]').each(function(){
+      $(this).rules('add', {
+        required: true,
+        messages: {
+            required: "Please slide value minimal is 0",
+        }
+      });
+    });
+
+    $('[name^="answer_rating"]').each(function(){
+      $(this).rules('add', {
+        required: true,
+        min: 1,
+        messages: {
+            required: "Please rate minimal 1",
+            min: "Please rate minimal 1",
+        }
+      });
+    });
+
+    $('[name^="answer_checkbox"]').each(function(){
+      $(this).rules('add', {
+        required: true,
+        messages: {
+            required: "Please choise this answer minimal 1",
+        }
+      });
+    });
+
+  }
   
-  
+  validateQuestionerQuestion();
 
 });
