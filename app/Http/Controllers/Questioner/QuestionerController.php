@@ -82,7 +82,7 @@ class QuestionerController extends Controller
         $answer_rating = isset($request->answer_rating) ? $request->answer_rating : [];
         $answer_slider = isset($request->answer_slider) ? $request->answer_slider : []; 
 
-        if(count($answer_asking) > 0 && count($answer_checkbox) > 0 && count($answer_rating) > 0 && count($answer_slider) > 0){
+        if(count($answer_asking) > 0 || count($answer_checkbox) > 0 || count($answer_rating) > 0 || count($answer_slider) > 0){
 
             foreach($question_id as $key=>$value){
                 
