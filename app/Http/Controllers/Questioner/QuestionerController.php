@@ -23,6 +23,7 @@ use App\Models\QuestionAsking;
 use App\Models\QuestionSlider;
 use App\Models\QuestionStarRating;
 use App\Models\QuestionCheckbox;
+use App\Models\Answer;
 
 class QuestionerController extends Controller
 {
@@ -67,6 +68,128 @@ class QuestionerController extends Controller
         $questioner = Questioner::getQuestionerQuestionAll($id);
 
         return view('questioner.questioner-view', ['questioner'=>$questioner]);
+    }
+
+    public function question_answer(Request $request){
+
+        $userId = Auth::id();
+        $id = isset($request->id)? $request->id:null;
+
+        $question_id = isset($request->question_id) ? $request->question_id : [];
+        $id_question_type = isset($request->id_question_type) ? $request->id_question_type : [];
+        $answer_asking = isset($request->answer_asking) ? $request->answer_asking : [];
+        $answer_checkbox = isset($request->answer_checkbox) ? $request->answer_checkbox : [];
+        $answer_rating = isset($request->answer_rating) ? $request->answer_rating : [];
+        $answer_slider = isset($request->answer_slider) ? $request->answer_slider : []; 
+
+        if(count($answer_asking) > 0 || count($answer_checkbox) > 0 || count($answer_rating) > 0 || count($answer_slider) > 0){
+
+            foreach($question_id as $key=>$value){
+                
+                $data = [];
+                if($id_question_type[$key]==1){
+                    $data = [
+                        'id_quisioner' => $id,
+                        'id_question' => $question_id[$key],
+                        'created_by' => $userId,
+                        'id_answer_asking'=> $answer_asking[ $question_id[$key] ]
+                    ];
+
+                    $insert = Answer::createAnswerAsking($data);
+
+                    if(!$insert){
+                        $response = array(
+                            'status' => 0,
+                            'message' => 'Insert answer asking failed'
+                        );
+            
+                        return $response;
+                    }
+                }
+
+                if($id_question_type[$key]==2){
+                    $data = [
+                        'id_quisioner' => $id,
+                        'id_question' => $question_id[$key],
+                        'created_by' => $userId,
+                        'value_slider'=> $answer_slider[ $question_id[$key] ]
+                    ];
+
+                    $insert = Answer::createAnswerSlider($data);
+
+                    if(!$insert){
+                        $response = array(
+                            'status' => 0,
+                            'message' => 'Insert answer slider failed'
+                        );
+            
+                        return $response;
+                    }
+                }
+
+                if($id_question_type[$key]==3){
+                    $data = [
+                        'id_quisioner' => $id,
+                        'id_question' => $question_id[$key],
+                        'created_by' => $userId,
+                        'value_rating'=> $answer_rating[ $question_id[$key] ]
+                    ];
+
+                    $insert = Answer::createAnswerStarsRating($data);
+
+                    if(!$insert){
+                        $response = array(
+                            'status' => 0,
+                            'message' => 'Insert answer rating failed'
+                        );
+            
+                        return $response;
+                    }
+                }
+
+                if($id_question_type[$key]==4){
+                    
+                    foreach($answer_checkbox[ $question_id[$key] ] as $item){
+                        $data = [
+                            'id_quisioner' => $id,
+                            'id_question' => $question_id[$key],
+                            'created_by' => $userId,
+                            'id_answer_checkbox'=> $item
+                        ];
+
+                        $insert = Answer::createAnswerCheckbox($data);
+
+                        if(!$insert){
+                            $response = array(
+                                'status' => 0,
+                                'message' => 'Insert answer checkbox failed'
+                            );
+                
+                            return $response;
+                        }
+                    }
+
+                }
+
+
+            }
+
+            $response = array(
+                'status' => 1,
+                'message' => 'Quisioner Answer Has Been Saved'
+            );
+            toastr()->success($response['message'],'Success');
+
+            return $response;
+
+        }else{
+            $response = array(
+                'status' => 0,
+                'message' => 'Question is must answer all'
+            );
+
+            return $response;
+        }
     }
 
     /**
