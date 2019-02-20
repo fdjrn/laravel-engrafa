@@ -54,7 +54,10 @@
   <!-- Theme style -->
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/plugins/pace/pace.min.css')}}">
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/dist/css/AdminLTE.min.css')}}">
-  @toastr_css
+  
+  <!--@toastr_css-->
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+
   <link rel="stylesheet" href=" {{ asset('theme/AdminLTE/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css')}}">
   {{--<link rel="stylesheet" href=" {{ asset('theme/AdminLTE/plugins/sweetalert/sweetalert.css')}}">--}}
   {{ Html::style('css/sweetalert2.min.css')}}
