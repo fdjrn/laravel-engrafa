@@ -1,4 +1,4 @@
-{{-- @extends('layouts.default') --}}
+@extends('layouts.default')
 
 @section('content')
     <h3>Administer Database Backups</h3>

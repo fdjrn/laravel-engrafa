@@ -33,6 +33,19 @@
 
 
 @section('body-inner-content')
+    @if ($message = Session::get('success'))
+      <div class="alert alert-success alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+          <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+    @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
 <div class="row">
   <div class="col-md-3">
     @include('setting.nav-left')
@@ -53,7 +66,7 @@
                 <!-- /.box-header -->
                 <div class="box-body">
                         <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#list_backup">List Backup</button>
-                        <button type="button" class="btn btn-block btn-info">To Aplication</button>
+                        <a href="{{ url('setting/backup/create') }}" class="btn btn-block btn-info">To Aplication</a>
                         <button type="button" class="btn btn-block btn-success">To Computer</button>
                 </div>
                 <!-- /.box-body -->

@@ -62,6 +62,18 @@
           </div>
       </div>
       @endif
+
+      @if ($errors->any())
+      <div id="success-msg">
+        <div class="alert alert-danger">
+          <ul>
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      </div>
+      @endif
       <!-- end message -->
 
       <div class="row">
@@ -162,7 +174,7 @@
             <label class="control-label col-sm-3">Title</label>
             <div class="col-sm-9">
               <!-- menyisipkan field dashboard_survey_id -->
-              <input type="text" class="form-control" id="title" placeholder="Title" name="title">
+              <input type="text" class="form-control" id="title" placeholder="Title" name="title" required>
             </div>
           </div>
 
@@ -953,12 +965,22 @@
       var chart_id = button.data('chart_id') // Extract info from data-* attributes
 
       $modal.find('#id').val(chart_id);
+
+      var remove_button = '';
       
       $.get(base_url + "/ajax/edit-survey/" + chart_id, function(oResp) {
         console.log(oResp)
         oResp.forEach(function (element, index) {
+          console.log(index)
           // 1. append dulu select nya
           // 2. set id nya berdasarkan foreach nya
+          if(index != 0){
+            remove_button = 
+            '<div class="col-sm-2">'+
+                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+            '</div>';
+          }
+
           $("#select-container").append(
             '<div class="form-group" id="row_survey_'+element.dashboard_survey_id+'">'+
               '<label class="control-label col-sm-3">Pilih Survey</label>'+
@@ -970,9 +992,7 @@
                       '@endforeach'+
                   '</select>'+
               '</div>'+
-              '<div class="col-sm-2">'+
-                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
-              '</div>'+
+              remove_button+
             '</div>'
           );
           // 3. sudah di append dom nya baru di set value nya berdasarkan id for nya
