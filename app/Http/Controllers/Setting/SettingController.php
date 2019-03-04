@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-use Alert;
+// namespace Spatie\Backup\Commands;
+
 use Artisan;
 use Log;
 use Spatie\Backup\Helpers\Format;
@@ -355,7 +356,9 @@ class SettingController extends Controller
 
     public function backup_index()
     {
-        $disk = Storage::disk(config('laravel-backup.backup.destination.disks')[0]);
+        // $disk = Storage::disk(config('laravel-backup.backup.destination.disks')[0]);
+        $disk = Storage::allFiles('');
+        dd($disk);
         $files = $disk->files(config('laravel-backup.backup.name'));
         
         $backups = [];
@@ -373,7 +376,6 @@ class SettingController extends Controller
         }
         // reverse the backups, so the newest one would be on top
         $backups = array_reverse($backups);
-        dd($backups);
         return view("setting.backups")->with(compact('backups'));
     }
     public function backup_create()
@@ -382,15 +384,16 @@ class SettingController extends Controller
             // start the backup process
             Artisan::call('backup:run');
             $output = Artisan::output();
-            dd($output);
+
             // log the results
             Log::info("Backpack\BackupManager -- new backup started from admin interface \r\n" . $output);
+            
             // return the results as a response to the ajax call
-            Alert::success('New backup created');
-            return redirect()->back();
+            // Alert::success('New backup created');
+            return redirect()->back()->with(['success' => 'New backup created']);
         } catch (Exception $e) {
             Flash::error($e->getMessage());
-            return redirect()->back();
+            return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
     /**

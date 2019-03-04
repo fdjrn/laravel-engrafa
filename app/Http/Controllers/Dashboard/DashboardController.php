@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 // insert models
 use App\Models\Dashboard;
@@ -80,6 +81,10 @@ class DashboardController extends Controller
     
     public function store(Request $request)
     {
+        $this->validate($request,[
+            'name' => 'required'
+        ]);
+            
         $input = $request->all();
         $userid = Auth::user()->id;
 
@@ -102,7 +107,11 @@ class DashboardController extends Controller
         $input = $request->all();
         
         if(isset($input['id'])){
-            // dd($input);
+            $this->validate($request,[
+                'title' => 'required',
+                'chart' => 'required'
+            ]);
+
             $input_dashboard_chart_update = [
                 'name' => $input['title'],
                 'chart_type' => $input['chart']
@@ -113,34 +122,39 @@ class DashboardController extends Controller
             $edit_charts->update($input_dashboard_chart_update);
 
             if($edit_charts){
-                $count_survey = count($input['survey']);
+                $count_survey = isset($input['survey']) ? count($input['survey']) : 0;
                 $count_dashboard_survey_id = count($input['dashboard_survey_id']);
 
-                for ($i=0, $k=0; $i < $count_survey; $i++, $k++) { 
-                    $edit_dashboard_survey = Dashboard_survey::find($input['dashboard_survey_id'][$k]);
-                    $edit_dashboard_survey->update(['survey' => $input['survey'][$i]]);
-                }
+                if($count_survey != 0){
+                    for ($i=0, $k=0; $i < $count_survey; $i++, $k++) { 
+                        $edit_dashboard_survey = Dashboard_survey::find($input['dashboard_survey_id'][$k]);
+                        $edit_dashboard_survey->update(['survey' => $input['survey'][$i]]);
+                    }
 
-                if ($edit_dashboard_survey) {
-                    if(isset($input['survey_new'])){
-                        $count_survey = count($input['survey_new']);
-                        for ($i=0; $i < $count_survey; $i++) { 
-                            $input_dashboard_survey = [
-                                'survey' => $input['survey_new'][$i],
-                                'chart' => $input['id'] // get last insert id from charts 
-                            ];
-                            $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+                    if ($edit_dashboard_survey) {
+                        if(isset($input['survey_new'])){
+                            $count_survey = count($input['survey_new']);
+                            for ($i=0; $i < $count_survey; $i++) { 
+                                $input_dashboard_survey = [
+                                    'survey' => $input['survey_new'][$i],
+                                    'chart' => $input['id'] // get last insert id from charts 
+                                ];
+                                $dashboard_survey = Dashboard_survey::create($input_dashboard_survey);
+                            }
                         }
                     }
                     return redirect()->route('dashboard')->with(['success'=>'true','message'=>'Charts berhasil di rubah']);
-                } else {
-                    return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal edit ke tabel Dashboard Survey']);
+                }else{
+                    return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal merubah chart']);
                 }
-            }else{
-                return redirect()->route('dashboard')->with(['success'=>'false','message'=>'Gagal merubah chart']);
             }
 
         }else{
+            $this->validate($request,[
+                'name' => 'required',
+                'chart' => 'required'
+            ]);
+            
             $input_dashboard_chart = [
                 'dashboard' => $input['id_dashboard'],
                 'name' => $input['name'],
