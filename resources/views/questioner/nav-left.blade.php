@@ -22,7 +22,7 @@
             </a>
           </li>
           <li class="">
-            <a href="#">
+            <a href="{{ route('quisioner.preview') }}">
               <h4><i class="fa fa-calculator"></i>&nbsp;<span>Preview & Score</span></h4>
             </a>
           </li>
