@@ -46,7 +46,7 @@ $(document).ready(function(){
       }
   });
   
-  var dtMain = $("#dt-questioner-table-index").DataTable({
+  var dtMain = $("#dt-questioner-preview-table-index").DataTable({
       destroy: true,
       processing: true,
       serverSide: true,
@@ -67,11 +67,10 @@ $(document).ready(function(){
           {
             data: "name",
             render: function (data, type, val, meta){
-              return '<a href="'+window.location.origin+'/quisioner/view/'+val.id+'">'+val.name+'</a>';
+              return '<a href="'+window.location.origin+'/quisioner/preview/detail/'+val.id+'">'+val.name+'</a>';
             }
           },
-          {data: "category_name"},
-          {data: "action", orderable: false, searchable: false}
+          {data: "category_name"}
           // {data: "Responses"},
           // {data: "comment"}
       ],
@@ -81,6 +80,42 @@ $(document).ready(function(){
               className: "mdl-data-table__cell--non-numeric"
       }]
   });
+
+  var dtMain2 = $("#dt-questioner-table-index").DataTable({
+    destroy: true,
+    processing: true,
+    serverSide: true,
+    ajax: "/quisioner/list-all",
+    columns: [
+        //{data: "checkbox", name: "file-exp-checkbox", orderable: false, searchable: false},
+        // {
+        //     data: "name",
+        //     "fnCreatedCell": function (nTd, sData, oData) {
+        //         if (oData.is_file === '1'){
+        //             $(nTd).html("<span><i class='fa fa-file fa-lg'></i></span>&nbsp; " + sData);
+        //         } else {
+        //             $(nTd).html("<span><i class='fa fa-folder fa-lg'></i></span>&nbsp; " + sData );
+        //         }
+        //     }
+        // },
+        {data: "rownum"},
+        {
+          data: "name",
+          render: function (data, type, val, meta){
+            return '<a href="'+window.location.origin+'/quisioner/view/'+val.id+'">'+val.name+'</a>';
+          }
+        },
+        {data: "category_name"},
+        {data: "action", orderable: false, searchable: false}
+        // {data: "Responses"},
+        // {data: "comment"}
+    ],
+    columnDefs: [{
+            //targets: [0, 1, 2, 3, 4],
+            targets: [0, 1, 2],
+            className: "mdl-data-table__cell--non-numeric"
+    }]
+});
 
   //main modal create quisioner
   $("#mn_create_new_questioner").click(function(){

@@ -46,6 +46,28 @@ class QuestionerController extends Controller
         return view('questioner.questioner');
     }
 
+
+    /**
+     * Create questioner
+     *
+     * URL /questioner/preview
+     */
+    public function preview()
+    {
+        return view('questioner.questioner-preview');
+    }
+
+    /**
+     * Create questioner
+     *
+     * URL /questioner/preview/detail/{id}
+     */
+    public function preview_detail($id)
+    {
+        $questioner = Questioner::getQuestionerQuestionAnswerAll($id);
+        return view('questioner.questioner-preview-detail', ['questioner'=>$questioner]);
+    }
+
     
     /**
      * Create questioner

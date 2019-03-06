@@ -184,10 +184,10 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/quisioner/list-all','Questioner\QuestionerController@get_list_all');
 	Route::get('/quisioner/create-new','Questioner\QuestionerController@create_new_questioner')->name('quisioner.create-new');
 	Route::get('/quisioner/view/{id}','Questioner\QuestionerController@view_questioner')->name('quisioner.view');
-	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
-
-
 	Route::post('/quisioner/answer','Questioner\QuestionerController@question_answer')->name('quisioner.answer');
+	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
+	Route::get('/quisioner/preview','Questioner\QuestionerController@preview')->name('quisioner.preview');
+	Route::get('/quisioner/preview/detail/{id}','Questioner\QuestionerController@preview_detail')->name('quisioner.preview.detail');
 
 });
 
