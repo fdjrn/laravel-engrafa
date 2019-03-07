@@ -107,7 +107,8 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/notification/read/all','Notification\NotificationController@readAll');
 
 	// survey
-	Route::get('/assessment/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
+	Route::get('/assessment','Survey\SurveyController@index')->where('id', '[0-9]+')->name('assessment');
+	Route::get('/assessment/{id}','Survey\SurveyController@showAssessment')->where('id', '[0-9]+')->name('survey');
 	// survey responden
 	Route::get('/assessment/{id}/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
 	Route::post('/assessment/{id}/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
@@ -135,16 +136,13 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/assessment/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');
 	Route::get('/assessment/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
 	Route::get('/assessment/{id}/chat','Survey\SurveyController@chat')->where('id', '[0-9]+')->name('survey.chat');
-	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
-	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
-	Route::get('/survey/add/question/test','Survey\SurveyController@test');
+	// Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
+	// Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
 	// Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
 	
-	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
-	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
-	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
-	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	// Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
+	// Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 
 	//setting

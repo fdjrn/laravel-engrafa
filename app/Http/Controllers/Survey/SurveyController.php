@@ -23,7 +23,37 @@ use App\Events\NewNotification;
 class SurveyController extends Controller
 {
     //
-    public function index($id){
+    public function index(){
+        $data['listSurvey'] = array();
+        $dataSurvey = DB::table('surveys')
+            ->select('surveys.*')
+            ->leftJoin('survey_members',function($join){
+                $join->on('survey_members.survey','=','surveys.id')
+                     ->on('survey_members.user', '=', DB::raw(Auth::user()->id));
+            })
+            ->where('surveys.created_by','=',Auth::user()->id)
+            ->orWhere('survey_members.user', '=', Auth::user()->id)
+            ->get();
+
+        foreach($dataSurvey as $survey){
+            $datas = new \stdClass();
+            @$datas->id = $survey->id;
+            @$datas->name = $survey->name;
+            @$datas->expired = $survey->expired;
+            if($survey->created_by == Auth::user()->id){
+                @$datas->created_by = "Yourself";
+            }else{
+                $user = Survey::get_user_by_id($survey->created_by);
+                @$datas->created_by = $user->name;
+            }
+            @$datas->ownership = explode("-",Survey::get_status_ownership($survey->id))[1];
+            array_push($data['listSurvey'], $datas);
+        }
+
+        return view('survey.index', $data);
+    }
+
+    public function showAssessment($id){
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
@@ -713,7 +743,7 @@ class SurveyController extends Controller
         $data['priorities'] = $priority;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.id')
+            ->select('surveys.id', 'surveys.name')
             ->where('surveys.id',$id)
             ->get();
 
@@ -726,6 +756,7 @@ class SurveyController extends Controller
                 ->where('tasks.survey',$id)
                 ->get();
             $data['tasks'] = $data_tasks;
+            $data['survey_name'] = $data_survey->first()->name;
             return view('survey.task',$data);  
         }else{
             abort(404);
