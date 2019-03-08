@@ -200,7 +200,7 @@ class QuestionerController extends Controller
                 'status' => 1,
                 'message' => 'Quisioner Answer Has Been Saved'
             );
-            toastr()->success($response['message'],'Success');
+            //toastr()->success($response['message'],'Success');
 
             return $response;
 
@@ -396,7 +396,7 @@ class QuestionerController extends Controller
                         'status' => 1,
                         'message' => 'Quisioner Has Been Created'
                     );
-                    toastr()->success($response['message'],'Success');
+                    //toastr()->success($response['message'],'Success');
         
                     return $response;
                 }else{

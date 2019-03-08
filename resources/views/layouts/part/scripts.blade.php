@@ -43,8 +43,7 @@
 <script src="{{ asset('theme/AdminLTE/dist/js/adminlte.min.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 {{-- <script src="{{ asset('theme/AdminLTE/dist/js/pages/dashboard.js')}}"></script> --}}
-@toastr_js
-@toastr_render
+
 <script src="{{ asset('colorselector/lib/bootstrap-colorselector-0.2.0/js/bootstrap-colorselector.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/chart.js2/Chart.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>

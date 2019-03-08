@@ -140,15 +140,40 @@ $(document).ready(function(){
       data: form.serialize(),
       success: function (response) {
         if(response.status == 1){
-          window.location.href = base_url+'/quisioner';
+          swal({
+              type: "success",
+              title: "Success",
+              text: 'Quisioner Has Been Created',
+              timer: 2000
+          }).then(function() {
+              $("#btn_save_new_quisioner").button('reset');
+              $('.form-control').removeAttr('disabled');
+              window.location.href = base_url+'/quisioner';
+          });
+
+          //window.location.href = base_url+'/quisioner';
+
+          // $("#btn_save_new_quisioner").button('reset');
+          // $('.form-control').removeAttr('disabled');
         }else{
-          toastr.error(response.message,'Error');
+          //toastr.error(response.message,'Error');
+          swal({
+              type: "error",
+              title: "Error",
+              text: response.message,
+              timer: 2000
+          });
         }
-        $("#btn_save_new_quisioner").button('reset');
-        $('.form-control').removeAttr('disabled');
+        
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {
-          toastr.error("Internal Server Error",'Error');
+          //toastr.error("Internal Server Error",'Error');
+          swal({
+              type: "error",
+              title: "Error",
+              text: "Internal Server Error",
+              timer: 2000
+          });
           $("#btn_save_new_quisioner").button('reset');
           $('.form-control').removeAttr('disabled');
       }
@@ -418,16 +443,36 @@ $(document).ready(function(){
       data: form.serialize(),
       success: function (response) {
         if(response.status == 1){
-          window.location.href = base_url+'/quisioner';
+          swal({
+              type: "success",
+              title: "Success",
+              text: 'Quisioner answer has been saved',
+              timer: 2000
+          }).then(function() {
+              window.location.href = base_url+'/quisioner';
+          });
+          //window.location.href = base_url+'/quisioner';
         }else{
-          toastr.error(response.message,'Error');
+          //toastr.error(response.message,'Error');
+          swal({
+              type: "error",
+              title: "Error",
+              text: 'Quisioner answer failed to be saved',
+              timer: 2000
+          });
         }
         $("#btn_save_new_quisioner").button('reset');
         $('.form-control').removeAttr('disabled');
         $('.custom-control').removeAttr('disabled');
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {
-          toastr.error("Internal Server Error",'Error');
+          //toastr.error("Internal Server Error",'Error');
+          swal({
+              type: "error",
+              title: "Error",
+              text: 'Internal Server Error',
+              timer: 2000
+          });
           $("#btn_save_new_quisioner").button('reset');
           $('.form-control').removeAttr('disabled');
           $('.custom-control').removeAttr('disabled');
