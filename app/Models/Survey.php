@@ -33,6 +33,10 @@ class Survey extends Model
 
 	}
 
+    public static function get_user_by_id($user_id){
+        return DB::table('users')->where('id', '=', $user_id)->get()->first();
+    }
+
     public static function get_status_ownership($survey_id){
         $data_survey = DB::table('surveys')
             ->select('created_by')
