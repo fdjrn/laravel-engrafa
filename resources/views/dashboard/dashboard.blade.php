@@ -62,6 +62,18 @@
           </div>
       </div>
       @endif
+
+      @if ($errors->any())
+      <div id="success-msg">
+        <div class="alert alert-danger">
+          <ul>
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      </div>
+      @endif
       <!-- end message -->
 
       <div class="row">
@@ -87,7 +99,7 @@
                   <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
                 @endif
               </ul>
-            <div class="tab-content">
+            <div class="tab-content" id="rownya">
 
             <!-- foreach untuk grafiknya -->
             @if (empty($dashboards))
@@ -105,7 +117,7 @@
 
                           <div class="box-tools pull-right">
                             <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
-                                    title="FullScreen" onclick="openFullscreen({{ $item->id }})">
+                                    title="FullScreen" onclick="javascript:toggleFullScreen()">
                               <i class="fa fa-arrows-alt"></i></button>
                               <button type="button" class="btn btn-box-tool" data-toggle="tooltip"
                                     title="PDF">
@@ -162,7 +174,7 @@
             <label class="control-label col-sm-3">Title</label>
             <div class="col-sm-9">
               <!-- menyisipkan field dashboard_survey_id -->
-              <input type="text" class="form-control" id="title" placeholder="Title" name="title">
+              <input type="text" class="form-control" id="title" placeholder="Title" name="title" required>
             </div>
           </div>
 
@@ -425,7 +437,6 @@
                         // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
                       }
                     }
-
                     $('#box-' + dashboard_id).append(div_class +
                               '<!-- Default box -->'+
                               '<div class="box box-primary">'+
@@ -475,22 +486,27 @@
                           // menampilkan chartnya ada berapa aja
                           if(element_id_survey.chart_type == "1-Batang"){
                             if (element_data_chart.total_survey > 1) {
-                              chart_type += '<div class="col-lg-4">'+
-                                              '<canvas id="grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                              chart_type += '<div id="canvas-div-'+element_data_chart.id+'-'+i+'" class="col-lg-4">'+
+                                              '<canvas id="canvas-grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
                                             '</div>';
+                              // console.log("ini chart batang ke "+element_data_chart.id+" urutan ke "+i)
                             }else{
-                              chart_type += '<canvas id="grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              chart_type += '<canvas id="canvas-grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              // console.log("eh chart batang "+element_data_chart.id+" ke print")
                             }
+                            $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
                           }else if(element_id_survey.chart_type == "2-Spider"){
                             if (element_data_chart.total_survey > 1) {
-                              chart_type += '<div class="col-lg-4">'+
-                                              '<canvas id="grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                              chart_type += '<div id="canvas-div-'+element_data_chart.id+'-'+i+'" class="col-lg-4">'+
+                                              '<canvas id="canvas-grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
                                             '</div>';
+                              // console.log("ini chart spider ke "+element_data_chart.id+" urutan ke "+i)
                             }else{
-                              chart_type += '<canvas id="grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              chart_type += '<canvas id="canvas-grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              // console.log("eh chart spider "+element_data_chart.id+" ke print")
                             }
+                            $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
                           }
-                          $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
 
                           $.ajax({
                             type: "POST",
@@ -502,9 +518,9 @@
                               // nampilin data grafiknya
                               if (element_data_chart.chart_type == "1-Batang") {
                                 if (element_data_chart.total_survey > 1) {
-                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id+"-"+i);
+                                  var ctx2 = document.getElementById("canvas-grafik-batang-"+element_data_chart.id+"-"+i);
                                 }else{
-                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id);
+                                  var ctx2 = document.getElementById("canvas-grafik-batang-"+element_data_chart.id);
                                 }
                                 var process_name = [];
                                 var level = [];
@@ -570,9 +586,9 @@
                                 });
                               } else if (element_data_chart.chart_type == "2-Spider") {
                                 if (element_data_chart.total_survey > 1) {
-                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id+"-"+i);
+                                  var marksCanvas = document.getElementById("canvas-grafik-spider-"+element_data_chart.id+"-"+i);
                                 }else{
-                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id);
+                                  var marksCanvas = document.getElementById("canvas-grafik-spider-"+element_data_chart.id);
                                 }
                                 var process_name = [];
                                 var level = [];
@@ -624,13 +640,18 @@
                                     chart.update();
                                 }
 
-                                // // inserting the new dataset after 3 seconds
-                                // setTimeout(function() {
-
-                                //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
-                                // }, 3000);
-
                               }
+
+                              // $('div[id^=canvas-div-]').addClass( "active" );
+                              var found = {};
+                              $('div[id^=canvas-div-]').filter(function() {
+                                var ending = this.id.replace("canvas-div-","");
+                                if( found.hasOwnProperty( ending ) ) {
+                                    return this;
+                                } else {
+                                    found[ ending ] = ending;
+                                }
+                              }).remove();
                             }
                           }); // tutup ajax keempat
                         }); // tutup foreach data_id_survey
@@ -642,12 +663,12 @@
             } // tutup success data_dashboard
           }); // tutup ajax paling pertama
       
-      $('.btn.btn-dashboard').click(function (e) { 
-        e.preventDefault();
-        var dashboard_id = $(this).attr('id');
-        $('#box-' + dashboard_id).empty();
+        $('.btn.btn-dashboard').click(function (e) { 
+          e.preventDefault();
+          var dashboard_id = $(this).attr('id');
+          $('#box-' + dashboard_id).empty();
 
-        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+          var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
           $.ajax({
             type: "POST",
             url: base_url+'/ajax_get_dashboard',
@@ -683,7 +704,6 @@
                         // var chart_type = '<canvas id="grafik-spider-'+element_data_chart.id+'" width="400" height="400"></canvas>';
                       }
                     }
-
                     $('#box-' + dashboard_id).append(div_class +
                               '<!-- Default box -->'+
                               '<div class="box box-primary">'+
@@ -733,22 +753,27 @@
                           // menampilkan chartnya ada berapa aja
                           if(element_id_survey.chart_type == "1-Batang"){
                             if (element_data_chart.total_survey > 1) {
-                              chart_type += '<div class="col-lg-4">'+
-                                              '<canvas id="grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                              chart_type += '<div id="canvas-div-'+element_data_chart.id+'-'+i+'" class="col-lg-4">'+
+                                              '<canvas id="canvas-grafik-batang-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
                                             '</div>';
+                              // console.log("ini chart batang ke "+element_data_chart.id+" urutan ke "+i)
                             }else{
-                              chart_type += '<canvas id="grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              chart_type += '<canvas id="canvas-grafik-batang-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              // console.log("eh chart batang "+element_data_chart.id+" ke print")
                             }
+                            $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
                           }else if(element_id_survey.chart_type == "2-Spider"){
                             if (element_data_chart.total_survey > 1) {
-                              chart_type += '<div class="col-lg-4">'+
-                                              '<canvas id="grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
+                              chart_type += '<div id="canvas-div-'+element_data_chart.id+'-'+i+'" class="col-lg-4">'+
+                                              '<canvas id="canvas-grafik-spider-'+element_data_chart.id+'-'+i+'" width="200" height="200"></canvas>'+
                                             '</div>';
+                              // console.log("ini chart spider ke "+element_data_chart.id+" urutan ke "+i)
                             }else{
-                              chart_type += '<canvas id="grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              chart_type += '<canvas id="canvas-grafik-spider-'+element_data_chart.id+'" width="200" height="200"></canvas>';
+                              // console.log("eh chart spider "+element_data_chart.id+" ke print")
                             }
+                            $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
                           }
-                          $('#chart-div-'+element_id_survey.id_charts).append(chart_type);
 
                           $.ajax({
                             type: "POST",
@@ -760,9 +785,9 @@
                               // nampilin data grafiknya
                               if (element_data_chart.chart_type == "1-Batang") {
                                 if (element_data_chart.total_survey > 1) {
-                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id+"-"+i);
+                                  var ctx2 = document.getElementById("canvas-grafik-batang-"+element_data_chart.id+"-"+i);
                                 }else{
-                                  var ctx2 = document.getElementById("grafik-batang-"+element_data_chart.id);
+                                  var ctx2 = document.getElementById("canvas-grafik-batang-"+element_data_chart.id);
                                 }
                                 var process_name = [];
                                 var level = [];
@@ -828,9 +853,9 @@
                                 });
                               } else if (element_data_chart.chart_type == "2-Spider") {
                                 if (element_data_chart.total_survey > 1) {
-                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id+"-"+i);
+                                  var marksCanvas = document.getElementById("canvas-grafik-spider-"+element_data_chart.id+"-"+i);
                                 }else{
-                                  var marksCanvas = document.getElementById("grafik-spider-"+element_data_chart.id);
+                                  var marksCanvas = document.getElementById("canvas-grafik-spider-"+element_data_chart.id);
                                 }
                                 var process_name = [];
                                 var level = [];
@@ -881,14 +906,19 @@
                                     });
                                     chart.update();
                                 }
-
-                                // // inserting the new dataset after 3 seconds
-                                // setTimeout(function() {
-
-                                //   addData(radarChart, survey_name, 'rgba(0,0,200,0.5)', level);
-                                // }, 3000);
-
+                                
                               }
+
+                              // $('div[id^=canvas-div-]').addClass( "active" );
+                              var found = {};
+                              $('div[id^=canvas-div-]').filter(function() {
+                                var ending = this.id.replace("canvas-div-","");
+                                if( found.hasOwnProperty( ending ) ) {
+                                    return this;
+                                } else {
+                                    found[ ending ] = ending;
+                                }
+                              }).remove();
                             }
                           }); // tutup ajax keempat
                         }); // tutup foreach data_id_survey
@@ -900,7 +930,7 @@
             } // tutup success data_dashboard
           }); // tutup ajax paling pertama
 
-      });
+        });
     });
   </script>
   
@@ -935,12 +965,22 @@
       var chart_id = button.data('chart_id') // Extract info from data-* attributes
 
       $modal.find('#id').val(chart_id);
+
+      var remove_button = '';
       
       $.get(base_url + "/ajax/edit-survey/" + chart_id, function(oResp) {
         console.log(oResp)
         oResp.forEach(function (element, index) {
+          console.log(index)
           // 1. append dulu select nya
           // 2. set id nya berdasarkan foreach nya
+          if(index != 0){
+            remove_button = 
+            '<div class="col-sm-2">'+
+                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
+            '</div>';
+          }
+
           $("#select-container").append(
             '<div class="form-group" id="row_survey_'+element.dashboard_survey_id+'">'+
               '<label class="control-label col-sm-3">Pilih Survey</label>'+
@@ -952,9 +992,7 @@
                       '@endforeach'+
                   '</select>'+
               '</div>'+
-              '<div class="col-sm-2">'+
-                '<a href="#" class="btn btn-danger" title="Remove Survey" onclick="hapusSurvey('+element.dashboard_survey_id+')"><i class="fa fa-remove" style="font-color:red"></i></a>'+
-              '</div>'+
+              remove_button+
             '</div>'
           );
           // 3. sudah di append dom nya baru di set value nya berdasarkan id for nya
@@ -1316,21 +1354,20 @@
 
   {{-- Fullscreen Dashboard --}}
   <script>
-    /* Function to open fullscreen mode */
-    function openFullscreen(id_tab) {
-      /* Get the element you want displayed in fullscreen */ 
-      var elem = document.getElementById("box-"+id_tab);
-      console.log(elem)
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.mozRequestFullScreen) { /* Firefox */
-        elem.mozRequestFullScreen();
-      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-        elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        elem.msRequestFullscreen();
+  // toggle full screen
+  window.toggleFullScreen = function() {
+    var elem = document.getElementById("rownya");
+    if (!elem.fullscreenElement && !elem.mozFullScreenElement && !elem.webkitFullscreenElement) {
+      $("#rownya").css("overflow-y", "scroll");
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    } else {
+        if (elem.cancelFullScreen) elem.cancelFullScreen();
+        else if (elem.mozCancelFullScreen) elem.mozCancelFullScreen();
+        else if (elem.webkitCancelFullScreen) elem.webkitCancelFullScreen();
       }
-    };
+  }
   </script>
 @stop
 

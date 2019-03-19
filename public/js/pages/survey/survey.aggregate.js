@@ -18,13 +18,13 @@ $(document).ready(function(){
 	  success : function (data) {
 
 	  	surveyProcessOutcomes = data.surveyProcessOutcomes;
-	  	console.log(surveyProcessOutcomes);
+
 	  	for (var i = data.surveyProcess.length - 1; i >= 0; i--) {
 	  		labels.push(data.surveyProcess[i].process);
-	  		if(data.surveyProcess[i].level == null){
-	  			levelTercapai.push(-1);
-	  		}else{
+	  		if(data.surveyProcess[i].level !== null){
 	  			levelTercapai.push(data.surveyProcess[i].level);
+	  		}else{
+	  			levelTercapai.push(NaN);
 	  		}
 	  		targetLevel.push(data.surveyProcess[i].target_level);
 	  	}
@@ -48,7 +48,6 @@ $(document).ready(function(){
 			    datasets: [
 			    {
 			        fill: true,
-			        borderColor : "#f56954",
 			        backgroundColor : "rgb(255, 153, 153, 0.5)",
 			        pointBackgroundColor : "#f56954",
 			        pointBorderColor : "#f56954",
@@ -57,7 +56,6 @@ $(document).ready(function(){
 			    },
 			    {
 			        fill: true,
-			        borderColor : "#3c8dbc",
 			        backgroundColor : "rgba(114, 175, 210, 0.5)",
 			        pointBackgroundColor : "#3c8dbc",
 			        pointBorderColor : "#3c8dbc",
@@ -76,12 +74,17 @@ $(document).ready(function(){
 		            label: function(tooltipItem, data) {
 			            if(data['datasets'][tooltipItem.datasetIndex]['data'][tooltipItem['index']] >= 0){
 			              return data['datasets'][tooltipItem.datasetIndex]['label']+': '+data['datasets'][tooltipItem.datasetIndex]['data'][tooltipItem['index']];
-			            }else{
-			              return data['datasets'][tooltipItem.datasetIndex]['label']+': -';
 			            }
 		            },
 		          }
-		      }
+		      },
+		    scale: {
+		        ticks: {
+		        	min: 0,
+		        	stepSize: 1,
+		            max: 5
+		        }
+		    }
 		    }
 		});
 	}
@@ -89,8 +92,12 @@ $(document).ready(function(){
 	function showSummaryProgress(){
 
 		for (var i = labels.length - 1; i >= 0; i--) {
-			if (levelTercapai[i]>=targetLevel[i]) {
-				jmlhProcessTercapai++;
+			if (levelTercapai[i] !== null){
+				if (levelTercapai[i] >= targetLevel[i]) {
+					jmlhProcessTercapai++;
+				}else{
+					jmlhProcessBelumTercapai++;
+				}
 			}else{
 				jmlhProcessBelumTercapai++;
 			}

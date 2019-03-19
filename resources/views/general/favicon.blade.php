@@ -1,5 +1,5 @@
 <!-- BEGIN FAVICON -->
-<link rel="apple-touch-icon" sizes="57x57" href="/cartenz/favicon/apple-icon-57x57.png">
+<!-- <link rel="apple-touch-icon" sizes="57x57" href="/cartenz/favicon/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/cartenz/favicon/apple-icon-60x60.png">
 <link rel="apple-touch-icon" sizes="72x72" href="/cartenz/favicon/apple-icon-72x72.png">
 <link rel="apple-touch-icon" sizes="76x76" href="/cartenz/favicon/apple-icon-76x76.png">
@@ -12,8 +12,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/cartenz/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="/cartenz/favicon/favicon-96x96.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/cartenz/favicon/favicon-16x16.png">
-{{-- <link rel="manifest" href="/cartenz/favicon/manifest.json"> --}}
-<meta name="msapplication-TileColor" content="#ffffff">
+<link rel="manifest" href="/cartenz/favicon/manifest.json"> -->
+<!-- <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="/cartenz/favicon/ms-icon-144x144.png">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#ffffff"> -->
 <!-- END FAVICON -->

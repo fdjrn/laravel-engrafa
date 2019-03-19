@@ -48,7 +48,7 @@
 @stop
 
 @section('page-breadcrumb')
-  <li><a class="active" href="{{route('survey',['id'=> $survey_id])}}"><i class="fa fa-files-o"></i> Assessment</a></li>
+  <li><a class="active" href="{{route('assessment')}}"><i class="fa fa-files-o"></i> Assessment</a></li>
 @stop
 
 
