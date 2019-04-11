@@ -17,10 +17,7 @@
 
         <!-- sidebar menu: : style can be found in sidebar.less -->
 
-        <ul class="sidebar-menu" data-widget="tree" id="notifToogle" style="
-    height:610px;
-    padding:10px 5px;
-    overflow:scroll;">
+        <ul class="sidebar-menu" data-widget="tree" id="notifToogle" >
             <notification-toogle-component :user="{{auth()->user()}}"></notification-toogle-component>
 
             <li data-toggle="control-sidebar">
