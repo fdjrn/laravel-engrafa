@@ -113,7 +113,7 @@
                     <!-- Default box -->
                       <div class="box">
                         <div class="box-header">
-                          <h3 class="box-title">{{ $item->name }}</h3>
+                          <!-- <h3 class="box-title">{{ $item->name }}</h3> -->
 
                           <div class="box-tools pull-right">
                             <button type="button" class="btn btn-box-tool" data-toggle="tooltip"

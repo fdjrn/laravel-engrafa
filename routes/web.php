@@ -134,8 +134,11 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/assessment/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/assessment/{id}/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::post('/assessment/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');
+	Route::delete('/assessment/{id}/task/{task_id}','Survey\SurveyController@task_delete')->name('survey.task.delete');
 	Route::get('/assessment/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
 	Route::get('/assessment/{id}/chat','Survey\SurveyController@chat')->where('id', '[0-9]+')->name('survey.chat');
+	Route::get('/assessment/{id}/status','Survey\SurveyController@status')->where('id', '[0-9]+')->name('survey.status');
+	Route::delete('/assessment/{id}','Survey\SurveyController@assesment_delete')->where('id', '[0-9]+')->name('survey.delete');
 	// Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	// Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
@@ -163,6 +166,7 @@ Route::middleware(['auth','web'])->group(function () {
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
 	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
+	Route::delete("/calendar/{id}",'Schedule\ScheduleController@calendar_delete')->name("calendar.delete");
 	Route::get("/calendar/{year}/{month}",'Schedule\ScheduleController@schedules_list')->name("calendar.list");
 
 	//bookmark

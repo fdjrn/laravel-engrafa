@@ -84,7 +84,7 @@
               <tbody>
                 @foreach($tasks as $task)
                   @if($task->progress < 100)
-                    <tr>
+                    <tr name="{{$task->id}}">
                       <td style="vertical-align: middle; text-align: left;">
                         <div style="position: relative; width:200px;"><canvas class="pieChart" width="200" height="110" data-progress="{{$task->progress}}" data-color="{{$task->color}}"></canvas></div>
                       </td>
@@ -113,7 +113,7 @@
               <tbody>
                 @foreach($tasks as $task)
                   @if($task->progress == 100)
-                    <tr>
+                    <tr name="{{$task->id}}">
                       <td style="vertical-align: middle; text-align: left;">
                         <div style="position: relative; width:200px;"><canvas class="pieChart" width="200" height="110" data-progress="{{$task->progress}}" data-color="{{$task->color}}"></canvas></div>
                       </td>
@@ -226,7 +226,8 @@
       </div>
       <div class="modal-footer" id="m_footer_task">
         <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><i class="fa fa-times"></i></button>
-        <button type="submit" form="form_n_task" class="btn btn-primary"><i class="fa fa-check"></i></button>
+        <button type="button" class="btn btn-danger" id="btn_delete"><i class="fa fa-times"></i></button>
+        <button type="submit" form="form_n_task" class="btn btn-primary" id="btn_submit"><i class="fa fa-check"></i></button>
       </div>
     </div>
     <!-- /.modal-content -->
