@@ -23,8 +23,21 @@ class ScheduleController extends Controller
     		$month = '0'.$month;
     	}
 
-    	$schedules = Schedules::where('date_from','like',$year."-".$month."%")->get();
-    	return json_encode($schedules);
+    	// $schedules = Schedules::where('date_from','like',$year."-".$month."%");
+    	
+    	$schedules = DB::table("tasks")
+    		->select(DB::raw("tasks.id as id, tasks.name as name, tasks.due_date as date_from, tasks.due_date as date_to, '' as location, tasks.detail as detail, tasks.color as color, tasks.created_by as created_by, tasks.updated_at as updated_at, tasks.created_at as created_at, 'task' as type"))
+    		->join("task_participant","tasks.id","=","task_participant.task")
+    		->where('due_date','like',$year."-".$month."%")
+    		->where('team_member',Auth::user()->id);
+    		
+    	$schedule = DB::table("schedules")
+    		->select(DB::raw("*, 'schedule' as type"))
+    		->where('date_from','like',$year."-".$month."%")
+    		->union($schedules)
+    		->get();
+    	// dd($schedules);
+    	return json_encode($schedule);
     }
 
     public function calendar_store(Request $request){
@@ -79,5 +92,10 @@ class ScheduleController extends Controller
 	    	]);    		
     	}
 
+    }
+
+    public function calendar_delete(Request $request){
+    	// dd($request->id);
+    	Schedules::where("id",$request->id)->delete();
     }
 }

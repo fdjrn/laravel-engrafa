@@ -72,6 +72,7 @@
                   <th>Ownership</th>
                   <th>Expire Date</th>
                   <th>Creator</th>
+                  <th>Action</th>
               </thead>
               <tbody>
                 @foreach($listSurvey as $index => $survey)
@@ -84,6 +85,13 @@
                   <td>{{$survey->ownership}}</td>
                   <td><i class="fa fa-calendar-times-o"></i>&nbsp;{{date('d M Y', strtotime($survey->expired))}}</td>
                   <td>{{$survey->created_by}}</td>
+                  @if($survey->ownership == 'CREATOR')
+                    <td>
+                      <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Delete Survey" id="btn_delete" onClick="confirmDeleteSurvey('{{$survey->id}}')">
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </td>
+                  @endif
                 </tr>
                 @endforeach
               </tbody>

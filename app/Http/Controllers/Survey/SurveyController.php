@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use App\Models\ChatRoom;
 use App\Models\Files;
+use App\Models\SurveyProcess;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
 use App\Models\Survey;
 use App\Models\Task;
+use App\Models\TaskParticipants;
 use App\Events\NewNotification;
 
 
@@ -1342,6 +1344,12 @@ class SurveyController extends Controller
         ]);
     }
 
+    public function task_delete(Request $request){
+        // dd($request->task_id);
+        TaskParticipants::where('task',$request->task_id)->delete();
+        Task::where('id',$request->task_id)->delete();
+    }
+
     //AGGREGATION
     public function getData(Request $request){
         $message = "success";
@@ -1486,5 +1494,41 @@ class SurveyController extends Controller
         $data['aUser'] = auth()->user();
         
         return view('survey.chat',$data);
+    }
+
+    public function status(Request $request){
+        $surveyProcess = SurveyProcess::where("survey", $request->id)->get();
+
+        $status = "1-Waiting";
+
+        foreach ($surveyProcess as $surveyProces) {
+            if($surveyProces->status == '1-Wating' || $surveyProces->status == "7-Done"){
+
+            }else{
+                $status = "2-Process Survey";
+                break;
+            }
+        }
+        
+        return json_encode([
+            'status' => $status
+        ]);
+
+    }
+
+    public function assessment_delete(Request $request){
+        //survey working product
+        //survey process outcome
+        //survey process
+        //dashboard survey
+        //survey member
+        
+        //chat
+        //chat room member
+        //chat room
+        
+        //task participant
+        //task
+
     }
 }

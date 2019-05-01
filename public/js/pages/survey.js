@@ -271,3 +271,42 @@ $("#form_e_process").submit(function(e) {
   })
 
 });
+
+function confirmDeleteSurvey(surveyId){
+
+  $.ajax({
+    type: "GET",
+    url: base_url + "/assessment/"+surveyId+"/status",
+    success: function(data)
+    {
+      let Data = JSON.parse(data);
+      if (Data.status != "1-Waiting") {
+        Swal.fire({
+          title: 'Assessment Sedang Berjalan, Apakah anda yakin akan menghapus assessment?',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.value) {
+            deleteSurvey(surveyId);
+          }
+        })
+      }else{
+        deleteSurvey(surveyId);
+      }
+    }
+  });
+
+}
+
+function deleteSurvey(surveyId){
+  console.log("delete survey for sure " + surveyId);
+  $.ajax({
+    type: "DELETE",
+    url: base_url + "/assessment/"+surveyId,
+    success: function(data)
+    {
+    }
+}
