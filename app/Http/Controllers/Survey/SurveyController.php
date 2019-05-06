@@ -1521,7 +1521,7 @@ class SurveyController extends Controller
         $status = "gagal";
 
         //survey working product
-        $surveyWorkingProduct = \App\Models\surveyWorkingProduct::where('survey',$surveyId)->delete();
+        $surveyWorkingProduct = \App\Models\SurveyWorkingProduct::where('survey',$surveyId)->delete();
         // $surveyWorkingProduct->delete();
 
         //survey process outcome
