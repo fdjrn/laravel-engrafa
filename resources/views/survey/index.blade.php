@@ -87,7 +87,7 @@
                   <td>{{$survey->created_by}}</td>
                   @if($survey->ownership == 'CREATOR')
                     <td>
-                      <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Delete Survey" id="btn_delete" onClick="confirmDeleteSurvey('{{$survey->id}}')">
+                      <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Delete Survey" id="btn_delete" onClick="confirmDeleteSurvey('{{$survey->id}}')" >
                         <i class="fa fa-times"></i>
                       </button>
                     </td>
