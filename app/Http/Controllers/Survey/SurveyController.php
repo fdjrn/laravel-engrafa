@@ -1516,19 +1516,67 @@ class SurveyController extends Controller
 
     }
 
-    public function assessment_delete(Request $request){
+    public function assesment_delete(Request $request){
+        $surveyId = $request->id;
+        $status = "gagal";
+
         //survey working product
+        $surveyWorkingProduct = \App\Models\surveyWorkingProduct::where('survey',$surveyId)->delete();
+        // $surveyWorkingProduct->delete();
+
         //survey process outcome
+        $surveyProcessOutcomes = \App\Models\SurveyProcessOutcomes::where('survey',$surveyId)->delete();
+        // $surveyProcessOutcomes->delete();
+        
         //survey process
+        $surveyProcess = \App\Models\SurveyProcess::where('survey',$surveyId)->delete();
+        // $surveyProcess->delete();
+        
         //dashboard survey
+        $dashboardSurvey = \App\Models\Dashboard_survey::where('survey',$surveyId)->delete();
+        // $dashboardSurvey->delete();
+        
         //survey member
+        $surveyMember = \App\Models\SurveyMembers::where('survey',$surveyId)->delete();
+        // $surveyMember->delete();
         
-        //chat
-        //chat room member
-        //chat room
-        
-        //task participant
-        //task
+        $chatRoom = \App\Models\ChatRoom::where('survey',$surveyId)->first();
+
+        if ($chatRoom) {
+
+            $chatRoomMembers = \App\Models\ChatMember::where('chat_room',$chatRoom->id)->get();
+
+            foreach ($chatRoomMembers as $chatRoomMember) {
+                # code...
+
+                //chat
+                $chats = \App\Models\Chats::where('chat_member',$chatRoomMember->id)->delete();
+                // $chats->delete();
+            }
+            
+            //chat room member
+            $chatRoomMembers = \App\Models\ChatMember::where('chat_room',$chatRoom->id)->delete();
+
+            //chat room
+            $chatRoom = \App\Models\ChatRoom::where('survey',$surveyId)->delete();
+
+        }
+
+        $tasks = \App\Models\Task::where('survey',$surveyId)->get();
+
+        foreach ($tasks as $task) {
+            $TaskParticipants = \App\Models\TaskParticipants::where('task',$task->id)->delete();
+            // $TaskParticipants->delete();
+        }
+        $tasks = \App\Models\Task::where('survey',$surveyId)->delete();
+
+        $survey = \App\Models\Survey::findOrFail($surveyId)->delete();
+
+        $status = "berhasil";
+
+        return json_encode([
+            'status' => $status
+        ]);
 
     }
 }

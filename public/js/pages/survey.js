@@ -274,6 +274,8 @@ $("#form_e_process").submit(function(e) {
 
 function confirmDeleteSurvey(surveyId){
 
+  console.log("delete");
+
   $.ajax({
     type: "GET",
     url: base_url + "/assessment/"+surveyId+"/status",
@@ -299,14 +301,29 @@ function confirmDeleteSurvey(surveyId){
     }
   });
 
-}
+};
 
 function deleteSurvey(surveyId){
   console.log("delete survey for sure " + surveyId);
   $.ajax({
-    type: "DELETE",
+    type: "delete",
     url: base_url + "/assessment/"+surveyId,
     success: function(data)
     {
+      let Data = JSON.parse(data);
+      if (Data.status == 'berhasil') {
+        Swal.fire({
+          title: 'Data Assessment Berhasil Dihapus',
+          type: 'success'
+        });
+        location.href = base_url + "/assessment";
+      }else{
+        Swal.fire({
+          title: 'Data Assessment Gagal Dihapus',
+          type: 'warning'
+        })
+      }
     }
-}
+  });
+
+};
