@@ -31,6 +31,10 @@ Route::middleware(['auth','web'])->group(function () {
 
 	// Route::get('/', 'HomeController@index');
 
+	//menu search
+	Route::get('/search/{search}','Search\SearchController@search')->name('search');
+
+
 	// dashboard
 	Route::get('/','Dashboard\DashboardController@index')->name('dashboard');
 	Route::post('/','Dashboard\DashboardController@store')->name('dashboard.post');

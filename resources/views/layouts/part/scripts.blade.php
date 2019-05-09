@@ -53,6 +53,7 @@
 <script src="{{ asset('theme/AdminLTE/plugins/validate/additional-methods.min.js')}}"></script>
 <script src="{{ asset('theme/AdminLTE/plugins/pace/pace.min.js')}}""></script>
 <script src="{{ asset('js/pages/main.js')}}"></script>
+<script type="text/javascript" src="{{ asset('js/pages/search.js')}}"></script>
 
 
 
