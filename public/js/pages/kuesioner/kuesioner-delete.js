@@ -6,7 +6,7 @@ $(document).ready(function(){
   var q_asking = "#q_asking";
   var next = 1;
   var countQuis = 0;
-  var formId = '#form_create_questioner';
+  var formId = '#form_delete_questioner';
   var formId2 = '#form_answer_questioner';
 
   $(q_asking).hide();
@@ -137,7 +137,7 @@ $(document).ready(function(){
     });
 
     $.ajax({
-      url: base_url+"/quisioner/create",
+      url: base_url+"/quisioner/savedelete",
       type: "POST",
       dataType: 'json', // what type of data do we expect back from the server
       encode: true,
@@ -147,17 +147,17 @@ $(document).ready(function(){
           swal({
               type: "success",
               title: "Success",
-              text: 'Quisioner Has Been Created',
+              text: 'Quisioner Has Been Deleted',
               timer: 2000
           }).then(function() {
-              $("#btn_save_new_quisioner").button('reset');
+              $("#btn_save_delete_quisioner").button('reset');
               $('.form-control').removeAttr('disabled');
               window.location.href = base_url+'/quisioner';
           });
 
           //window.location.href = base_url+'/quisioner';
 
-          // $("#btn_save_new_quisioner").button('reset');
+          // $("#btn_save_delete_quisioner").button('reset');
           // $('.form-control').removeAttr('disabled');
         }else{
           //toastr.error(response.message,'Error');
@@ -178,7 +178,7 @@ $(document).ready(function(){
               text: "Internal Server Error",
               timer: 2000
           });
-          $("#btn_save_new_quisioner").button('reset');
+          $("#btn_save_delete_quisioner").button('reset');
           $('.form-control').removeAttr('disabled');
       }
     });
@@ -187,7 +187,7 @@ $(document).ready(function(){
 
   $(formId).submit(function(e){
     if($(this).valid()){
-        $("btn_save_new_quisioner").button('loading');
+        $("btn_save_delete_quisioner").button('loading');
         handlingProccess($(this));
         $('.form-control').attr('disabled','disabled');
 
@@ -195,10 +195,335 @@ $(document).ready(function(){
     e.preventDefault();
   });
 
-  $('#btn_cancel_view').click(function(){
+  $('#btn_cancel_delete').click(function(){
     window.location.href = window.location.origin + '/quisioner';
   });
 
+  
+  //edit proses
+  var editProcess = function(){
+    for(var i=0; i<QUESTIONER_DETAIL.question.length; i++){
+      // console.log(QUESTIONER_DETAIL.question[i].id_question_type);
+      if(QUESTIONER_DETAIL.question[i].id_question_type == 1){
+        countQuis = countQuis + 1;
+        createQuisCategoryEdit(QUESTIONER_DETAIL.question[i]);
+      }else if(QUESTIONER_DETAIL.question[i].id_question_type == 2){
+        countQuis = countQuis + 1;
+        createQuisCategoryEdit(QUESTIONER_DETAIL.question[i]);
+      }else if(QUESTIONER_DETAIL.question[i].id_question_type == 3){
+        countQuis = countQuis + 1;
+        createQuisCategoryEdit(QUESTIONER_DETAIL.question[i]);
+      }else if(QUESTIONER_DETAIL.question[i].id_question_type == 4){
+        countQuis = countQuis + 1;
+        createQuisCategoryEdit(QUESTIONER_DETAIL.question[i]);
+      }
+    }
+  };
+
+  var createQuisCategoryEdit = function (arrParams){
+    var elCat = '<div id="quis_'+countQuis+'">'+
+                  '<div class="row form-group">' +
+                    '<label for="c_qeustion_category" class="col-sm-3 control-label" style="text-align:left;">Question '+countQuis+'</label>' +
+                    '<div class="col-sm-4" id="quis_question_'+countQuis+'">' +
+                      '<input type="text" readonly="true" id="c_question_'+countQuis+'" name="c_question_name['+(countQuis-1)+']" value="'+arrParams.question+'" class="form-control" placeholder="Enter your question" style="width: 100%;">' +
+                      '<input type="hidden" id="c_question_id_'+countQuis+'" name="c_question_id['+(countQuis-1)+']" value="'+arrParams.id+'" class="form-control" placeholder="Enter your question" style="width: 100%;">' +
+                    '</div>' +
+                    '<div class="col-sm-4" id="quis_cat_'+countQuis+'">' +
+                      '<select id="c_question_category_'+countQuis+'" readonly="true" name="c_question_category['+(countQuis-1)+']" class="form-control select2" data-placeholder="Question Category" '+
+                            'style="width: 100%;">' +
+                        '<option value=""></option>';
+                        if(arrParams.id_question_type == 1){
+                          elCat = elCat + '<option value="1" selected>Asking</option>'+
+                                          '<option value="2">Slider</option>' +
+                                          '<option value="3">Star Rating</option>' +
+                                          '<option value="4">Checkboxes</option>';
+                        }else if(arrParams.id_question_type == 2){
+                          elCat = elCat + '<option value="1">Asking</option>' +
+                                          '<option value="2" selected>Slider</option>' +
+                                          '<option value="3">Star Rating</option>' +
+                                          '<option value="4">Checkboxes</option>';
+                        }else if(arrParams.id_question_type == 3){
+                          elCat = elCat + '<option value="1">Asking</option>' +
+                                          '<option value="2">Slider</option>' +
+                                          '<option value="3" selected>Star Rating</option>' +
+                                          '<option value="4">Checkboxes</option>';
+                        }else if(arrParams.id_question_type == 4){
+                          elCat = elCat + '<option value="1">Asking</option>' +
+                                          '<option value="2">Slider</option>' +
+                                          '<option value="3">Star Rating</option>' +
+                                          '<option value="4" selected>Checkboxes</option>';
+                        }
+
+                      elCat = elCat + '</select>' +
+                    '</div>' +
+                    '<span class="help-block"> </span>' +
+                  '</div>' +
+                  '<div id="choise_answer_question_'+countQuis+'">' +
+                  '</div>' +
+                '</div>';
+
+    $("#box-body").append(elCat);
+    //$("#quis_"+countQuis).prepend(elCat);
+    $('#c_question_category_'+countQuis).select2();
+
+    if(arrParams.id_question_type == 1){
+      // console.log('test=');
+      // console.log(arrParams.choise_asking[0].id);
+      for(var i=0; i<arrParams.choise_asking.length; i++){
+        handlingQeustionCategoryEdit(countQuis, arrParams.choise_asking);
+        addRulesValidation('#c_question_'+countQuis,'Question');
+        addRulesValidation('#c_question_category_'+countQuis,'Question Category');
+      }
+      handlingQeustionCategory(countQuis);
+    }else if(arrParams.id_question_type == 2){
+      // console.log('test=');
+      // console.log(arrParams.slider);
+      handlingQeustionCategoryEdit(countQuis, arrParams.slider);
+      addRulesValidation('#c_question_'+countQuis,'Question');
+      addRulesValidation('#c_question_category_'+countQuis,'Question Category');
+      handlingQeustionCategory(countQuis);
+    }else if(arrParams.id_question_type == 3){
+      // console.log('test=');
+      // console.log(arrParams.rating);
+      handlingQeustionCategoryEdit(countQuis, arrParams.rating);
+      addRulesValidation('#c_question_'+countQuis,'Question');
+      addRulesValidation('#c_question_category_'+countQuis,'Question Category');
+      handlingQeustionCategory(countQuis);
+    }else if(arrParams.id_question_type == 4){
+      // console.log('test=');
+      // console.log(arrParams.choise_asking[0].id);
+      for(var i=0; i<arrParams.choise_checkbox.length; i++){
+        handlingQeustionCategoryEdit(countQuis, arrParams.choise_checkbox);
+        addRulesValidation('#c_question_'+countQuis,'Question');
+        addRulesValidation('#c_question_category_'+countQuis,'Question Category');
+      }
+      handlingQeustionCategory(countQuis);
+    }
+
+    // handlingQeustionCategory(countQuis);
+    // addRulesValidation('#c_question_'+countQuis,'Question');
+    // addRulesValidation('#c_question_category_'+countQuis,'Question Category');
+  }
+
+  var handlingQeustionCategoryEdit = function(cntQuis, arrParams){
+    $("#choise_answer_question_"+cntQuis).html('');
+
+    if($('#c_question_category_'+cntQuis).val() == 1){
+      for(var i=0; i<arrParams.length; i++){
+        if(i == 0){
+          createAskingQuestionEdit(cntQuis,'', arrParams[i].question_asking_answer, false);
+        }else if(i == arrParams.length-1){
+          createAskingQuestionEdit(cntQuis, i+1, arrParams[i].question_asking_answer, true);
+        }else{
+          createAskingQuestionEdit(cntQuis, i+1, arrParams[i].question_asking_answer, false);
+        }
+      }
+      handlingAddMoreAskingEdit(cntQuis);
+    }
+    
+    if($('#c_question_category_'+cntQuis).val() == 2){
+      createSliderQuestionEdit(arrParams.min_value, arrParams.max_value, cntQuis);
+    }
+
+    if($('#c_question_category_'+cntQuis).val() == 3){
+      createStarRatingQuestionEdit(arrParams.number_of_stars, cntQuis);
+    }
+
+    if($('#c_question_category_'+cntQuis).val() == 4){
+      for(var i=0; i<arrParams.length; i++){
+        if(i == 0){
+          createCheckboxQuestionEdit(cntQuis,'', arrParams[i].question_checkbox_answer, false);
+        }else if(i == arrParams.length-1){
+          createCheckboxQuestionEdit(cntQuis, i+1, arrParams[i].question_checkbox_answer, true);
+        }else{
+          createCheckboxQuestionEdit(cntQuis, i+1, arrParams[i].question_checkbox_answer, false);
+        }
+      }
+      handlingAddMoreCheckboxEdit(cntQuis);
+
+      // createCheckboxQuestion(cntQuis);
+      // handlingAddMoreCheckbox(cntQuis);
+    } 
+  }
+
+  var handlingAddMoreAskingEdit = function(cntQuis){
+
+    $(document).on('click', '.add-more-asking', function (e) {
+      // your function here
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      var addto = "#field" + next;
+
+      var cntQuis = $(this).attr('data-count-quis');
+      var next = $(this).attr('data-id-next');
+      var removeBtn = '<button id="remove_asking_'+ cntQuis + '_' + (next) + '" data-count-quis="'+cntQuis+'" data-id-next="'+(next)+'" class="btn btn-default remove-asking" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">-</button>';
+      var idField = '#field_asking_'+cntQuis+'_'+next;
+      var buttonAdd = '#b_asking_'+cntQuis+'_'+next;
+      
+      $(buttonAdd).remove();
+      $(idField).append(removeBtn);
+
+      next++;
+
+      createAskingQuestionEdit(cntQuis,next,'',true);
+
+    });
+
+    $(document).on('click', '.remove-asking', function (e) {
+      // your function here
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+  
+      var cntQuis = $(this).attr('data-count-quis');
+      var next = $(this).attr('data-id-next');
+  
+      var field = "#quis_asking_" + cntQuis + '_' + next;
+      $(field).remove();
+  
+    });
+    
+  }
+
+  var handlingAddMoreCheckboxEdit = function(cntQuis){
+    $(document).on('click', '.add-more-checkbox', function (e) {
+      // your function here
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      //var addto = "#field" + next;
+
+      var cntQuis = $(this).attr('data-count-quis');
+      var next = $(this).attr('data-id-next');
+      var removeBtn = '<button id="remove_checkbox_'+ cntQuis + '_' + (next) + '" data-count-quis="'+cntQuis+'" data-id-next="'+(next)+'" class="btn btn-default remove-checkbox" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">-</button>';
+      var idField = '#field_checkbox_'+cntQuis+'_'+next;
+      var buttonAdd = '#b_checkbox_'+cntQuis+'_'+next;
+      
+      $(buttonAdd).remove();
+      $(idField).append(removeBtn);
+
+      next++;
+
+      createCheckboxQuestion(cntQuis,next)
+
+    });
+
+    $(document).on('click', '.remove-checkbox', function (e) {
+      // your function here
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+  
+      var cntQuis = $(this).attr('data-count-quis');
+      var next = $(this).attr('data-id-next');
+  
+      var field = "#quis_checkbox_" + cntQuis + '_' + next;
+      $(field).remove();
+  
+    });
+  };
+
+  var createAskingQuestionEdit = function (cntQuis, next='', questionName='', isLast=false){
+    if(isLast == false){
+      var elAsking = '<div class="row form-group" id="quis_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                      '<div class="col-sm-offset-3 col-sm-8 control-group" id="fields_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                          '<div class="controls" id="profs_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                              '<div class="input-append" id="field_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                                '<input type="radio" readonly="true" id="fieldRadio_asking_'+cntQuis+((next)?'_'+next:'_1')+'" value="" checked="true" style="margin-right:7px;" disabled>' +
+                                '<input autocomplete="off" readonly="true" class="input form-control" id="fields_asking_'+cntQuis+((next)?'_'+next:'_1')+'" name="choise_asking_question['+(cntQuis-1)+']['+((next)?next-1:'0')+']" value="'+questionName+'" type="text" style="width:87%; display:inline-block; margin-right:5px;"/>' +
+                                '<button id="remove_asking_'+ cntQuis + '_' + (next) + '" disabled="true" data-count-quis="'+cntQuis+'" data-id-next="'+(next)+'" class="btn btn-default remove-asking" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">-</button>' +
+                              '</div>' +
+                          '</div>' +
+                      '</div>' +
+                      '<span class="help-block"></span>'+
+                    '</div>';
+    }else{
+      var elAsking = '<div class="row form-group" id="quis_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                      '<div class="col-sm-offset-3 col-sm-8 control-group" id="fields_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                          '<div class="controls" id="profs_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                              '<div class="input-append" id="field_asking_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                                '<input type="radio" readonly="true" id="fieldRadio_asking_'+cntQuis+((next)?'_'+next:'_1')+'" value="" checked="true" style="margin-right:7px;" disabled>' +
+                                '<input autocomplete="off" readonly="true" class="input form-control" id="fields_asking_'+cntQuis+((next)?'_'+next:'_1')+'" name="choise_asking_question['+(cntQuis-1)+']['+((next)?next-1:'0')+']" value="'+questionName+'" type="text" style="width:87%; display:inline-block; margin-right:5px;"/>' +
+                                '<button id="b_asking_'+cntQuis+((next)?'_'+next:'_1')+'" disabled="true" class="btn btn-default add-more-asking" data-count-quis="'+cntQuis+'" data-id-next="'+((next)?next:'1')+'" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">+</button>' +
+                              '</div>' +
+                          '</div>' +
+                      '</div>' +
+                      '<span class="help-block"></span>'+
+                    '</div>';
+    }
+
+    $("#choise_answer_question_"+cntQuis).append(elAsking);
+    addRulesValidationArray('choise_asking_question',cntQuis-1,((next)?next-1:0),'Asking Question');
+  }
+
+  var createCheckboxQuestionEdit = function(cntQuis, next='', questionName='', isLast=false){
+    if(isLast == false){
+      var elCheckbox = '<div class="row form-group" id="quis_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                      '<div class="col-sm-offset-3 col-sm-8 control-group" id="fields_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                          '<div class="controls" id="profs_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                              '<div class="input-append" id="field_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                                '<input type="checkbox" readonly="true" id="fieldCheckbox_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'" value="" checked="true" style="margin-right:7px;" disabled>' +
+                                '<input autocomplete="off" readonly="true" class="input form-control" id="fields_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'" name="choise_checkbox_question['+(cntQuis-1)+']['+((next)?next-1:'0')+']" value="'+questionName+'" type="text" style="width:87%; display:inline-block; margin-right:5px;"/>' +
+                                '<button id="remove_checkbox_'+ cntQuis + '_' + (next) + '" disabled="true" data-count-quis="'+cntQuis+'" data-id-next="'+(next)+'" class="btn btn-default remove-checkbox" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">-</button>' +
+                              '</div>' +
+                          '</div>' +
+                      '</div>' +
+                      '<span class="help-block"></span>'+
+                    '</div>';
+    }else{
+      var elCheckbox = '<div class="row form-group" id="quis_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                      '<div class="col-sm-offset-3 col-sm-8 control-group" id="fields_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                          '<div class="controls" id="profs_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                              '<div class="input-append" id="field_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                                '<input type="checkbox" readonly="true" id="fieldCheckbox_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'" value="" checked="true" style="margin-right:7px;" disabled>' +
+                                '<input autocomplete="off" readonly="true" class="input form-control" id="fields_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'" name="choise_checkbox_question['+(cntQuis-1)+']['+((next)?next-1:'0')+']" value="'+questionName+'" type="text" style="width:87%; display:inline-block; margin-right:5px;"/>' +
+                                '<button id="b_checkbox_'+cntQuis+((next)?'_'+next:'_1')+'" disabled="true" class="btn btn-default add-more-checkbox" data-count-quis="'+cntQuis+'" data-id-next="'+((next)?next:'1')+'" type="button" style="margin-left:3px; margin-bottom:3px; width:7%; height:35px;">+</button>' +
+                              '</div>' +
+                          '</div>' +
+                      '</div>' +
+                      '<span class="help-block"></span>'+
+                    '</div>';  
+    }
+
+    $("#choise_answer_question_"+cntQuis).append(elCheckbox);
+    addRulesValidationArray('choise_checkbox_question',cntQuis-1,((next)?next-1:0),'Checkbox Question');
+  }
+
+  var createSliderQuestionEdit = function(minVal, maxVal, cntQuis,next=''){
+    var elSlider = '<div class="row form-group" id="quis_slider_min_value_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                        '<label for="field_slider_min_value_'+cntQuis+((next)?'_'+next:'_1')+'" class="col-sm-3 col-sm-offset-3 control-label" style="text-align:left;">Minimal Value</label>' +
+                        '<div class="col-sm-5">'+
+                          '<input type="number" readonly="true" id="field_slider_min_value_'+cntQuis+((next)?'_'+next:'_1')+'" min="0" name="slider_min_value['+(cntQuis-1)+']" value="'+minVal+'" class="form-control" placeholder="Min Value">'+
+                        '</div>'+
+                        '<span class="help-block"></span>'+
+                    '</div>'+
+                    '<div class="row form-group" id="quis_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                        '<label for="field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'" class="col-sm-3 col-sm-offset-3 control-label" style="text-align:left;">Maximal Value</label>' +
+                        '<div class="col-sm-5">'+
+                          '<input type="number" readonly="true" id="field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'" min="0" name="slider_max_value['+(cntQuis-1)+']" value="'+maxVal+'" class="form-control" placeholder="Max Value">'+                          
+                        '</div>'+
+                        '<span class="help-block"></span>'+
+                    '</div>';
+
+    $("#choise_answer_question_"+cntQuis).append(elSlider);
+    addRulesValidation('#field_slider_min_value_'+cntQuis+((next)?'_'+next:'_1'),'Slider Minimal Value');
+    addRulesValidation('#field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1'),'Slider Maximal Value');
+  }
+
+  var createStarRatingQuestionEdit = function(jmlStar, cntQuis,next){
+    var elStarRating = '<div class="row form-group" id="quis_star_rating_'+cntQuis+((next)?'_'+next:'_1')+'">' +
+                        '<label for="field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1')+'" class="col-sm-3 col-sm-offset-3 control-label" style="text-align:left;">Number of Stars</label>' +
+                        '<div class="col-sm-5">'+
+                          '<input type="number" readonly="true" id="field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1')+'" name="star_rating_value['+(cntQuis-1)+']" value="'+jmlStar+'" class="form-control" min="2" placeholder="Number of Stars">'+
+                        '</div>'+
+                        '<span class="help-block"></span>'+
+                    '</div>';
+
+    $("#choise_answer_question_"+cntQuis).append(elStarRating);
+    
+    addRulesValidation('#field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1'),'Number of Stars');
+  }
+
+
+  
+  //create process
   //add new element
   $("#btn_add_question").click(function(e){
     //$(q_asking).show();
@@ -393,7 +718,7 @@ $(document).ready(function(){
 
       next++;
 
-      createAskingQuestion(cntQuis,next)
+      createAskingQuestion(cntQuis,next);
 
     });
 
@@ -468,7 +793,7 @@ $(document).ready(function(){
               timer: 2000
           });
         }
-        $("#btn_save_new_quisioner").button('reset');
+        $("#btn_save_delete_quisioner").button('reset');
         $('.form-control').removeAttr('disabled');
         $('.custom-control').removeAttr('disabled');
       },
@@ -480,7 +805,7 @@ $(document).ready(function(){
               text: 'Internal Server Error',
               timer: 2000
           });
-          $("#btn_save_new_quisioner").button('reset');
+          $("#btn_save_delete_quisioner").button('reset');
           $('.form-control').removeAttr('disabled');
           $('.custom-control').removeAttr('disabled');
       }
@@ -574,5 +899,6 @@ $(document).ready(function(){
   }
   
   validateQuestionerQuestion();
+  editProcess();
 
 });

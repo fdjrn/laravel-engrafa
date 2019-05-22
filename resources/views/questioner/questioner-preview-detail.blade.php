@@ -73,7 +73,7 @@
         }
 
         .slider .slider-track-low {
-	        background: red !important;
+            background: red !important;
         }
 
         .rating {
@@ -142,6 +142,10 @@
             text-shadow: 0 0 5px #09f;
         }
 
+        body{
+            padding-right: 0 !important;
+        }
+
     </style>
 @stop
 
@@ -200,6 +204,7 @@
                                                     <th>Answer</th>
                                                     <th>Total User Answer</th>
                                                     <th>Percentage</th>
+                                                    <th>View User</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -208,6 +213,7 @@
                                                         <td>{{ $item->question_asking_answer }}</td>
                                                         <td>{{ $item->total_user }}</td>
                                                         <td>{{ $item->percentage }}%</td>
+                                                        <td><button type="button" class="btn btn-xs btn-primary btn-answer-asking" data-toggle="modal" data-target="#modal-questioner-view-user" data-idquisioner="{{ $item->answer_id_quisioner }}" data-idquestion="{{ $item->answer_id_question }}" data-idanswer="{{ $item->id_answer_asking }}"><i class="fa fa-eye"></i></button></td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>                                       
@@ -219,12 +225,14 @@
                                                 <tr>
                                                     <th>Total User Answer</th>
                                                     <th>Average Value</th>
+                                                    <th>View User</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $question->slider->count_user }}</td>
                                                     <td>{{ $question->slider->avg_value}}</td>
+                                                    <td><button type="button" class="btn btn-xs btn-primary btn-answer-slider" data-toggle="modal" data-target="#modal-questioner-view-user" data-idquisioner="{{ $question->slider->answer_id_quisioner }}" data-idquestion="{{ $question->slider->answer_id_question }}"><i class="fa fa-eye"></i></button></td>
                                                 </tr>
                                             </tbody> 
                                         @endif
@@ -234,12 +242,14 @@
                                                 <tr>
                                                     <th>Total User Answer</th>
                                                     <th>Average Rating</th>
+                                                    <th>View User</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $question->rating->count_user }}</td>
                                                     <td>{{ $question->rating->avg_rating }}</td>
+                                                    <td><button type="button" class="btn btn-xs btn-primary btn-answer-rating" data-toggle="modal" data-target="#modal-questioner-view-user" data-idquisioner="{{ $question->rating->answer_id_quisioner }}" data-idquestion="{{ $question->rating->answer_id_question }}"><i class="fa fa-eye"></i></button></td>
                                                 </tr>
                                             </tbody>
                                         @endif
@@ -250,6 +260,7 @@
                                                     <th>Answer</th>
                                                     <th>Total User Answer</th>
                                                     <th>Percentage</th>
+                                                    <th>View User</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -258,6 +269,7 @@
                                                         <td>{{ $item->question_checkbox_answer }}</td>
                                                         <td>{{ $item->total_user }}</td>
                                                         <td>{{ $item->percentage }}%</td>
+                                                        <td><button type="button" class="btn btn-xs btn-primary btn-answer-checkbox" data-toggle="modal" data-target="#modal-questioner-view-user" data-idquisioner="{{ $item->answer_id_quisioner }}" data-idquestion="{{ $item->answer_id_question }}" data-idanswer="{{ $item->id_answer_checkbox }}"><i class="fa fa-eye"></i></button></td>
                                                     </tr>
                                                 @endforeach
                                             </tbody> 
@@ -310,6 +322,7 @@
 @section('page-level-plugins')
     @include('questioner.questioner-create-modal')
     @include('questioner.questioner-create-question-modal')
+    @include('questioner.questioner-view-user-modal')
 @stop
 
 @section('theme-global-scripts')
@@ -322,6 +335,7 @@
     {{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/bootstrap-slider.min.js') }}
     {{--{{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js') }}--}}
     {{ Html::script('js/pages/kuesioner/kuesioner.js') }}
+    {{ Html::script('js/pages/kuesioner/kuesioner-user-view.js') }}
     <script>
         $('.slider').bootstrapSlider({
             formatter: function(value) {

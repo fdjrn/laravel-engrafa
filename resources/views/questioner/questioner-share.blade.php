@@ -177,84 +177,51 @@
                 <div class="box-header with-border">
                     <h4>
                         <i class="fa fa-angle-left fa-fw header-cursor" id="main-back"></i>
-                        <label class="header-cursor">Answer Quisioner - {{ $questioner->name }}</label>
+                        <label class="header-cursor">Share Quisioner</label>
                         <span class="pull-right">
                             <i class="fa fa-clone"></i>
                         </span>
                     </h4>
                 </div>
 
-                <form id="form_answer_questioner" role="form" >
+                <!-- <form id="form_share_questioner" role="form" > -->
                     {{-- Main grid--}}
                     <div class="box-body" id="box-body">
-                        @php ($i = 1)
-                        @foreach($questioner->question as $question)
-                            <div class="form-group mt-checkbox-inline">
-                                <label>{{ $i.'. '.$question->question }}</label>
-
-                                
-                                @if($question->id_question_type==1)
-                                    @php($j = 1)
-                                    @foreach ($question->choise_asking as $item)
-                                            <div class="control-group">
-                                                <div class="controls">
-                                                    <div class="input-append">
-                                                        <input type="radio" class="custom-control" id="field_asking_{{ $i-1 }}_{{ $j-1 }}" name="answer_asking[{{ $question->id }}]" value="{{ $item->id  }}"  style="margin-right:7px;" >
-                                                        <label for="field_asking_{{ $i-1 }}_{{ $j-1 }}">{{ $item->question_asking_answer }}</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @php( $j++ )
-                                    @endforeach
-                                @endif
-                                @if($question->id_question_type==2)
-                                    <br/>
-                                    <input class="slider form-control"  name="answer_slider[{{ $question->id }}]" type="text" data-slider-min="{{ $question->slider->min_value }}" data-slider-max="{{ $question->slider->max_value }}" data-slider-step="1" data-slider-value="0"/>
-                                @endif
-
-                                @if($question->id_question_type==3)
-                                    <br/>
-                                    <div class="rating">
-                                        @for($j=0; $j<$question->rating->number_of_stars; $j++)
-                                            <label>
-                                                <input type="radio" class="form-control" name="answer_rating[{{ $question->id }}]" value="{{ $j+1 }}" />
-                                                @for($k=0; $k<$j+1; $k++)
-                                                    <span class="icon">★</span>
-                                                @endfor
-                                            </label>
-                                        @endfor
-                                    </div>
-                                @endif
-
-                                @if($question->id_question_type==4)
-                                    @php($j = 1)
-                                    @foreach ($question->choise_checkbox as $item)
-                                        <div class="control-group">
-                                            <div class="controls">
-                                                <div class="input-append">
-                                                    <input type="checkbox" class="custom-control" id="field_checkbox_{{ $i-1 }}_{{ $j-1 }}" name="answer_checkbox[{{ $question->id }}][]" value="{{ $item->id  }}"  style="margin-right:7px;" >
-                                                    <label for="field_checbox_{{ $i-1 }}_{{ $j-1 }}">{{ $item->question_checkbox_answer }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @php( $j++ )
-                                    @endforeach
-                                @endif
-                                <span class="help-block"></span>
-                                <input type="hidden" name="question_id[{{ $i-1 }}]" value="{{ $question->id }}"/>
-                                <input type="hidden" name="id_question_type[{{ $i-1 }}]" value="{{ $question->id_question_type }}"/>
+                        <div class="row">
+                            <div class="col-lg-12">
+                              <div class="form-group">
+                                <label for="share_qeustioner_name" class="col-sm-4 control-label" style="text-align:left;">Quisioner Name</label>
+                                <div class="col-sm-8">
+                                  <input type="text" id="share_qeustioner_name" name="share_qeustioner_name" class="form-control" placeholder="Share Quisioner Name" value="{{ $questioner->name }}" readonly="true">
+                                  <input type="hidden" id="share_qeustioner_id" name="share_qeustioner_id" value="{{ $questioner->id }}"/>
+                                </div>
+                              </div>
                             </div>
-                            @php ($i++)
-                        @endforeach
-                        <input type="hidden" name="id" value="{{ $questioner->id }}"/>
-                        
+                        </div>
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-lg-12">
+                              <div class="form-group">
+                                <label for="share_qeustioner_user" class="col-sm-4 control-label" style="text-align:left;">Share To</label>
+                                <div class="col-sm-8">
+                                  <select id="share_qeustioner_user" name="share_qeustioner_user" class="form-control select2" data-placeholder="Share To"
+                                          style="width: 100%;">
+                                    <option value=""></option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
                     </div>
-
+                    
                     <div class="box-footer"> 
                         <button type="button" class="btn btn-default pull-left" id="btn_cancel_view"><!--<i class="fa fa-times"></i>--> Cancel</button>
-                        <button type="submit" id="btn_save_answer_quisioner" class="btn btn-primary pull-right"><!--<i class="fa fa-check"></i>-->Submit</button>
+                        <!-- <button type="submit" id="btn_save_share_quisioner" class="btn btn-primary pull-right">Submit</button> -->
+                        <button id="btn_save_share_quisioner" class="btn btn-primary pull-right">Submit</button>
                     </div>
-                </form>
+                <!-- </form> -->
             </div>
         </div>
 
@@ -306,13 +273,13 @@
     {{--{{ Html::script('js/dropzone.min.js') }}--}}
     {{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.1/bootstrap-slider.min.js') }}
     {{--{{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js') }}--}}
-    {{ Html::script('js/pages/kuesioner/kuesioner.js') }}
+    {{ Html::script('js/pages/kuesioner/kuesioner-share.js') }}
     <script>
-        $('.slider').bootstrapSlider({
-            formatter: function(value) {
-                return 'Nilai : ' + value;
-            }
-        });
+        // $('.slider').bootstrapSlider({
+        //     formatter: function(value) {
+        //         return 'Nilai : ' + value;
+        //     }
+        // });
     </script>
 @stop
 

@@ -188,6 +188,16 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
 	Route::get('/quisioner/preview','Questioner\QuestionerController@preview')->name('quisioner.preview');
 	Route::get('/quisioner/preview/detail/{id}','Questioner\QuestionerController@preview_detail')->name('quisioner.preview.detail');
+	Route::get('/quisioner/edit/{id}','Questioner\QuestionerController@edit_questioner')->name('quisioner.edit');
+	Route::get('/quisioner/share/{id}','Questioner\QuestionerController@share_questioner')->name('quisioner.share');
+	Route::post('/quisioner/saveshare','Questioner\QuestionerController@save_share_questioner')->name('quisioner.saveshare');
+	Route::post('/quisioner/quisioneranswerasking','Questioner\QuestionerController@quisioner_answer_asking')->name('quisioner.quisioneranswerasking');
+	Route::post('/quisioner/quisioneranswercheckbox','Questioner\QuestionerController@quisioner_answer_checkbox')->name('quisioner.quisioneranswercheckbox');
+	Route::post('/quisioner/quisioneranswerslider','Questioner\QuestionerController@quisioner_answer_slider')->name('quisioner.quisioneranswerslider');
+	Route::post('/quisioner/quisioneranswerrating','Questioner\QuestionerController@quisioner_answer_rating')->name('quisioner.quisioneranswerrating');
+	Route::post('/quisioner/saveedit','Questioner\QuestionerController@save_edit_questioner')->name('quisioner.saveedit');
+	Route::get('/quisioner/delete/{id}','Questioner\QuestionerController@delete_questioner')->name('quisioner.delete');
+	Route::post('/quisioner/savedelete','Questioner\QuestionerController@save_delete_questioner')->name('quisioner.savedelete');
 
 });
 

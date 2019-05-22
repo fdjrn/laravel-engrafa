@@ -15,5 +15,13 @@ class QuestionStarRating extends Model
         return $insert;
     }
 
+    public static function deleteQuestionStarsRatingByIdQuestion($questionId){
+        $delete = DB::table('question_stars_rating')
+            ->where('id_question', $questionId)
+            ->delete();
+
+        return $delete;
+    }
+
 
 }
