@@ -15,5 +15,13 @@ class QuestionCheckbox extends Model
         return $insert;
     }
 
+    public static function deleteQuestionCheckboxByIdQuestion($questionId){
+        $delete = DB::table('question_checkbox')
+            ->where('id_question', $questionId)
+            ->delete();
+
+        return $delete;
+    }
+
 
 }

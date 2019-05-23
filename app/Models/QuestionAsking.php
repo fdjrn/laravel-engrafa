@@ -15,5 +15,12 @@ class QuestionAsking extends Model
         return $insert;
     }
 
+    public static function deleteQuestionAskingByIdQuestion($questionId){
+        $delete = DB::table('question_asking')
+            ->where('id_question', $questionId)
+            ->delete();
+
+        return $delete;
+    }
 
 }

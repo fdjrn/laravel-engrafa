@@ -71,10 +71,6 @@
             font-weight: normal;
         }
 
-        body{
-            padding-right: 0 !important;
-        }
-
     </style>
 @stop
 
@@ -82,6 +78,9 @@
 @stop
 
 @section('custom-scripts')
+<script>
+    var QUESTIONER_DETAIL = {!! json_encode($questioner) !!};
+</script>
 @stop
 
 @section('page-header')
@@ -110,30 +109,66 @@
                 <div class="box-header with-border">
                     <h4>
                         <i class="fa fa-angle-left fa-fw header-cursor" id="main-back"></i>
-                        <label class="header-cursor">Quisioner</label>
+                        <label class="header-cursor">Edit Quisioner</label>
                         <span class="pull-right">
-                            <i class="fa fa-list fa-fw"></i>
+                            <i class="fa fa-clone"></i>
                         </span>
                     </h4>
                 </div>
 
-                {{-- Main grid--}}
-                <div class="box-body">
-                    <div class="table-responsive">
-                        <table id="dt-questioner-table-index" class="mdl-data-table" width="100%">
-                            <thead>
-                                <tr>
-                                    <th width="25px">No</th>
-                                    <th width="250px">Name</th>
-                                    <th width="250px">Category</th>
-                                    <th width="80px" style="text-align:center;">More</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
+                <form id="form_edit_questioner" role="form"{{-- method="POST" action="{{route('quisioner.create')}}" --}} >
+                    {{-- Main grid--}}
+                    <div class="box-body" id="box-body">
+                    
+                        {{--  @csrf --}}
 
-                {{--<div class="box-footer"> </div>--}}
+                            <div class="row form-group">
+                                <label for="c_questioner_name" class="col-sm-3 control-label" style="text-align:left;">Quisioner Name</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="c_questioner_name" name="c_questioner_name" class="form-control" placeholder="New Quisioner Name" value="{{ $questioner->name }}">
+                                    <input type="hidden" id="c_questioner_id" name="c_questioner_id" class="form-control" placeholder="New Quisioner Name" value="{{ $questioner->id }}">
+                                    <!-- <span class="error" id="error_name">This field is required</span> -->
+                                </div>
+                                <span class="help-block"> </span>
+                            </div>
+
+                            <div class="row form-group">
+                                <label for="c_questioner_category" class="col-sm-3 control-label" style="text-align:left;">Quisioner Category</label>
+                                <div class="col-sm-8">
+                                    <select id="c_questioner_category" name="c_questioner_category" class="form-control select2" data-placeholder="Quisioner Category"
+                                            style="width: 100%;">
+                                        <option value=""></option>
+                                        <option value="1" @if($questioner->category == 1)
+                                                            selected
+                                                          @endif>Community</option>
+                                        <option value="2" @if($questioner->category == 2)
+                                                            selected
+                                                          @endif>Education</option>
+                                        <option value="3" @if($questioner->category == 3)
+                                                            selected
+                                                          @endif>Event</option>
+                                        <option value="4" @if($questioner->category == 4)
+                                                            selected
+                                                          @endif>Other</option>
+                                    </select>
+                                </div>
+                                <span class="help-block"> </span>
+                            </div>
+
+                            <div class="row form-group">
+                                <label for="c_qeustioner_category" class="col-sm-3 control-label" style="text-align:left;"></label>
+                                <div class="col-sm-8">
+                                    <button type="button" class="btn btn-default pull-left" id="btn_add_question"><!--<i class="fa fa-times"></i>--> Add Question</button>
+                                </div>
+                            </div>                        
+                        
+                    </div>
+
+                    <div class="box-footer"> 
+                        <button type="button" class="btn btn-default pull-left" id="btn_cancel_edit"><!--<i class="fa fa-times"></i>--> Cancel</button>
+                        <button type="submit" id="btn_save_edit_quisioner" class="btn btn-primary pull-right"><!--<i class="fa fa-check"></i>-->Save</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -174,7 +209,6 @@
 @section('page-level-plugins')
     @include('questioner.questioner-create-modal')
     @include('questioner.questioner-create-question-modal')
-    @include('questioner.questioner-share-modal')
 @stop
 
 @section('theme-global-scripts')
@@ -185,7 +219,7 @@
     {{ Html::script('js/dataTables.material.min.js') }}
     {{--{{ Html::script('js/dropzone.min.js') }}--}}
     {{--{{ Html::script('https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.js') }}--}}
-    {{ Html::script('js/pages/kuesioner/kuesioner.js') }}
+    {{ Html::script('js/pages/kuesioner/kuesioner-edit.js') }}
 @stop
 
 @section('theme-layout-scripts')

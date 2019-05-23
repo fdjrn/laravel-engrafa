@@ -15,5 +15,12 @@ class QuestionSlider extends Model
         return $insert;
     }
 
+    public static function deleteQuestionSliderByIdQuestion($questionId){
+        $delete = DB::table('question_slider')
+            ->where('id_question', $questionId)
+            ->delete();
+
+        return $delete;
+    }
 
 }
