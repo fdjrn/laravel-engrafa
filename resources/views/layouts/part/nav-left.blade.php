@@ -1,5 +1,5 @@
 <!-- Left side column. contains the logo and sidebar -->
-<aside class="main-sidebar">
+<aside class="main-sidebar" >
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
         <!-- Sidebar user panel -->
@@ -17,7 +17,7 @@
 
         <!-- sidebar menu: : style can be found in sidebar.less -->
 
-        <ul class="sidebar-menu" data-widget="tree" id="notifToogle">
+        <ul class="sidebar-menu" data-widget="tree" id="notifToogle" >
             <notification-toogle-component :user="{{auth()->user()}}"></notification-toogle-component>
 
             <li data-toggle="control-sidebar">
@@ -33,15 +33,28 @@
             <user-bookmark-toggle :user="{{auth()->user()}}"></user-bookmark-toggle>
 
             <!-- search form -->
-            <form action="#" method="get" class="sidebar-form">
+            <div class="sidebar-form">
                 <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search...">
+                    <input type="text" name="q" class="form-control" placeholder="Search..." id="textSearch">
                     <span class="input-group-btn">
-                  <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                  <button type="button" name="search" id="search-btn" class="btn btn-flat" onClick="searchBtn()"><i class="fa fa-search"></i>
                   </button>
                 </span>
                 </div>
-            </form>
+            </div>
+
+            <div id="searchData" class="sidebar-menu">
+                <!-- <li class="treeview">
+                  <a href="#">
+                      <i class=""></i>
+                      <span>test</span>
+                  </a>
+                </li> -->
+            </div>
+
+            <li class="header">
+                <span>Menu</span>
+            </li>
         <!-- @foreach($roleMenus as $menu)
             <li class="treeview">
               <a href="{{ $menu->url }}">

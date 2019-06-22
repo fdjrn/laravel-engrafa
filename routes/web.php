@@ -31,6 +31,10 @@ Route::middleware(['auth','web'])->group(function () {
 
 	// Route::get('/', 'HomeController@index');
 
+	//menu search
+	Route::get('/search/{search}','Search\SearchController@search')->name('search');
+
+
 	// dashboard
 	Route::get('/','Dashboard\DashboardController@index')->name('dashboard');
 	Route::post('/','Dashboard\DashboardController@store')->name('dashboard.post');
@@ -107,7 +111,8 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/notification/read/all','Notification\NotificationController@readAll');
 
 	// survey
-	Route::get('/assessment/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
+	Route::get('/assessment','Survey\SurveyController@index')->where('id', '[0-9]+')->name('assessment');
+	Route::get('/assessment/{id}','Survey\SurveyController@showAssessment')->where('id', '[0-9]+')->name('survey');
 	// survey responden
 	Route::get('/assessment/{id}/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
 	Route::post('/assessment/{id}/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
@@ -133,18 +138,18 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/assessment/{id}/task','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
 	Route::post('/assessment/{id}/task','Survey\SurveyController@task_store')->name('survey.task.store');
 	Route::post('/assessment/{id}/task/update/{task_id}','Survey\SurveyController@task_update')->name('survey.task.update');
+	Route::delete('/assessment/{id}/task/{task_id}','Survey\SurveyController@task_delete')->name('survey.task.delete');
 	Route::get('/assessment/{id}/task/{task_id}','Survey\SurveyController@get_task_by_id')->where('id', '[0-9]+')->name('survey.get_task_by_id');
 	Route::get('/assessment/{id}/chat','Survey\SurveyController@chat')->where('id', '[0-9]+')->name('survey.chat');
-	Route::get('/survey/{id}','Survey\SurveyController@index')->where('id', '[0-9]+')->name('survey');
-	Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
-	Route::get('/survey/add/question/test','Survey\SurveyController@test');
+	Route::get('/assessment/{id}/status','Survey\SurveyController@status')->where('id', '[0-9]+')->name('survey.status');
+	Route::delete('/assessment/{id}','Survey\SurveyController@assesment_delete')->where('id', '[0-9]+')->name('survey.delete');
+	// Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
+	// Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');
 	// Route::post('/survey/answer/{inputans}','Survey\SurveyController@postAnswer')->name('survey.answer.post');
 	
-	Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
-	Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
-	Route::get('/survey/task/{id}','Survey\SurveyController@task')->where('id', '[0-9]+')->name('survey.task');
-	Route::post('/survey/task','Survey\SurveyController@task_store')->name('survey.task.store');
+	// Route::get('/survey/ajax_get_list_user', 'Survey\SurveyController@ajax_get_list_user');
+	// Route::get('/survey/get_process_outcome_wp/{id}', 'Survey\SurveyController@get_process_outcome_wp');
 	Route::resource('surveyrs', 'Survey\SurveyController');
 
 	//setting
@@ -165,11 +170,41 @@ Route::middleware(['auth','web'])->group(function () {
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
 	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
+	Route::delete("/calendar/{id}",'Schedule\ScheduleController@calendar_delete')->name("calendar.delete");
 	Route::get("/calendar/{year}/{month}",'Schedule\ScheduleController@schedules_list')->name("calendar.list");
 
 	//bookmark
     Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
+  
+	//backup
+	Route::get('/setting/backup', 'Setting\SettingController@backup_index')->name('setting.backups');
+	Route::get('/setting/backup/create', 'Setting\SettingController@backup_create')->name('setting.backups');
+	Route::get('/setting/backup/download/{file_name}', 'Setting\SettingController@backup_download')->name('setting.backups');
+	Route::get('/setting/backup/delete/{file_name}', 'Setting\SettingController@backup_delete')->name('setting.backups');
+
+
     Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
+
+    //kuesioner
+	Route::get('/quisioner', 'Questioner\QuestionerController@index')->name('quisioner.list');
+	Route::get('/quisioner/list-all','Questioner\QuestionerController@get_list_all');
+	Route::get('/quisioner/create-new','Questioner\QuestionerController@create_new_questioner')->name('quisioner.create-new');
+	Route::get('/quisioner/view/{id}','Questioner\QuestionerController@view_questioner')->name('quisioner.view');
+	Route::post('/quisioner/answer','Questioner\QuestionerController@question_answer')->name('quisioner.answer');
+	Route::post('/quisioner/create','Questioner\QuestionerController@create_questioner')->name('quisioner.create');
+	Route::get('/quisioner/preview','Questioner\QuestionerController@preview')->name('quisioner.preview');
+	Route::get('/quisioner/preview/detail/{id}','Questioner\QuestionerController@preview_detail')->name('quisioner.preview.detail');
+	Route::get('/quisioner/edit/{id}','Questioner\QuestionerController@edit_questioner')->name('quisioner.edit');
+	Route::get('/quisioner/share/{id}','Questioner\QuestionerController@share_questioner')->name('quisioner.share');
+	Route::post('/quisioner/saveshare','Questioner\QuestionerController@save_share_questioner')->name('quisioner.saveshare');
+	Route::post('/quisioner/quisioneranswerasking','Questioner\QuestionerController@quisioner_answer_asking')->name('quisioner.quisioneranswerasking');
+	Route::post('/quisioner/quisioneranswercheckbox','Questioner\QuestionerController@quisioner_answer_checkbox')->name('quisioner.quisioneranswercheckbox');
+	Route::post('/quisioner/quisioneranswerslider','Questioner\QuestionerController@quisioner_answer_slider')->name('quisioner.quisioneranswerslider');
+	Route::post('/quisioner/quisioneranswerrating','Questioner\QuestionerController@quisioner_answer_rating')->name('quisioner.quisioneranswerrating');
+	Route::post('/quisioner/saveedit','Questioner\QuestionerController@save_edit_questioner')->name('quisioner.saveedit');
+	Route::get('/quisioner/delete/{id}','Questioner\QuestionerController@delete_questioner')->name('quisioner.delete');
+	Route::post('/quisioner/savedelete','Questioner\QuestionerController@save_delete_questioner')->name('quisioner.savedelete');
+
 });
 
 //DocumentViewer Library

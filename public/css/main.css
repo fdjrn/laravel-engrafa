@@ -1,6 +1,4 @@
 .crud-button{
-  font-size: 20px !important;
-  margin-top: -5px !important;
   margin-bottom: -5px !important;
 }
 .crud-button > a{
@@ -8,6 +6,37 @@
 }
 .crud-button a:hover{
   color:#4d984e !important;
+}
+.crud-button > a > i {
+  margin-top: -5px !important;
+  font-size: 20px !important;
+}
+
+.nav-add-button > button{
+  margin-top: 2px;
+  font-size: 15px !important;
+  background: transparent;
+  border: none;
+  color: #56a957;
+}
+
+.nav-add-button > button:hover{
+  color: #4d984e;
+}
+
+.nav-add-button > button:active{
+  box-shadow: none;
+  color: #4d984e;
+}
+
+.nav-add-button > button:focus{
+  box-shadow: none;
+  color: #4d984e;
+}
+
+.nav-add-button > button > span{
+}
+.nav-add-button > button > i{
 }
 
 .inside-sidemenu{

@@ -13,17 +13,49 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use App\Models\ChatRoom;
 use App\Models\Files;
+use App\Models\SurveyProcess;
 use App\Models\SurveyProcessOutcomes;
 use App\Models\Rating;
 use App\Models\Survey;
 use App\Models\Task;
+use App\Models\TaskParticipants;
 use App\Events\NewNotification;
 
 
 class SurveyController extends Controller
 {
     //
-    public function index($id){
+    public function index(){
+        $data['listSurvey'] = array();
+        $dataSurvey = DB::table('surveys')
+            ->select('surveys.*')
+            ->leftJoin('survey_members',function($join){
+                $join->on('survey_members.survey','=','surveys.id')
+                     ->on('survey_members.user', '=', DB::raw(Auth::user()->id));
+            })
+            ->where('surveys.created_by','=',Auth::user()->id)
+            ->orWhere('survey_members.user', '=', Auth::user()->id)
+            ->get();
+
+        foreach($dataSurvey as $survey){
+            $datas = new \stdClass();
+            @$datas->id = $survey->id;
+            @$datas->name = $survey->name;
+            @$datas->expired = $survey->expired;
+            if($survey->created_by == Auth::user()->id){
+                @$datas->created_by = "Yourself";
+            }else{
+                $user = Survey::get_user_by_id($survey->created_by);
+                @$datas->created_by = $user->name;
+            }
+            @$datas->ownership = explode("-",Survey::get_status_ownership($survey->id))[1];
+            array_push($data['listSurvey'], $datas);
+        }
+
+        return view('survey.index', $data);
+    }
+
+    public function showAssessment($id){
         $data['survey_id'] = $id;
 
         $data_survey = DB::table('surveys')
@@ -713,7 +745,7 @@ class SurveyController extends Controller
         $data['priorities'] = $priority;
 
         $data_survey = DB::table('surveys')
-            ->select('surveys.id')
+            ->select('surveys.id', 'surveys.name')
             ->where('surveys.id',$id)
             ->get();
 
@@ -726,6 +758,7 @@ class SurveyController extends Controller
                 ->where('tasks.survey',$id)
                 ->get();
             $data['tasks'] = $data_tasks;
+            $data['survey_name'] = $data_survey->first()->name;
             return view('survey.task',$data);  
         }else{
             abort(404);
@@ -1311,6 +1344,12 @@ class SurveyController extends Controller
         ]);
     }
 
+    public function task_delete(Request $request){
+        // dd($request->task_id);
+        TaskParticipants::where('task',$request->task_id)->delete();
+        Task::where('id',$request->task_id)->delete();
+    }
+
     //AGGREGATION
     public function getData(Request $request){
         $message = "success";
@@ -1455,5 +1494,89 @@ class SurveyController extends Controller
         $data['aUser'] = auth()->user();
         
         return view('survey.chat',$data);
+    }
+
+    public function status(Request $request){
+        $surveyProcess = SurveyProcess::where("survey", $request->id)->get();
+
+        $status = "1-Waiting";
+
+        foreach ($surveyProcess as $surveyProces) {
+            if($surveyProces->status == '1-Wating' || $surveyProces->status == "7-Done"){
+
+            }else{
+                $status = "2-Process Survey";
+                break;
+            }
+        }
+        
+        return json_encode([
+            'status' => $status
+        ]);
+
+    }
+
+    public function assesment_delete(Request $request){
+        $surveyId = $request->id;
+        $status = "gagal";
+
+        //survey working product
+        $surveyWorkingProduct = \App\Models\SurveyWorkingProduct::where('survey',$surveyId)->delete();
+        // $surveyWorkingProduct->delete();
+
+        //survey process outcome
+        $surveyProcessOutcomes = \App\Models\SurveyProcessOutcomes::where('survey',$surveyId)->delete();
+        // $surveyProcessOutcomes->delete();
+        
+        //survey process
+        $surveyProcess = \App\Models\SurveyProcess::where('survey',$surveyId)->delete();
+        // $surveyProcess->delete();
+        
+        //dashboard survey
+        $dashboardSurvey = \App\Models\Dashboard_survey::where('survey',$surveyId)->delete();
+        // $dashboardSurvey->delete();
+        
+        //survey member
+        $surveyMember = \App\Models\SurveyMembers::where('survey',$surveyId)->delete();
+        // $surveyMember->delete();
+        
+        $chatRoom = \App\Models\ChatRoom::where('survey',$surveyId)->first();
+
+        if ($chatRoom) {
+
+            $chatRoomMembers = \App\Models\ChatMember::where('chat_room',$chatRoom->id)->get();
+
+            foreach ($chatRoomMembers as $chatRoomMember) {
+                # code...
+
+                //chat
+                $chats = \App\Models\Chats::where('chat_member',$chatRoomMember->id)->delete();
+                // $chats->delete();
+            }
+            
+            //chat room member
+            $chatRoomMembers = \App\Models\ChatMember::where('chat_room',$chatRoom->id)->delete();
+
+            //chat room
+            $chatRoom = \App\Models\ChatRoom::where('survey',$surveyId)->delete();
+
+        }
+
+        $tasks = \App\Models\Task::where('survey',$surveyId)->get();
+
+        foreach ($tasks as $task) {
+            $TaskParticipants = \App\Models\TaskParticipants::where('task',$task->id)->delete();
+            // $TaskParticipants->delete();
+        }
+        $tasks = \App\Models\Task::where('survey',$surveyId)->delete();
+
+        $survey = \App\Models\Survey::findOrFail($surveyId)->delete();
+
+        $status = "berhasil";
+
+        return json_encode([
+            'status' => $status
+        ]);
+
     }
 }

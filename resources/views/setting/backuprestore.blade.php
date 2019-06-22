@@ -33,6 +33,19 @@
 
 
 @section('body-inner-content')
+    @if ($message = Session::get('success'))
+      <div class="alert alert-success alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+          <strong>{{ $message }}</strong>
+      </div>
+    @endif
+
+    @if ($message = Session::get('error'))
+      <div class="alert alert-danger alert-block">
+        <button type="button" class="close" data-dismiss="alert">×</button> 
+        <strong>{{ $message }}</strong>
+      </div>
+    @endif
 <div class="row">
   <div class="col-md-3">
     @include('setting.nav-left')
@@ -53,7 +66,7 @@
                 <!-- /.box-header -->
                 <div class="box-body">
                         <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#list_backup">List Backup</button>
-                        <button type="button" class="btn btn-block btn-info">To Aplication</button>
+                        <a href="{{ url('setting/backup/create') }}" class="btn btn-block btn-info">To Aplication</a>
                         <button type="button" class="btn btn-block btn-success">To Computer</button>
                 </div>
                 <!-- /.box-body -->
@@ -68,8 +81,8 @@
                     </div>
                     <!-- /.box-header -->
                     <div class="box-body">
-                        <button type="button" class="btn btn-block btn-info">List</button>
-                        <button type="button" class="btn btn-block btn-success">New</button>
+                        <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#list_restore">List</button>
+                        <button type="button" class="btn btn-block btn-success" data-toggle="modal" data-target="#scan_restore">New</button>
                     </div>
                     <!-- /.box-body -->
                 </div>
@@ -95,26 +108,55 @@
                 <div class="tab-pane active" id="tab_1">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Auto Backup</h5>
+                          <label><input type="checkbox" value=""> 
+                            Set Backup Every 
+                            <select>
+                              <option value="">Choose</option>
+                              <option value="day">Day</option>
+                              <option value="wee">Week</option>
+                              <option value="month">Month</option>
+                              <option value="year">Year</option>
+                            </select>
+                          </label>
                         </li>
                         <li class="list-group-item">
-                                <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Always show the latest searches</h5>
+                          <label><input type="checkbox" value=""> 
+                            Set Backup to 
+                            <select>
+                              <option value="">Choose</option>
+                              <option value="application">Application</option>
+                              <option value="computer">Computer / Drive</option>
+                            </select>
+                          </label>
                         </li>
                         <li class="list-group-item">
-                            <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Log activity Backup</h5>
+                            <label><input type="checkbox" value=""> 
+                              Log Activity Backup
+                            </label>
+                        </li>
+                        <li class="list-group-item">
+                            <label><input type="checkbox" value=""> 
+                              Auto Restore Application
+                            </label>
                         </li>
                     </ul>
                 </div>
                 <div class="tab-pane" id="tab_2">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Auto Restore</h5>
+                            <label><input type="checkbox" value=""> 
+                              Auto Restore Application
+                            </label>
                         </li>
                         <li class="list-group-item">
-                                <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Always show the latest searches</h5>
-                        </li>
-                        <li class="list-group-item">
-                            <input type="checkbox" checked data-toggle="toggle" data-size="mini"><h5>Log activity Restore</h5>
+                            <label><input type="checkbox" value=""> 
+                              Always show the latest searches
+                            </label>
+                          </li>
+                          <li class="list-group-item">
+                            <label><input type="checkbox" value=""> 
+                              Log activity Restore
+                            </label>
                         </li>
                     </ul>
                 </div>
@@ -128,7 +170,7 @@
 @stop
 
 @section('body-modals')
-<div class="modal fade" id="list_backup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="list_backup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -138,11 +180,139 @@
               </button>
             </div>
             <div class="modal-body">
-              ...
+                <div class="box">
+                    <div class="box-header">
+                      <h3 class="box-title">List Backup</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <table id="example2" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                        </tr>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                        </tr>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                          <th>Name</th>
+                          <th>Date</th>
+                        </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                  <!-- /.box -->
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Oke</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="list_restore" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">List Backup</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-header">
+                      <h3 class="box-title">List Restore</h3>
+                      <h5 class="pull-right">Checklist All</h5>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                      <table id="example2" class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                          <th>Data</th>
+                          <th>Date</th>
+                          <th>Checklist</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                          <th><input type="checkbox" value=""></th>
+                        </tr>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                          <th><input type="checkbox" value=""></th>
+                        </tr>
+                        <tr>
+                          <td><i class="fa fa-database fa-fw"></i>Some Backup</td>
+                          <td>Date</td>
+                          <th><input type="checkbox" value=""></th>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                          <th>Name</th>
+                          <th>Date</th>
+                          <th>Checklist</th>
+                        </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                  <!-- /.box -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Restore to Computer / Drive</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Restore to Application</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="scan_restore" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Restore</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="box-header">
+                      <h3 class="box-title">Restore</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                  <!-- /.box -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Scan</button>
             </div>
           </div>
         </div>

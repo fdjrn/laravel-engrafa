@@ -91,6 +91,7 @@
                   <tr>
                     <th>Name</th>
                     <th>Start Date</th>
+                    <th>
                   </tr>
                   </thead>
                   <tbody id="list-schedules">

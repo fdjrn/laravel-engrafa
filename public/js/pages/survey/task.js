@@ -70,20 +70,26 @@ function openModals(type,taskId){
   if(type == 'create'){
     $('#m_title_task').html('<i class="fa fa-plus"></i>&nbsp;Create New Task');
     $('#form_n_task').attr('action','');
+    $('#btn_delete').hide();
+    $('#btn_submit').show();
     $('#m_new_task').modal('show');
   }else if(type == 'edit'){
     $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-edit"></i>&nbsp;Edit Existing Task');
     $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
+    $('#btn_delete').show();
+    $('#btn_delete').click(function(){ delete_task(survey_id, taskId); });
     $('#m_new_task').modal('show');
     ajax_modal(survey_id,taskId);
   }else{
+    console.log("complete task");
     $('#div_i_n_participant').show();
     $('#m_title_task').html('<i class="fa fa-eye"></i>&nbsp;View Existing Task');
     $('#form_n_task').attr('action','/assessment/'+survey_id+'/task/update/'+taskId);
     $('#i_n_progress_gr').show();
-    $('#m_footer_task').hide();
+    // $('#m_footer_task').hide();
+    $('#btn_submit').hide();
     $('#m_new_task').modal('show');
     $('#i_n_name_task').attr('readonly', true);
     $('#i_n_due_date').attr('readonly', true);
@@ -94,6 +100,8 @@ function openModals(type,taskId){
     $('#i_n_detail').attr('readonly', true);
     $('#i_n_color').attr('readonly', true);
     $('#i_n_priority').attr('readonly', true);
+    $('#btn_delete').show();
+    $('#btn_delete').click(function(){ delete_task(survey_id, taskId); });
     ajax_modal(survey_id,taskId);
   }
 }
@@ -167,6 +175,27 @@ $("#form_n_task").submit(function(e) {
          processData: false
        });
 });
+
+function delete_task(surveyId, taskId){
+  console.log("hapus task " + taskId);
+
+  $.ajax({
+      url:
+        base_url + '/assessment/'+surveyId+'/task/'+taskId,
+        method: 'delete',
+      success: function(response) {
+        console.log("hapus task " + taskId);
+        swal({
+          type: 'success',
+          title: 'Berhasil',
+          text: 'Berhasil Hapus Task'
+        });
+
+        $('tr[name='+taskId+']').remove();
+        $('#m_new_task').modal('hide');
+      }
+    });
+};
 
 Chart.pluginService.register({
   beforeDraw: function (chart) {
