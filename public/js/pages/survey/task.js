@@ -179,22 +179,33 @@ $("#form_n_task").submit(function(e) {
 function delete_task(surveyId, taskId){
   console.log("hapus task " + taskId);
 
-  $.ajax({
-      url:
-        base_url + '/assessment/'+surveyId+'/task/'+taskId,
-        method: 'delete',
-      success: function(response) {
-        console.log("hapus task " + taskId);
-        swal({
-          type: 'success',
-          title: 'Berhasil',
-          text: 'Berhasil Hapus Task'
-        });
+  Swal.fire({
+          title: 'Apakah anda yakin akan menghapus task?',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes'
+        }).then((result) => {
+          if (result.value) {
+            $.ajax({
+              url:
+                base_url + '/assessment/'+surveyId+'/task/'+taskId,
+                method: 'delete',
+              success: function(response) {
+                console.log("hapus task " + taskId);
+                swal({
+                  type: 'success',
+                  title: 'Berhasil',
+                  text: 'Berhasil Hapus Task'
+                });
 
-        $('tr[name='+taskId+']').remove();
-        $('#m_new_task').modal('hide');
-      }
-    });
+                $('tr[name='+taskId+']').remove();
+                $('#m_new_task').modal('hide');
+              }
+            });
+          }
+        })
 };
 
 Chart.pluginService.register({
