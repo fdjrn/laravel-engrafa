@@ -12,7 +12,7 @@
       </button>
     </span> -->
     
-    <input type="text" name="sendMessage" @keyup.enter="sendMessage" v-model="message" class="form-control" placeholder="Type Message ...">
+    <input type="text" name="sendMessage" @keyup.enter="sendMessage" v-model="message" class="form-control" placeholder="Type Message ..." maxlength="250">
   </div>
 </template>
 
