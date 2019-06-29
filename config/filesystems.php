@@ -43,6 +43,13 @@ return [
 
     'disks' => [
 
+        'backup_folder' => [
+            'driver' => 'local',
+            'root' => storage_path('app/Tata-Kelola-IT'),
+            'url' => env('APP_URL').'/storage/app/Tata-Kelola-IT',
+            'visibility' => 'public',
+        ],
+        
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
