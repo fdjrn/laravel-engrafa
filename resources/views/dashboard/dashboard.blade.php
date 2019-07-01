@@ -95,7 +95,7 @@
                   @endif
                 </li>
               @endforeach
-                @if ($user_role == "1-Super Admin")
+                @if ($user_role == "1-Super Admin" || $user_role == "2-Admin" || $user_role == "3-Creator")
                   <li class="pull-right"><a href="#" data-toggle="modal" data-target="#modal-insert-dashboard" class=""><i class="fa fa-plus"></i> Tambah Dashboard</a></li>
                 @endif
               </ul>
