@@ -223,7 +223,7 @@ class QuestionerController extends Controller
                 $answeredQuesioner = Questioner::checkAnsweredQuisioner($questioner->id);
                 $str_result = '';
 
-                if($user[0]->role == '1-Super Admin' || $user[0]->role == '2-Admin' || $user[0]->role == '3-Creator'){
+                if($user[0]->role == '1-Super Admin' || $user[0]->role == '2-Admin' || $user[0]->id == $questioner->created_by){
                     if($answeredQuesioner == 1){
                         $str_result = '
                         <a href="quisioner/share/'.$questioner->id.'" class="btn btn-xs btn-primary" title="Share"><i class="glyphicon glyphicon-share"></i></a>

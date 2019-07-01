@@ -164,9 +164,6 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::post('/setting/update_profile_user','Setting\SettingController@update_profile_user')->name('setting.update_profile_user');
 
 
-	Route::get('/setting/backuprestore', 'Setting\SettingController@backuprestore')->name('setting.backuprestore');
-
-
 	//calendar
 	Route::get("/calendar",'Schedule\ScheduleController@index')->name("calendar");
 	Route::post("/calendar",'Schedule\ScheduleController@calendar_store')->name("calendar.store");
@@ -177,10 +174,16 @@ Route::middleware(['auth','web'])->group(function () {
     Route::get("/bookmarks/{id}", "Bookmark\BookmarkController@getBookmarks");
   
 	//backup
-	Route::get('/setting/backup', 'Setting\SettingController@backup_index')->name('setting.backups');
-	Route::get('/setting/backup/create', 'Setting\SettingController@backup_create')->name('setting.backups');
-	Route::get('/setting/backup/download/{file_name}', 'Setting\SettingController@backup_download')->name('setting.backups');
-	Route::get('/setting/backup/delete/{file_name}', 'Setting\SettingController@backup_delete')->name('setting.backups');
+	// Route::get('/setting/backup', 'Setting\SettingController@backup_index')->name('setting.backups');
+	// Route::get('/setting/backup/create', 'Setting\SettingController@backup_create')->name('setting.backups');
+	// Route::get('/setting/backup/download/{file_name}', 'Setting\SettingController@backup_download')->name('setting.backups');
+	// Route::get('/setting/backup/delete/{file_name}', 'Setting\SettingController@backup_delete')->name('setting.backups');
+
+	Route::get('/setting/backuprestore', 'Setting\BackupController@index')->name('setting.backuprestore');
+	Route::get('/setting/backup/create', 'Setting\BackupController@create')->name('setting.backupcreate');
+	Route::get('/setting/backup/download/{file_name}', 'Setting\BackupController@download')->name('setting.backupdownload');
+	Route::get('/setting/backup/delete/{file_name}', 'Setting\BackupController@delete')->name('setting.backupdelete');
+	Route::get('/setting/backup/restore/{file_name}', 'Setting\BackupController@restore')->name('setting.restore');
 
 
     Route::get("/bookmarks/show/{id}", "Bookmark\BookmarkController@showBookmarkedFiles");
