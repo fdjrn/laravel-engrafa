@@ -126,6 +126,7 @@
                                     <th width="25px">No</th>
                                     <th width="250px">Name</th>
                                     <th width="250px">Category</th>
+                                    <th width="250px">Creator</th>
                                     <th width="80px" style="text-align:center;">More</th>
                                 </tr>
                             </thead>

@@ -498,7 +498,7 @@ $(document).ready(function(){
                     '<div class="row form-group" id="quis_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'">' +
                         '<label for="field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'" class="col-sm-3 col-sm-offset-3 control-label" style="text-align:left;">Maximal Value</label>' +
                         '<div class="col-sm-5">'+
-                          '<input type="number" id="field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'" min="0" name="slider_max_value['+(cntQuis-1)+']" value="'+maxVal+'" class="form-control" placeholder="Max Value">'+                          
+                          '<input type="number" id="field_slider_max_value_'+cntQuis+((next)?'_'+next:'_1')+'" min="0" max="100" name="slider_max_value['+(cntQuis-1)+']" value="'+maxVal+'" class="form-control" placeholder="Max Value">'+                          
                         '</div>'+
                         '<span class="help-block"></span>'+
                     '</div>';
@@ -512,7 +512,7 @@ $(document).ready(function(){
     var elStarRating = '<div class="row form-group" id="quis_star_rating_'+cntQuis+((next)?'_'+next:'_1')+'">' +
                         '<label for="field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1')+'" class="col-sm-3 col-sm-offset-3 control-label" style="text-align:left;">Number of Stars</label>' +
                         '<div class="col-sm-5">'+
-                          '<input type="number" id="field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1')+'" name="star_rating_value['+(cntQuis-1)+']" value="'+jmlStar+'" class="form-control" min="2" placeholder="Number of Stars">'+
+                          '<input type="number" id="field_star_rating_value_'+cntQuis+((next)?'_'+next:'_1')+'" name="star_rating_value['+(cntQuis-1)+']" value="'+jmlStar+'" class="form-control" min="2" max="5" placeholder="Number of Stars">'+
                         '</div>'+
                         '<span class="help-block"></span>'+
                     '</div>';

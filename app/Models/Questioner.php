@@ -73,7 +73,8 @@ class Questioner extends Model
         DB::statement(DB::raw('set @rownum=0'));
         $data = DB::table('quisioner')
               ->leftJoin('quisioner_categories', 'quisioner.category', '=', 'quisioner_categories.id')
-              ->select('quisioner.*', 'quisioner_categories.name as category_name', DB::raw('@rownum  := @rownum  + 1 AS rownum'))
+              ->leftJoin('users', 'users.id', '=', 'quisioner.created_by')
+              ->select('quisioner.*', 'quisioner_categories.name as category_name', 'users.name as creator_name', DB::raw('@rownum  := @rownum  + 1 AS rownum'))
               ->orderBy('quisioner.id')
               ->get();
       }else{
@@ -81,13 +82,14 @@ class Questioner extends Model
         $data = DB::table('quisioner')
               ->leftJoin('quisioner_categories', 'quisioner.category', '=', 'quisioner_categories.id')
               ->leftJoin('user_quisioner', 'quisioner.id', '=', 'user_quisioner.quisioner')
-              ->select('quisioner.*', 'quisioner_categories.name as category_name', 'user_quisioner.quisioner as quisioner_to_user', DB::raw('@rownum  := @rownum  + 1 AS rownum'))
+              ->leftJoin('users', 'users.id', '=', 'quisioner.created_by')
+              ->select('quisioner.*', 'quisioner_categories.name as category_name', 'user_quisioner.quisioner as quisioner_to_user', 'users.name as creator_name', DB::raw('@rownum  := @rownum  + 1 AS rownum'))
               ->where('user_quisioner.user','=',$userId)
               ->orderBy('quisioner.id')
               ->get();
       }
 
-      // dd($data);
+      //dd($data);
 
       return $data;
     }
