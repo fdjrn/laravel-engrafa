@@ -85,6 +85,13 @@
             cursor: pointer;
         }
 
+        .mdl-data-table tbody td {
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: normal;
+            vertical-align: text-top;
+        }
+
     </style>
 @stop
 
@@ -178,10 +185,10 @@
                 {{-- Main grid--}}
                 <div class="box-body">
                     <div class="table-responsive">
-                        <table id="dt-file-exp-table-index" class="mdl-data-table" width="100%">
+                        <table id="dt-file-exp-table-index" class="mdl-data-table" width="100%" style="table-layout: fixed">
                             <thead>
                                 <tr>
-                                    <th width="75px"><input value="1" id="file-exp-select-all" type="checkbox"></th>
+                                    <th width="50px"><input value="1" id="file-exp-select-all" type="checkbox"></th>
                                     <th width="250px">Name</th>
                                     <th width="120px">Date Modified</th>
                                     <th width="150px">Creator</th>
