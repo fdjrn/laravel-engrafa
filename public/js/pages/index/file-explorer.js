@@ -46,7 +46,7 @@ function setComment(id) {
             $('#fieldName').val('comment');
         },
         error: function (response) {
-            console.log(response);
+            console.log(response.statusText);
         }
     })
 }
@@ -439,19 +439,31 @@ $(document).ready(function () {
             success: function (response) {
                 $('#comment-modals').modal('hide');
                 dtMain.ajax.url("/index/list-all/" + response.data.folder_root).load();
-                if (response.tipe === 'description'){
-                    $('#file-descr-text').text(response.data.description);
-                    setFilesProperties(response.data, true);
+
+                if(response.is_error != true) {
+                    if (response.tipe === 'description'){
+                        $('#file-descr-text').text(response.data.description);
+                        setFilesProperties(response.data, true);
+                    } else {
+                        setFilesProperties(null, false);
+                    }
+
+                    swal({
+                        title: 'Success!',
+                        text: response.message,
+                        type: 'success',
+                        timer: '1500'
+                    });
                 } else {
                     setFilesProperties(null, false);
-                }
 
-                swal({
-                    title: 'Success!',
-                    text: response.message,
-                    type: 'success',
-                    timer: '1500'
-                });
+                    swal({
+                        title: 'Error!',
+                        text: "Something went wrong, " + response.message,
+                        type: 'error',
+                        timer: '1500'
+                    });
+                }
             },
             error: function () {
                 swal({
