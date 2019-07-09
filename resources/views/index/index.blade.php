@@ -87,9 +87,13 @@
 
         .mdl-data-table tbody td {
             word-wrap: break-word;
-            word-break: break-all;
+            word-break: break-word;
             white-space: normal;
             vertical-align: text-top;
+        }
+
+        #file-descr-text {
+            word-break: break-word;
         }
 
     </style>

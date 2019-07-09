@@ -127,7 +127,7 @@
                 <hr/>
                 <div class="form-group has-feedback">
                     {!! Form::label('label-file-comments','Comments: ',['class'=>'control-label', 'for'=>'filecomment', 'id'=>'label-file-comments']) !!}
-                    <textarea id="filecomment" name="filecomment" class="file-comment" style="width: -moz-available; font-weight: normal;" rows="3"></textarea>
+                    <textarea id="filecomment" name="filecomment" class="file-comment" style="width: 100%; font-weight: normal;" rows="3"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
