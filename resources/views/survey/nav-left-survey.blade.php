@@ -10,7 +10,11 @@
         <ul class="list-group inside-submenu no-margin" data-widget="tree" style="list-style: none;">
           <li class="">
             <a href="{{route('survey.chat',['id'=> $survey_id])}}">
-              <h4><i class="fa fa-comment-o"></i>&nbsp;&nbsp;<span>Chat</span></h4>
+              <h4><i class="fa fa-comment-o"></i>&nbsp;&nbsp;<span>Chat</span>
+                <div id="chatAssessmentNotif" style="float: right;">
+                  <chat-assessment-notif-component :user="{{ auth()->user() }}" :survey-id="{{$survey_id}}"></chat-assessment-notif-component>
+                </div>
+              </h4>
             </a>
           </li>
           <li class="">
