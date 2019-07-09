@@ -1492,6 +1492,12 @@ class SurveyController extends Controller
 
         $data['chatRooms'] = $chatRooms;
         $data['aUser'] = auth()->user();
+
+        //update unread message
+        DB::table('chat_room_members')
+            ->where('chat_room', $chatRooms->chat_room)
+            ->where('user', Auth()->user()->id)
+            ->update(['unread_messages' => 0]);
         
         return view('survey.chat',$data);
     }
@@ -1578,5 +1584,18 @@ class SurveyController extends Controller
             'status' => $status
         ]);
 
+    }
+
+    public function getChatRoom($surveyId){
+        
+        $chatRooms = ChatRoom::
+            select('chat_rooms.id','chat_room_members.unread_messages')
+            ->join('chat_room_members','chat_room_members.chat_room','chat_rooms.id')
+            ->where('chat_room_members.user',auth()->user()->id)
+            ->where('chat_rooms.survey',$surveyId)
+            ->orderBy('chat_rooms.updated_at','desc')
+            ->get();
+
+        return response()->json($chatRooms);
     }
 }
