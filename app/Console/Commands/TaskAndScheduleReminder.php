@@ -52,6 +52,7 @@ class TaskAndScheduleReminder extends Command
 
         $currendDate = Carbon::now()->format('Y-m-d');
         $currentHour = Carbon::now()->format('H');
+        $currentMinute = Carbon::now()->format('i');
         $now = Carbon::now()->format('Y-m-d H:i:s');
         $notification = new Notifications;
         $user = New User;
@@ -105,7 +106,7 @@ class TaskAndScheduleReminder extends Command
 
             }
 
-            if($hourDifference <= 5 && $hourDifference > 0){
+            if($hourDifference <= 5 && $hourDifference > 0 && $currentMinute == "00"){
 
                 if ($taskId2 <> $task->id) {
                     # code...
@@ -193,7 +194,7 @@ class TaskAndScheduleReminder extends Command
             }
 
             //notifikasi per jam
-            if($hourFromDifference <= 5 && $hourFromDifference > 0){
+            if($hourFromDifference <= 5 && $hourFromDifference > 0 && $currentMinute == "00"){
                 $notification2->notification_text = 'Event '.$schedule->name. ' is '.$hourFromDifference.' hours will begin';
                 $notification2->modul = '4-Schedule';
                 $notification2->modul_id = $schedule->id;
@@ -224,7 +225,7 @@ class TaskAndScheduleReminder extends Command
                 }
                 
                 //notifikasi perjam
-                if($hourFromDifference <= 5 && $hourFromDifference > 0){
+                if($hourFromDifference <= 5 && $hourFromDifference > 0 && $currentMinute == "00"){
                     $notificationReceiver = new NotificationReceivers;
                     $notificationReceiver->notification = $notification2->id;
                     $notificationReceiver->receiver = $user->id;
@@ -283,7 +284,7 @@ class TaskAndScheduleReminder extends Command
             }
 
             //notifikasi per jam
-            if($hourToDifference >= 1 && $hourToDifference <= 5){
+            if($hourToDifference >= 1 && $hourToDifference <= 5 && $currentMinute == "00"){
                 $notification2->notification_text = 'Event '.$schedule->name. ' in '.$hourToDifference.' hours will over';
                 $notification2->modul = '4-Schedule';
                 $notification2->modul_id = $schedule->id;
@@ -314,7 +315,7 @@ class TaskAndScheduleReminder extends Command
                 }
                 
                 //notifikasi perjam
-                if($hourToDifference >= 1 && $hourToDifference <= 5){
+                if($hourToDifference >= 1 && $hourToDifference <= 5 && $currentMinute == "00"){
                     $notificationReceiver = new NotificationReceivers;
                     $notificationReceiver->notification = $notification2->id;
                     $notificationReceiver->receiver = $user->id;
