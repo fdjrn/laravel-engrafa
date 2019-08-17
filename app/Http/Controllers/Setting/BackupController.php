@@ -47,7 +47,9 @@ class BackupController extends Controller
         // $path_file_name = "\app\Tata-Kelola-IT\mysql_db_engrafa_".date("Y")."_".date("m")."_".date("d")."_".date("H")."_".date("i")."_".date("s").".sql 2>&1";
         $path_file_name = "/app/Tata-Kelola-IT/mysql_db_engrafa_".date("Y").date("m").date("d").date("H").date("i").date("s").".sql 2>&1";
 
-        $command = "C:/xampp/mysql/bin/mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " > " . storage_path() . $path_file_name; 
+        // $command = "C:/xampp/mysql/bin/mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " > " . storage_path() . $path_file_name; 
+
+        $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " > " . storage_path() . $path_file_name;
 
         ini_set('max_execution_time', '9000');
         exec($command, $output, $returnVar);
@@ -152,7 +154,9 @@ class BackupController extends Controller
 
         // $command = "mysql --user=" . env('DB_USERNAME') ." --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " < " . storage_path() . "/app/Tata-Kelola-IT/mysql-db_dev_engrafa.sql";
 
-        $command = "C:/xampp/mysql/bin/mysql --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " < " . storage_path() . $path_file_name;
+        // $command = "C:/xampp/mysql/bin/mysql --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " < " . storage_path() . $path_file_name;
+
+        $command = "mysql --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . " < " . storage_path() . $path_file_name;
 
         //$eksekusi = exec($command, $output, $returnVar);
         // $eksekusi = exec($command, $output);
