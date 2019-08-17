@@ -88,7 +88,11 @@
 				}else if(notification.modul == '3-Quisioner'){
 
 				}else if(notification.modul == '4-Schedule'){
-					
+					url = "/calendar/";
+					window.location.href = url;
+				}else if(notification.modul == '5-Task'){
+					url = "/assessment/";
+					window.location.href = url+notification.modul_id+"/task";
 				}
 			},
 			ReadAllNotification(){
