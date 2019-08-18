@@ -476,6 +476,43 @@ $(document).ready(function () {
         });
     });
 
+    $("#share-file").on("click", function (event) {
+        event.preventDefault();
+        let id = $('#file-descr-id').val();
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        }
+
+        $.ajax({
+            url: '/index/share/' + id,
+            type: 'POST',
+            data: {'_token': csrf_token},
+            success: function (response) {
+                if (response.success) {
+                    Swal({
+                        title: 'Success!',
+                        text: response.message,
+                        type: 'success',
+                        timer: '2000'
+                    });
+                }
+            },
+            fail: function () {
+                Swal({
+                    title: 'Failure!',
+                    text: 'Your file/folder has not been shared!',
+                    type: 'error',
+                    timer: '2000'
+                });
+            }
+        });
+
+    });
+
     $('#edit-file-descr').on('click', function (e) {
         e.preventDefault();
         let id = $('#file-descr-id').val();

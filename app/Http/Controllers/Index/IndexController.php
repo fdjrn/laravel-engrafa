@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Index;
 
 use App\Events\NewBookmarks;
+use App\Events\NewNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Files;
+use App\Models\NotificationReceivers;
+use App\Models\Notifications;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -315,6 +319,51 @@ class IndexController extends Controller
                 "data" => $files
             ]);
         }
+    }
+
+    public function shareIt($file_id)
+    {
+        $files = Files::find($file_id);
+        $receivers = DB::table("users")->get();
+        $notification = Notifications::where("modul", "3-File-Explorer")
+            ->where("modul_id", $file_id)
+            ->where("created_by", Auth::user()->id)
+            ->get();
+
+        if ($notification->count() > 1) {
+            return response()->json([
+                "success" => false,
+                "message" => "Already Shared",
+                "data" => $files
+            ], 500);
+        }
+
+        $notification = new Notifications();
+        $notification->notification_text = $files->name . ' has been shared by ' . Auth::user()->name;
+        $notification->modul = $files->is_file === 1 ? '5-FileSharing' : '5-FolderSharing';
+        $notification->modul_id = $file_id;
+        $notification->created_by = Auth::user()->id;
+        $notification->save();
+
+        foreach ($receivers as $receiver) {
+            if ($receiver->id !== Auth::user()->id) {
+                $notificationReceiver = new NotificationReceivers;
+                $notificationReceiver->notification = $notification->id;
+                $notificationReceiver->receiver = $receiver->id;
+                $notificationReceiver->is_read = 0;
+                $notificationReceiver->created_by = Auth::user()->id;
+                $notificationReceiver->save();
+
+                broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
+            }
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "File/Folder successfully shared.",
+            "data" => $files
+        ]);
+
     }
 
     /**
