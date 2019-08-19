@@ -98,4 +98,8 @@ class ScheduleController extends Controller
     	// dd($request->id);
     	Schedules::where("id",$request->id)->delete();
     }
+
+    public function CheckJadwal(Request $request){
+        dd("test");
+    }
 }

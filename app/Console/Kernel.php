@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\TaskAndScheduleReminder::class,
     ];
 
     /**
@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('backup:clean')->dailyAt('01:30');
         $schedule->command('backup:run --only-db')->dailyAt('01:35');
+        $schedule->command('schedule:reminder')->everyMinute();
     }
 
     /**
