@@ -243,7 +243,7 @@
                                     @if(substr($currentUser['role'],0,1) <= '4' )
                                         <a href="" id="edit-file-descr" data-toggle="tooltip" title="edit"><i class="fa fa-edit fa-fw"></i></a>
                                     @endif
-                                    <a href="#" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
+                                    <a href="" id="share-file" data-toggle="tooltip" title="share"><i class="fa fa-share fa-fw"></i></a>
                                     @if(substr($currentUser['role'],0,1) <= '4' )
                                         <a href="" id="delete-file" data-toggle="tooltip" title="delete"><i class="fa fa-trash fa-fw"></i></a>
                                     @endif
