@@ -71,6 +71,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
     Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
     Route::delete('/index/delete-file/{id}','Index\IndexController@deleteFilesById');
+    Route::post('/index/share/{id}','Index\IndexController@shareIt');
 
     Route::get('/index/get-file/{id}',function ($id){
         $files = \App\Models\Files::findOrFail($id);
