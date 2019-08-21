@@ -66,17 +66,41 @@ function getWP(input){
               render: function(data, type, row, meta) {
                 let action = "File Unavailable";
                 if(mtype == 'answer' && row.process !== null){
-                 action = "<input type='file' name='files["+row.id+"]' style='width:100%;' accept='"+supported_type+"' />";
+                  action = "<input type='file' name='files["+row.id+"]' style='width:100%;' accept='"+supported_type+"' />";
                 }
                 if(data){
-                  action="<a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
-                  "&nbsp;&nbsp;&nbsp;<a onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>";
+                  action="<div style='height:30px;'><input type='file' name='files["+row.id+"]' id='btn_add_file_"+row.id+"' onchange='pressed(\"btn_add_file_"+row.id+"\", \"text_add_file_"+row.id+"\", \"btn_download"+row.id+"\")' style='width:95px;color:transparent;float:left;' accept='"+supported_type+"'><label id='text_add_file_"+row.id+"' style='display: block;white-space: nowrap;width: 15em;overflow: hidden;text-overflow: ellipsis;'>"+row.filename+"</label>"+
+                  "</div>"+
+                  "<div id='btn_download"+row.id+"'><a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a></div>"+
+                  "<div><input type='hidden' id='file_id["+row.id+"]' name='file_id["+row.id+"]' value='"+row.fileid+"'></div>";
+
+                  // action="<div style='height:30px;'><input type='file' id='btn_add_file_"+row.id+"' onchange='pressed(\"btn_add_file_"+row.id+"\", \"text_add_file_"+row.id+"\")' style='width:95px;color:transparent;float:left;' accept='"+supported_type+"'><a id='text_add_file_"+row.id+"' onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>"+
+                  // "</div>"+
+                  // "<div><a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a></div>";
+
+                  // action="<a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
+                  // "&nbsp;&nbsp;&nbsp;<a onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>";
                 }
                 return action;
               }
           }
       ]
   });
+}
+
+window.pressed = function(idBtn, idTxt, idBtnDownload){
+    var a = document.getElementById(idBtn);
+    if(a.value == "")
+    {
+        // fileLabel.innerHTML = "Choose file";
+    }
+    else
+    {
+        var theSplit = a.value.split('\\');
+        // fileLabel.innerHTML = theSplit[theSplit.length-1];
+        document.getElementById(idTxt).innerHTML = theSplit[theSplit.length-1];
+        document.getElementById(idBtnDownload).style.visibility = 'hidden';
+    }
 }
 
 function doWp(fileid,doAction){
