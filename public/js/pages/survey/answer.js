@@ -74,10 +74,6 @@ function getWP(input){
                   "<div id='btn_download"+row.id+"'><a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a></div>"+
                   "<div><input type='hidden' id='file_id["+row.id+"]' name='file_id["+row.id+"]' value='"+row.fileid+"'></div>";
 
-                  // action="<div style='height:30px;'><input type='file' id='btn_add_file_"+row.id+"' onchange='pressed(\"btn_add_file_"+row.id+"\", \"text_add_file_"+row.id+"\")' style='width:95px;color:transparent;float:left;' accept='"+supported_type+"'><a id='text_add_file_"+row.id+"' onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>"+
-                  // "</div>"+
-                  // "<div><a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a></div>";
-
                   // action="<a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a>"+
                   // "&nbsp;&nbsp;&nbsp;<a onClick='doWp(\""+row.fileid+"\",\"viewWp\")'>"+row.filename+"</a>";
                 }

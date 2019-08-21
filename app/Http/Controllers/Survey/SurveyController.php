@@ -472,7 +472,6 @@ class SurveyController extends Controller
         if($survey_files_id){
             foreach ($request->file('files') as $wpid => $file) {
                 if ($file->isValid()) {
-
                     //cek file sudah pernah di upload atau belum
                     if(array_key_exists($wpid, $request->file_id)){
                         //kondisi jika file sudah ada
