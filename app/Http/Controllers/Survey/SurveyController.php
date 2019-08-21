@@ -472,21 +472,49 @@ class SurveyController extends Controller
         if($survey_files_id){
             foreach ($request->file('files') as $wpid => $file) {
                 if ($file->isValid()) {
-                    //cek file sudah pernah di upload atau belum
-                    if(array_key_exists($wpid, $request->file_id)){
-                        //kondisi jika file sudah ada
-                        $existFile = Files::where('id',$request->file_id[$wpid])->first();
-                        if ($existFile) {
-                            unlink(storage_path('app/public/index/'.$existFile->url));
+                    if($request->has('file_id')) {
+                        // print_r('ada');
+                        //cek file sudah pernah di upload atau belum
+                        if(array_key_exists($wpid, $request->file_id)){
+                            //kondisi jika file sudah ada
+                            $existFile = Files::where('id',$request->file_id[$wpid])->first();
+                            if ($existFile) {
+                                unlink(storage_path('app/public/index/'.$existFile->url));
+                                $path = $file->store('assessment/'.$survey->name);
+
+                                DB::table('files')
+                                ->where([
+                                    ['id','=',$request->file_id[$wpid]]
+                                ])
+                                ->update(['name' => $file->getClientOriginalName(), 'url' => $path, 'updated_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+                            }
+                        }else{
+                            //kondisi jika file belum ada
                             $path = $file->store('assessment/'.$survey->name);
 
-                            DB::table('files')
-                            ->where([
-                                ['id','=',$request->file_id[$wpid]]
-                            ])
-                            ->update(['name' => $file->getClientOriginalName(), 'url' => $path, 'updated_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+                            $files = [
+                                'folder_root' => $survey_files_id,
+                                'name' => $file->getClientOriginalName(),
+                                'url' => $path,
+                                'is_file' => 1,
+                                'version' => 1,
+                                'size' => $file->getClientSize(),
+                                'created_by' => Auth::user()->id,
+                                'created_at' => $now = Carbon::now()->format('Y-m-d H:i:s'),
+                                'updated_at' => $now,
+                            ];
+
+                            $fileid = Files::insertGetId($files);
+
+                            DB::table('survey_working_products')->insert(
+                                [   'survey' => $id, 
+                                    'working_product' => $wpid,
+                                    'file' => $fileid
+                                ]
+                            );
                         }
                     }else{
+                        // print_r('kosong');
                         //kondisi jika file belum ada
                         $path = $file->store('assessment/'.$survey->name);
 
@@ -511,6 +539,7 @@ class SurveyController extends Controller
                             ]
                         );
                     }
+                    
                 }
             }
         }
