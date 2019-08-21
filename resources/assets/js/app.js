@@ -32,6 +32,7 @@ Vue.component('notification-toogle-component', require('./components/notificatio
 
 Vue.component('user-bookmark', require('./components/bookmark/BookmarkComponent.vue'));
 Vue.component('user-bookmark-toggle', require('./components/bookmark/BookmarkComponentToggle.vue'));
+Vue.component('chat-assessment-notif-component', require('./components/chat/ChatAssesmentNotifComponent.vue'));
 
 const app = new Vue({
     el: '#app',
@@ -44,4 +45,8 @@ const notif = new Vue({
 
 const notifToogle = new Vue({
     el: '#notifToogle',
+});
+
+const chatAssessmentNotif = new Vue({
+    el: '#chatAssessmentNotif',
 });

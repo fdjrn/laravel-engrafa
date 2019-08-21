@@ -117,7 +117,7 @@
                   </div>
                 </div>
                 <div class="col-sm-4">
-                  <div class="box box-default" id="list-itgoal" style="overflow-x:hidden; overflow-y: auto; max-height: 520px;">
+                  <div class="box box-default" id="list-itgoal" style="overflow-x:hidden; overflow-y: scroll; max-height: 520px; min-height: 400px">
                     <div class="box-header">
                       <a href="#" data-widget="collapse">
                         <h5 style="margin:2px 0px;">Process List</h5>

@@ -71,6 +71,7 @@ Route::middleware(['auth','web'])->group(function () {
     Route::post('/index/bookmark-file/{id}','Index\IndexController@bookmarkFile');
     Route::post('/index/update-file/{id}','Index\IndexController@updateFilesById');
     Route::delete('/index/delete-file/{id}','Index\IndexController@deleteFilesById');
+    Route::post('/index/share/{id}','Index\IndexController@shareIt');
 
     Route::get('/index/get-file/{id}',function ($id){
         $files = \App\Models\Files::findOrFail($id);
@@ -143,6 +144,7 @@ Route::middleware(['auth','web'])->group(function () {
 	Route::get('/assessment/{id}/chat','Survey\SurveyController@chat')->where('id', '[0-9]+')->name('survey.chat');
 	Route::get('/assessment/{id}/status','Survey\SurveyController@status')->where('id', '[0-9]+')->name('survey.status');
 	Route::delete('/assessment/{id}','Survey\SurveyController@assesment_delete')->where('id', '[0-9]+')->name('survey.delete');
+	Route::get('/assessment/getChatRoom/{surveyId?}','Survey\SurveyController@getChatRoom');
 	// Route::get('/survey/add/question','Survey\SurveyController@addQuestion')->name('survey.add.question');
 	// Route::get('/survey/add/question/test','Survey\SurveyController@test');
 	// Route::get('/survey/answer/{inputans}', 'Survey\SurveyController@chooseAnswer')->name('survey.answer');

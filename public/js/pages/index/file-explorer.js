@@ -46,7 +46,7 @@ function setComment(id) {
             $('#fieldName').val('comment');
         },
         error: function (response) {
-            console.log(response);
+            console.log(response.statusText);
         }
     })
 }
@@ -439,19 +439,31 @@ $(document).ready(function () {
             success: function (response) {
                 $('#comment-modals').modal('hide');
                 dtMain.ajax.url("/index/list-all/" + response.data.folder_root).load();
-                if (response.tipe === 'description'){
-                    $('#file-descr-text').text(response.data.description);
-                    setFilesProperties(response.data, true);
+
+                if(response.is_error != true) {
+                    if (response.tipe === 'description'){
+                        $('#file-descr-text').text(response.data.description);
+                        setFilesProperties(response.data, true);
+                    } else {
+                        setFilesProperties(null, false);
+                    }
+
+                    swal({
+                        title: 'Success!',
+                        text: response.message,
+                        type: 'success',
+                        timer: '1500'
+                    });
                 } else {
                     setFilesProperties(null, false);
-                }
 
-                swal({
-                    title: 'Success!',
-                    text: response.message,
-                    type: 'success',
-                    timer: '1500'
-                });
+                    swal({
+                        title: 'Error!',
+                        text: "Something went wrong, " + response.message,
+                        type: 'error',
+                        timer: '1500'
+                    });
+                }
             },
             error: function () {
                 swal({
@@ -462,6 +474,43 @@ $(document).ready(function () {
                 });
             }
         });
+    });
+
+    $("#share-file").on("click", function (event) {
+        event.preventDefault();
+        let id = $('#file-descr-id').val();
+
+        if (id === ''){
+            swal("Warning!!!",
+                'No files/folder selected',
+                'warning');
+            return;
+        }
+
+        $.ajax({
+            url: '/index/share/' + id,
+            type: 'POST',
+            data: {'_token': csrf_token},
+            success: function (response) {
+                if (response.success) {
+                    Swal({
+                        title: 'Success!',
+                        text: response.message,
+                        type: 'success',
+                        timer: '2000'
+                    });
+                }
+            },
+            fail: function () {
+                Swal({
+                    title: 'Failure!',
+                    text: 'Your file/folder has not been shared!',
+                    type: 'error',
+                    timer: '2000'
+                });
+            }
+        });
+
     });
 
     $('#edit-file-descr').on('click', function (e) {

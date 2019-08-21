@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Index;
 
 use App\Events\NewBookmarks;
+use App\Events\NewNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Files;
+use App\Models\NotificationReceivers;
+use App\Models\Notifications;
 use App\Traits\FilesTrait;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -61,27 +65,27 @@ class IndexController extends Controller
             ->addColumn('action', function ($file) {
 
                 $newCol =
-                    '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
-                    '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                    '<a onclick="bookmarkFile(' . $file->id . ')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>' .
+                    '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' .
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
 
-                if ($file->is_file === 1 ) {
-                    if(auth()->user()->role <= 4) {
-                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
-                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                            '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
-                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                if ($file->is_file === 1) {
+                    if (auth()->user()->role <= 4) {
+                        $list = '<li><a href="/index/detail/' . $file->id . '">View</a></li>' .
+                            '<li><a href="/index/download-file/' . $file->id . '">Download</a></li>' .
+                            '<li><a onclick="uploadNewVersion(' . $file->id . ')" >Upload New Version</a></li>' .
+                            '<li><a onclick="seeFileHistory(' . $file->id . ')" >See File Version</a></li>';
                     } else {
-                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
-                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                        $list = '<li><a href="/index/detail/' . $file->id . '">View</a></li>' .
+                            '<li><a href="/index/download-file/' . $file->id . '">Download</a></li>' .
+                            '<li><a onclick="seeFileHistory(' . $file->id . ')" >See File Version</a></li>';
                     }
                 } else {
-                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
-                    '<li><a href="#">See File Version</a></li>';
+                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>' .
+                        '<li><a href="#">See File Version</a></li>';
                 }
 
-                $newCol =  $newCol . $list .'</ul></div>';
+                $newCol = $newCol . $list . '</ul></div>';
                 return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
@@ -105,31 +109,32 @@ class IndexController extends Controller
 
         return DataTables::of($data)
             ->addColumn('checkbox', function ($list) {
-                return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';})
+                return '<input type="checkbox" name="selected[]" value="' . htmlentities(json_encode($list)) . '">';
+            })
             ->addColumn('action', function ($file) {
 
                 $newCol =
-                    '<a onclick="bookmarkFile('. $file->id .')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>'.
-                    '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.
+                    '<a onclick="bookmarkFile(' . $file->id . ')" class="btn btn-xs btn-outline-light"><i class="fa fa-bookmark fa-2x"></i></a>' .
+                    '<div class="btn-group"><a class="btn btn-xs btn-outline-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' .
                     '<span><i class="fa fa-align-justify fa-2x"></i></span><span class="caret"></span></a><ul class="dropdown-menu">';
 
-                if ($file->is_file === 1 ) {
-                    if(auth()->user()->role <= '4') {
-                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
-                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                            '<li><a onclick="uploadNewVersion('. $file->id .')" >Upload New Version</a></li>'.
-                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                if ($file->is_file === 1) {
+                    if (auth()->user()->role <= '4') {
+                        $list = '<li><a href="/index/detail/' . $file->id . '">View</a></li>' .
+                            '<li><a href="/index/download-file/' . $file->id . '">Download</a></li>' .
+                            '<li><a onclick="uploadNewVersion(' . $file->id . ')" >Upload New Version</a></li>' .
+                            '<li><a onclick="seeFileHistory(' . $file->id . ')" >See File Version</a></li>';
                     } else {
-                        $list = '<li><a href="/index/detail/'. $file->id .'">View</a></li>'.
-                            '<li><a href="/index/download-file/'.$file->id.'">Download</a></li>'.
-                            '<li><a onclick="seeFileHistory('. $file->id .')" >See File Version</a></li>';
+                        $list = '<li><a href="/index/detail/' . $file->id . '">View</a></li>' .
+                            '<li><a href="/index/download-file/' . $file->id . '">Download</a></li>' .
+                            '<li><a onclick="seeFileHistory(' . $file->id . ')" >See File Version</a></li>';
                     }
                 } else {
-                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>'.
+                    $list = '<li><a href="#">View</a></li><li><a href="#">Download</a></li><li><a href="#">Upload New Version</a></li>' .
                         '<li><a href="#">See File Version</a></li>';
                 }
 
-                $newCol =  $newCol . $list .'</ul></div>';
+                $newCol = $newCol . $list . '</ul></div>';
                 return $newCol;
             })
             ->with('mainRootFolderName', $root_folder_name)
@@ -237,7 +242,7 @@ class IndexController extends Controller
 
         foreach ($files as $file) {
             $fileMimeType = $file->getClientMimeType();
-            $fileName = str_replace(' ','_',$file->getClientOriginalName());
+            $fileName = str_replace(' ', '_', $file->getClientOriginalName());
             $fileSize = $file->getClientSize();
             $fileCreatedBy = Auth()->user()->id;
 
@@ -283,7 +288,8 @@ class IndexController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function bookmarkFile($id) {
+    public function bookmarkFile($id)
+    {
         $bookmark = Bookmark::with('files')
             ->where('file', $id)
             ->where('created_by', auth()->id())
@@ -294,7 +300,7 @@ class IndexController extends Controller
                 "success" => false,
                 "message" => "Already Bookmarked",
                 "data" => $bookmark->files
-            ],500);
+            ], 500);
         } else {
             $new_bookmark = Bookmark::create([
                 'file' => $id,
@@ -315,6 +321,51 @@ class IndexController extends Controller
         }
     }
 
+    public function shareIt($file_id)
+    {
+        $files = Files::find($file_id);
+        $receivers = DB::table("users")->get();
+        $notification = Notifications::where("modul", "3-File-Explorer")
+            ->where("modul_id", $file_id)
+            ->where("created_by", Auth::user()->id)
+            ->get();
+
+        if ($notification->count() > 1) {
+            return response()->json([
+                "success" => false,
+                "message" => "Already Shared",
+                "data" => $files
+            ], 500);
+        }
+
+        $notification = new Notifications();
+        $notification->notification_text = $files->name . ' has been shared by ' . Auth::user()->name;
+        $notification->modul = $files->is_file === 1 ? '5-FileSharing' : '5-FolderSharing';
+        $notification->modul_id = $file_id;
+        $notification->created_by = Auth::user()->id;
+        $notification->save();
+
+        foreach ($receivers as $receiver) {
+            if ($receiver->id !== Auth::user()->id) {
+                $notificationReceiver = new NotificationReceivers;
+                $notificationReceiver->notification = $notification->id;
+                $notificationReceiver->receiver = $receiver->id;
+                $notificationReceiver->is_read = 0;
+                $notificationReceiver->created_by = Auth::user()->id;
+                $notificationReceiver->save();
+
+                broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
+            }
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "File/Folder successfully shared.",
+            "data" => $files
+        ]);
+
+    }
+
     /**
      * Update record in table Files
      *
@@ -322,20 +373,35 @@ class IndexController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateFilesById(Request $request, $id) {
+    public function updateFilesById(Request $request, $id)
+    {
         $type = $request->get('fieldName');
         $files = Files::findOrFail($id);
 
-        if($type === 'comment')
+        $err_response = false;
+
+        if ($type === 'comment') {
             $files->comment = $request->get('filecomment');
-        else
-            $files->description = $request->get('filecomment');
+        } else {
+            if (strlen($request->get('filecomment')) <= 250) {
+                $files->description = $request->get('filecomment');
+            } else {
+                $err_response = true;
+                return response()->json([
+                    "data" => $files,
+                    "tipe" => $type,
+                    "is_error" => $err_response,
+                    "message" => 'Maximum Description should be 250 Character or Below!'
+                ]);
+            }
+        }
 
         $files->save();
 
         return response()->json([
             "data" => $files,
             "tipe" => $type,
+            "is_error" => $err_response,
             "message" => ($type === 'comment' ? 'Comment' : 'Description') . ' Added/Updated Successfully'
         ]);
     }
@@ -347,7 +413,8 @@ class IndexController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteFilesById($id) {
+    public function deleteFilesById($id)
+    {
         $files = Files::find($id);
 
         if ($files->is_file == 1) {
@@ -387,7 +454,7 @@ class IndexController extends Controller
 
         foreach ($files as $file) {
             $fileMimeType = $file->getClientMimeType();
-            $fileName = str_replace(' ','_',$file->getClientOriginalName());
+            $fileName = str_replace(' ', '_', $file->getClientOriginalName());
             $fileSize = $file->getClientSize();
             $fileCreatedBy = Auth()->user()->id;
 
@@ -405,7 +472,7 @@ class IndexController extends Controller
                 'url' => $fileUrl,
                 'is_file' => 1,
                 'size' => $fileSize,
-                'version' =>$fileVersion,
+                'version' => $fileVersion,
                 'mime_type' => $fileMimeType,
                 'created_by' => $fileCreatedBy
             ]);
@@ -439,7 +506,7 @@ class IndexController extends Controller
         return DataTables::of($data)
             ->addColumn('action', function ($dt) {
                 /*return '<a href="/index/download-file/'.$dt->id.' class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a>';*/
-                return '<a href="/index/download-file/'.$dt->id.'" class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a></a>';
+                return '<a href="/index/download-file/' . $dt->id . '" class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a></a>';
             })
             ->make(true);
     }
