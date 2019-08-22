@@ -83,14 +83,19 @@ class TaskAndScheduleReminder extends Command
         $tasks = DB::table("tasks")
             ->select(DB::raw("tasks.id as id, tasks.name as name, tasks.due_date, '' as location, tasks.detail as detail, tasks.color as color, tasks.created_by as created_by, tasks.updated_at as updated_at, tasks.created_at as created_at, 'task' as type, tasks.survey, task_participant.team_member"))
             ->join("task_participant","tasks.id","=","task_participant.task")
-            ->whereRaw('DATE(due_date) >= DATE(?)',$currentDate)
+            // ->whereRaw('DATE(tasks.due_date) >= DATE(?)',$currentDate->format("Y-m-d H:i:s") )
+            ->where('due_date','>=',$currentDate->format("Y-m-d H:i:s"))
             ->orderBy('tasks.id')
             ->get();
+
+        // dd($tasks);
 
         foreach ($tasks as $task) {
             $minutesDiff = $currentDate->diffInminutes($task->due_date);
             $notificationText = "";
             $send = false;
+
+            //dd($task->name." ".$minutesDiff);
 
             if (in_array($minutesDiff, $this->minuteDiffToSendDailyNotif)) {
                 # pesan perhari
@@ -143,7 +148,8 @@ class TaskAndScheduleReminder extends Command
         //begin
         $schedules = DB::table("schedules")
             ->select(DB::raw("*, 'schedule' as type"))
-            ->whereRaw('DATE(date_from) >= DATE(?)',$currentDate)
+            // ->whereRaw('DATE(date_from) >= DATE(?)',$currentDate)
+            ->where('date_from',">=",$currentDate->format("Y-m-d H:i:s"))
             ->orderBy('id')
             ->get();
         $this->sendScheduleNotification($schedules, "begin",$users, $currentDate);
@@ -152,12 +158,14 @@ class TaskAndScheduleReminder extends Command
         DB::enableQueryLog();
         $schedules = DB::table("schedules")
             ->select(DB::raw("*, 'schedule' as type"))
-            ->whereRaw('DATE(date_from) <= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
-            ->whereRaw('DATE(date_to) >= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
+            // ->whereRaw('DATE(date_from) <= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
+            // ->whereRaw('DATE(date_to) >= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
+            ->where('date_from', '<',$currentDate->format("Y-m-d H:i:s"))
+            ->where('date_to','>=',$currentDate->format("Y-m-d H:i:s"))
             ->orderBy('id')
             ->get();
         // dd(DB::getQueryLog());
-        // dd($schedules);
+        dd($schedules);
         $this->sendScheduleNotification($schedules, "over",$users, $currentDate);
     }
 
