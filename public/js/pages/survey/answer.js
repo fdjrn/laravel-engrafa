@@ -69,7 +69,7 @@ function getWP(input){
                   action = "<input type='file' name='files["+row.id+"]' style='width:100%;' accept='"+supported_type+"' />";
                 }
                 if(data){
-                  action="<div style='height:30px;'><input type='file' name='files["+row.id+"]' id='btn_add_file_"+row.id+"' onchange='pressed(\"btn_add_file_"+row.id+"\", \"text_add_file_"+row.id+"\", \"btn_download"+row.id+"\")' style='width:95px;color:transparent;float:left;' accept='"+supported_type+"'><label id='text_add_file_"+row.id+"' style='display: block;white-space: nowrap;width: 15em;overflow: hidden;text-overflow: ellipsis;'>"+row.filename+"</label>"+
+                  action="<div style='height:30px;'><input type='file' name='files["+row.id+"]' id='btn_add_file_"+row.id+"' onchange='pressed(\"btn_add_file_"+row.id+"\", \"text_add_file_"+row.id+"\", \"btn_download"+row.id+"\")' style='width:95px;color:transparent;float:left;' accept='"+supported_type+"'><label id='text_add_file_"+row.id+"' style='display: block;white-space: nowrap;width: 12em;overflow: hidden;text-overflow: ellipsis;'>"+row.filename+"</label>"+
                   "</div>"+
                   "<div id='btn_download"+row.id+"'><a onClick='doWp(\""+row.fileid+"\",\"downloadWp\")' class='btn btn-sm btn-default'><i class='fa fa-download'></i></a></div>"+
                   "<div><input type='hidden' id='file_id["+row.id+"]' name='file_id["+row.id+"]' value='"+row.fileid+"'></div>";
@@ -122,6 +122,10 @@ function doWp(fileid,doAction){
 
 $("#form_w_product").submit(function(e) {
   e.preventDefault();
+  
+  $body = $("body");
+  $body.addClass("loading");
+
   var form = $(this);
   var url = form.attr('action');
   var formData = new FormData(this);
@@ -135,12 +139,14 @@ $("#form_w_product").submit(function(e) {
           let parse = JSON.parse(data);
           if (parse.status > 0) {
             getWP($('#curWP').val());
+            $body.removeClass("loading");
             swal({
               type: 'success',
               title: 'Berhasil',
               text: parse.messages
             });
           } else {
+            $body.removeClass("loading")
             swal({
               type: 'error',
               title: 'Gagal',
