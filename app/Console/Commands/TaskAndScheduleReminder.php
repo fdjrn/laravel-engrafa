@@ -70,7 +70,8 @@ class TaskAndScheduleReminder extends Command
 
         $currentDate = Carbon::now();
         $testDate = new Carbon("2019-08-21 15:59:00");
-
+        
+        $this->sendTaskNotifications($currentDate);
         $this->sendScheduleNotifications($currentDate);
 
     }
