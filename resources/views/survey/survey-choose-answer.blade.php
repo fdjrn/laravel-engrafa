@@ -30,6 +30,41 @@
     .example-modal .modal {
       background: transparent !important;
     }
+
+    .loader {
+      display:    none;
+      position:   fixed;
+      z-index:    1000;
+      top:        0;
+      left:       0;
+      height:     100%;
+      width:      100%;
+      background: rgba( 153, 153, 153, .8 ) 
+                  url('{{ asset('theme/AdminLTE/dist/img/loader5.gif')}}') 
+                  50% 50% 
+                  no-repeat;
+  }
+
+  .loader:after{
+  content: "Uploading Files ...";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+
+  /* When the body has the loading class, we turn
+     the scrollbar off with overflow:hidden */
+  body.loading .loader {
+      overflow: hidden;   
+  }
+
+  /* Anytime the body has the loading class, our
+     modal element will be visible */
+  body.loading .loader {
+      display: block;
+  }
   </style>
 @stop
 
@@ -202,6 +237,7 @@
       <!-- /.modal-content -->
     </div>
     <!-- /.modal-dialog -->
+    <div class="loader"><!-- Place at bottom of page --></div>
   </div>
   @include('survey.survey-invite-modal')
 @stop

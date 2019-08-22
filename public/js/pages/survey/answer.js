@@ -122,6 +122,10 @@ function doWp(fileid,doAction){
 
 $("#form_w_product").submit(function(e) {
   e.preventDefault();
+  
+  $body = $("body");
+  $body.addClass("loading");
+
   var form = $(this);
   var url = form.attr('action');
   var formData = new FormData(this);
@@ -135,12 +139,14 @@ $("#form_w_product").submit(function(e) {
           let parse = JSON.parse(data);
           if (parse.status > 0) {
             getWP($('#curWP').val());
+            $body.removeClass("loading");
             swal({
               type: 'success',
               title: 'Berhasil',
               text: parse.messages
             });
           } else {
+            $body.removeClass("loading")
             swal({
               type: 'error',
               title: 'Gagal',
