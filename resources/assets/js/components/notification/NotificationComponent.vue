@@ -94,13 +94,18 @@
 
                         break;
                     case "4-Schedule" :
-
+                    	url = "/calendar/";
+						window.location.href = url;
                         break;
                     case "5-FileSharing" :
                         window.location.href = "/index/detail/" + notification.modul_id;
                         break;
                     case "5-FolderSharing" :
                         window.location.href = "/index?folder_id=" + notification.modul_id;
+                        break;
+                    case "6-Task" :
+                        url = "/assessment/";
+						window.location.href = url+notification.modul_id+"/task/";
                         break;
                 }
 

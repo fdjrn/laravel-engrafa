@@ -30,6 +30,10 @@ class TaskAndScheduleReminder extends Command
      */
     protected $description = 'Command untuk notifikasi task dan schedule yang akan berlangsung dan sudah selesai';
 
+    protected $minuteDiffToSendDailyNotif = array();
+
+    protected $minuteDiffToSendHourlyNotif = array();
+
     /**
      * Create a new command instance.
      *
@@ -47,50 +51,73 @@ class TaskAndScheduleReminder extends Command
      */
     public function handle()
     {
-        $hourToSentDailyNotif = array("00:00");
-        $hourDiffToSentHourlyNotif = array(1,2,3,4,5);
 
-        $currendDate = Carbon::now()->format('Y-m-d');
-        $currentHour = Carbon::now()->format('H');
-        $currentMinute = Carbon::now()->format('i');
-        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $this->minuteDiffToSendDailyNotif = array(
+            $this->daysToMinutes(1),
+            $this->daysToMinutes(2),
+            $this->daysToMinutes(3),
+            $this->daysToMinutes(4),
+            $this->daysToMinutes(5)
+        );
+
+        $this->minuteDiffToSendHourlyNotif = array(
+            $this->hoursToMinutes(1),
+            $this->hoursToMinutes(2),
+            $this->hoursToMinutes(3),
+            $this->hoursToMinutes(4),
+            $this->hoursToMinutes(5)
+        );
+
+        $currentDate = Carbon::now();
+        $testDate = new Carbon("2019-08-21 15:59:00");
+
+        $this->sendScheduleNotifications($currentDate);
+
+    }
+
+    private function sendTaskNotifications($currentDate){
         $notification = new Notifications;
-        $user = New User;
-
-        $taskId1 = "";
-        $taskId2 = "";
-        $taskId3 = "";
-
-        $users = User::all();
-
+        $taskId = "";
+        
         $tasks = DB::table("tasks")
-            ->select(DB::raw("tasks.id as id, tasks.name as name, tasks.due_date as date_from, tasks.due_date as date_to, '' as location, tasks.detail as detail, tasks.color as color, tasks.created_by as created_by, tasks.updated_at as updated_at, tasks.created_at as created_at, 'task' as type, tasks.survey, task_participant.team_member"))
+            ->select(DB::raw("tasks.id as id, tasks.name as name, tasks.due_date, '' as location, tasks.detail as detail, tasks.color as color, tasks.created_by as created_by, tasks.updated_at as updated_at, tasks.created_at as created_at, 'task' as type, tasks.survey, task_participant.team_member"))
             ->join("task_participant","tasks.id","=","task_participant.task")
-            ->whereDate('due_date','>=',$currendDate)
+            ->whereRaw('DATE(due_date) >= DATE(?)',$currentDate)
             ->orderBy('tasks.id')
             ->get();
 
-        //notifikasi task
-        foreach($tasks as $task){
-            $dateFrom = new Carbon($task->date_from);
-            $dayDifference = $dateFrom->diff(new Carbon($currendDate))->days;
-            $hourDifference = $dateFrom->diffInHours(new Carbon($now));
-            $minuteDifference = $dateFrom->diffInminutes(new Carbon($now));
+        foreach ($tasks as $task) {
+            $minutesDiff = $currentDate->diffInminutes($task->due_date);
+            $notificationText = "";
+            $send = false;
 
-            //notifikasi perhari
-            if($dayDifference <= 3 && $dayDifference > 0 && in_array($currentHour.":00", $hourToSentDailyNotif)){
+            if (in_array($minutesDiff, $this->minuteDiffToSendDailyNotif)) {
+                # pesan perhari
+                $notificationText = 'Task '.$task->name. ' is '.$this->minutesToDays($minutesDiff).' days remain';
+                $send = true;
+            }elseif (in_array($minutesDiff, $this->minuteDiffToSendHourlyNotif)) {
+                # pesan perjam
+                $notificationText = 'Task '.$task->name. ' is '.$this->minutesToHours($minutesDiff).' hours remain';
+                $send = true;
+            }elseif ($minutesDiff == 0) {
+                # code...
+                $notificationText = 'Task '.$task->name. ' is over';
+                $send = true;
+            }
 
-                if ($taskId1 <> $task->id) {
+            if ($send) {
+                # kirim notifikasi
+                if ($taskId <> $task->id) {
                     # code...
                     //simpan notifikasi
                     $notification = new Notifications;
-                    $notification->notification_text = 'Task '.$task->name. ' is '.$dayDifference.' days remain';
-                    $notification->modul = '5-Task';
+                    $notification->notification_text = $notificationText;
+                    $notification->modul = '6-Task';
                     $notification->modul_id = $task->survey;
                     $notification->created_by = $task->created_by;
                     $notification->save();
 
-                    $taskId1 = $task->id; 
+                    $taskId = $task->id;
 
                     $user = User::find($task->created_by);
                 }
@@ -103,243 +130,105 @@ class TaskAndScheduleReminder extends Command
                 $notificationReceiver->save();
 
                 broadcast(new NewNotification($notification, $notificationReceiver, $user));
-
             }
-
-            if($hourDifference <= 5 && $hourDifference > 0 && $currentMinute == "00"){
-
-                if ($taskId2 <> $task->id) {
-                    # code...
-                    //simpan notifikasi
-                    $notification = new Notifications;
-                    $notification->notification_text = 'Task '.$task->name. ' is '.$hourDifference.' hours remain';
-                    $notification->modul = '5-Task';
-                    $notification->modul_id = $task->survey;
-                    $notification->created_by = $task->created_by;
-                    $notification->save();
-
-                    $taskId2 = $task->id; 
-
-                    $user = User::find($task->created_by);
-                }
-
-                $notificationReceiver = new NotificationReceivers;
-                $notificationReceiver->notification = $notification->id;
-                $notificationReceiver->receiver = $task->team_member;
-                $notificationReceiver->is_read = 0;
-                $notificationReceiver->created_by = $task->created_by;
-                $notificationReceiver->save();
-
-                broadcast(new NewNotification($notification, $notificationReceiver, $user));
-
-            }
-
-            //task berakhir
-            if($minuteDifference <= 0){
-
-                if ($taskId3 <> $task->id) {
-                    # code...
-                    //simpan notifikasi
-                    $notification = new Notifications;
-                    $notification->notification_text = 'Task '.$task->name. ' is over';
-                    $notification->modul = '5-Task';
-                    $notification->modul_id = $task->survey;
-                    $notification->created_by = $task->created_by;
-                    $notification->save();
-
-                    $taskId3 = $task->id; 
-
-                    $user = User::find($task->created_by);
-                }
-
-                $notificationReceiver = new NotificationReceivers;
-                $notificationReceiver->notification = $notification->id;
-                $notificationReceiver->receiver = $task->team_member;
-                $notificationReceiver->is_read = 0;
-                $notificationReceiver->created_by = $task->created_by;
-                $notificationReceiver->save();
-
-                broadcast(new NewNotification($notification, $notificationReceiver, $user));
-
-            }
-        }
-
-        $schedules = DB::table("schedules")
-            ->select(DB::raw("*, 'schedule' as type"))
-            ->whereDate('date_from','>=',$now)
-            ->orderBy('id')
-            ->get();
-
-        foreach($schedules as $schedule){
-            $dateFrom = new Carbon($schedule->date_from);
             
-            $dayFromDifference = $dateFrom->diff(new Carbon($currendDate))->days;
-            $hourFromDifference = $dateFrom->diffInHours(new Carbon($now));
-            $minuteFromDifference = $dateFrom->diffInminutes(new Carbon($now));
-
-            // dd($schedule->id." ".$dateFrom." ".(new Carbon($now))." ".$minuteFromDifference);
-
-            $notification1 = new Notifications;
-            $notification2 = new Notifications;
-            $notification3 = new Notifications;
-
-            //notifikasi perhari
-            if($dayFromDifference <= 3 && $dayFromDifference > 0 && in_array($currentHour.":00", $hourToSentDailyNotif)){
-                //simpan notifikasi
-                $notification1->notification_text = 'Event '.$schedule->name. ' is '.$dayFromDifference.' days will begin';
-                $notification1->modul = '4-Schedule';
-                $notification1->modul_id = $schedule->id;
-                $notification1->created_by = $schedule->created_by;
-                $notification1->save();
-            }
-
-            //notifikasi per jam
-            if($hourFromDifference <= 5 && $hourFromDifference > 0 && $currentMinute == "00"){
-                $notification2->notification_text = 'Event '.$schedule->name. ' is '.$hourFromDifference.' hours will begin';
-                $notification2->modul = '4-Schedule';
-                $notification2->modul_id = $schedule->id;
-                $notification2->created_by = $schedule->created_by;
-                $notification2->save();
-            }
-
-            //event dimulai
-            if($minuteFromDifference <= 0){
-                $notification3->notification_text = 'Event '.$schedule->name. ' is begin';
-                $notification3->modul = '4-Schedule';
-                $notification3->modul_id = $schedule->id;
-                $notification3->created_by = $schedule->created_by;
-                $notification3->save();
-            }
-
-            foreach ($users as $user) {
-                //notifikasi perhari
-                if($dayFromDifference <= 3 && $dayFromDifference > 3 && in_array($currentHour.":00", $hourToSentDailyNotif)){
-                    $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification1->id;
-                    $notificationReceiver->receiver = $user->id;
-                    $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification1->created_by;
-                    $notificationReceiver->save();
-
-                    broadcast(new NewNotification($notification1, $notificationReceiver, $user));
-                }
-                
-                //notifikasi perjam
-                if($hourFromDifference <= 5 && $hourFromDifference > 0 && $currentMinute == "00"){
-                    $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification2->id;
-                    $notificationReceiver->receiver = $user->id;
-                    $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification2->created_by;
-                    $notificationReceiver->save();
-
-                    broadcast(new NewNotification($notification2, $notificationReceiver, $user));
-                }
-                
-                //event dimulai
-                if($minuteFromDifference <= 0){
-                    $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification3->id;
-                    $notificationReceiver->receiver = $user->id;
-                    $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification3->created_by;
-                    $notificationReceiver->save();
-
-                    broadcast(new NewNotification($notification3, $notificationReceiver, $user));
-                }
-
-            }
         }
+    }
 
+    private function sendScheduleNotifications($currentDate){
+        $dateComparisonColom = "";
+        $users = User::all();
+
+        //begin
         $schedules = DB::table("schedules")
             ->select(DB::raw("*, 'schedule' as type"))
-            ->whereDate('date_from','<',$now)
-            ->WhereDate('date_to','>=',$now)
+            ->whereRaw('DATE(date_from) >= DATE(?)',$currentDate)
             ->orderBy('id')
             ->get();
+        $this->sendScheduleNotification($schedules, "begin",$users, $currentDate);
 
+        //over
+        DB::enableQueryLog();
+        $schedules = DB::table("schedules")
+            ->select(DB::raw("*, 'schedule' as type"))
+            ->whereRaw('DATE(date_from) <= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
+            ->whereRaw('DATE(date_to) >= DATE(?)',$currentDate->format("Y-m-d H:i:s"))
+            ->orderBy('id')
+            ->get();
+        // dd(DB::getQueryLog());
         // dd($schedules);
+        $this->sendScheduleNotification($schedules, "over",$users, $currentDate);
+    }
 
-        foreach($schedules as $schedule){
-            $dateTo = new Carbon($schedule->date_to);
-            
-            $dayToDifference = $dateTo->diff(new Carbon($currendDate))->days;
-            $hourToDifference = $dateTo->diffInHours(new Carbon($now));
-            $minuteToDifference = $dateTo->diffInminutes(new Carbon($now));
+    private function sendScheduleNotification($schedules, $type, $users, $currentDate){
+        $notification = new Notifications;
+        foreach ($schedules as $schedule) {
+            $minutesDiff = 0;
+            switch ($type) {
+                case 'begin':
+                    $minutesDiff = $currentDate->diffInminutes($schedule->date_from);
+                    break;
+                case 'over':
+                    $minutesDiff = $currentDate->diffInminutes($schedule->date_to);
+                    break;
+            }
 
-            // dd($schedule->id." ".$dateFrom." ".(new Carbon($now))." ".$hourToDifference);
+            $notificationText = "";
+            $send = false;
 
-            $notification1 = new Notifications;
-            $notification2 = new Notifications;
-            $notification3 = new Notifications;
+            if (in_array($minutesDiff, $this->minuteDiffToSendDailyNotif)) {
+                # pesan perhari
+                $notificationText = 'Event '.$schedule->name. ' is '.$this->minutesToDays($minutesDiff).' days will '.$type;
+                $send = true;
+            }elseif (in_array($minutesDiff, $this->minuteDiffToSendHourlyNotif)) {
+                # pesan perjam
+                $notificationText = 'Event '.$schedule->name. ' is '.$this->minutesToHours($minutesDiff).' hours will '.$type;
+                $send = true;
+            }elseif ($minutesDiff == 0) {
+                # code...
+                $notificationText = 'Event '.$schedule->name. ' is '.$type;
+                $send = true;
+            }
 
-            //notifikasi perhari
-            if($dayToDifference <= 5 && $dayToDifference > 0 && in_array($currentHour.":00", $hourToSentDailyNotif)){
+            if ($send) {
+                # kirim notifikasi
                 //simpan notifikasi
-                $notification1->notification_text = 'Event '.$schedule->name. ' in '.$dayToDifference.' days will over';
-                $notification1->modul = '4-Schedule';
-                $notification1->modul_id = $schedule->id;
-                $notification1->created_by = $schedule->created_by;
-                $notification1->save();
-            }
+                $notification = new Notifications;
+                $notification->notification_text = $notificationText;
+                $notification->modul = '4-Schedule';
+                $notification->modul_id = $schedule->id;
+                $notification->created_by = $schedule->created_by;
+                $notification->save();
 
-            //notifikasi per jam
-            if($hourToDifference >= 1 && $hourToDifference <= 5 && $currentMinute == "00"){
-                $notification2->notification_text = 'Event '.$schedule->name. ' in '.$hourToDifference.' hours will over';
-                $notification2->modul = '4-Schedule';
-                $notification2->modul_id = $schedule->id;
-                $notification2->created_by = $schedule->created_by;
-                $notification2->save();
-            }
-
-            //event dimulai
-            if($minuteToDifference <= 0){
-                $notification3->notification_text = 'Event '.$schedule->name. ' in over';
-                $notification3->modul = '4-Schedule';
-                $notification3->modul_id = $schedule->id;
-                $notification3->created_by = $schedule->created_by;
-                $notification3->save();
-            }
-
-            foreach ($users as $user) {
-                //notifikasi perhari
-                if($dayToDifference <= 5 && $dayToDifference > 0 && in_array($currentHour.":00", $hourToSentDailyNotif)){
+                foreach ($users as $user) {
+                    # code...
                     $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification1->id;
+                    $notificationReceiver->notification = $notification->id;
                     $notificationReceiver->receiver = $user->id;
                     $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification1->created_by;
+                    $notificationReceiver->created_by = $schedule->created_by;
                     $notificationReceiver->save();
 
-                    broadcast(new NewNotification($notification1, $notificationReceiver, $user));
+                    broadcast(new NewNotification($notification, $notificationReceiver, $user));
                 }
-                
-                //notifikasi perjam
-                if($hourToDifference >= 1 && $hourToDifference <= 5 && $currentMinute == "00"){
-                    $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification2->id;
-                    $notificationReceiver->receiver = $user->id;
-                    $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification2->created_by;
-                    $notificationReceiver->save();
-
-                    broadcast(new NewNotification($notification2, $notificationReceiver, $user));
-                }
-                
-                //event dimulai
-                if($minuteToDifference <= 0){
-                    $notificationReceiver = new NotificationReceivers;
-                    $notificationReceiver->notification = $notification3->id;
-                    $notificationReceiver->receiver = $user->id;
-                    $notificationReceiver->is_read = 0;
-                    $notificationReceiver->created_by = $notification3->created_by;
-                    $notificationReceiver->save();
-
-                    broadcast(new NewNotification($notification3, $notificationReceiver, $user));
-                }
-
             }
+            
         }
+    }
 
+    private function daysToMinutes($days){
+        return (1440 * $days);
+    }
+
+    private function hoursToMinutes($hours){
+        return (60 * $hours);
+    }
+
+    private function minutesToDays($minutes){
+        return ($minutes / 60 / 24);
+    }
+
+    private function minutesToHours($minutes){
+        return ($minutes / 60);
     }
 }
