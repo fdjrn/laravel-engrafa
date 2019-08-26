@@ -191,3 +191,36 @@
     </div>
 </div>
 
+<div class="modal eng-modal fade" id="share-modals" tabindex="-1" role="dialog" aria-labelledby="share-modalsLabel">
+    <div class="modal-dialog eng-modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right fa fa-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&nbsp;</span>
+                </button>
+                <h4 id="modal-caption" class="modal-title">Share File/Folder With:</h4>
+            </div>
+            <div class="modal-body">
+                {{ Form::open(['id'=>'sharing-form']) }}
+                @csrf
+                <div class="box-body">
+                    <div class="table-responsive">
+                        <table id="dt-share" class="mdl-data-table" width="100%">
+                            <thead>
+                            <tr>
+                                <th><input value="1" id="file-share-select-all" type="checkbox"></th>
+                                <th>Name</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {!! Form::button('Share', ['class' => 'btn btn-info','id'=>'btn-share']) !!}
+            </div>
+            {{ Form::close() }}
+        </div>
+    </div>
+</div>
+

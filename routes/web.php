@@ -92,6 +92,7 @@ Route::middleware(['auth','web'])->group(function () {
 
     Route::get('/index/detail/{id}','Index\IndexDetailController@index')->name('index.detail');
     Route::get('/index/file-history/{id}','Index\IndexController@showFileHistory');
+    Route::get('/index/list-user','Index\IndexController@getListUser');
 
 
 	// chat

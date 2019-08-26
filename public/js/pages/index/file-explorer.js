@@ -66,7 +66,7 @@ function uploadNewVersion(id) {
     });
 }
 
-function seeFileHistory(id){
+function seeFileHistory(id) {
     var dtHistory = $("#file-history-table").DataTable();
 
     dtHistory.destroy();
@@ -88,9 +88,9 @@ function seeFileHistory(id){
                 // "dom": "<fl<t>ip>",
                 ajax: "/index/file-history/" + fId,
                 columns: [
-                    { data: "name" },
-                    { data: "created_at" },
-                    { data: "size_in_kb" },
+                    {data: "name"},
+                    {data: "created_at"},
+                    {data: "size_in_kb"},
                     {data: "action", name: "action", orderable: false, searchable: false}
                 ],
                 columnDefs: [{
@@ -196,6 +196,8 @@ $(document).ready(function () {
             $(api.column(0).header()).html($.fn.dataTable.render.text().display(json.rootFolderName));
         }
     });
+
+    var dtShare = $('#dt-share').DataTable();
 
     function getCurrentMainFolderDetail(id) {
         dtMain.ajax.url("/index/list-all/" + id).load();
@@ -322,17 +324,7 @@ $(document).ready(function () {
         dzUploadNewFile.processQueue();
     });
 
-    $("#dt-file-exp-table-index tbody").on("change", "input[type='checkbox']", function () {
-        // If checkbox is not checked
-        if (!this.checked) {
-            var el = $("#file-exp-select-all").get(0);
-            if (el && el.checked && ("indeterminate" in el)) {
-                el.indeterminate = true;
-            }
-        }
-    });
-
-    function setFilesProperties(data,status){
+    function setFilesProperties(data, status) {
         if (status === true) {
             $('#file-descr-id').val(data.id);
             $('.file-descr-name').html(
@@ -408,17 +400,10 @@ $(document).ready(function () {
                     $('#success-msg').removeClass('hide');
                     $("#btn-create-folder").attr("disabled", true);
                     getCurrentFolderDetail(rootFolderId);
-                    /*closeModalInterval = setInterval(function () {
-                        $('#create-new-folder-modal').modal('hide');
-                    }, 1000);*/
                 }
             }
         });
     });
-
-    /*$('#create-new-folder-modal').on('shown.bs.modal', function () {
-        $('#folderName').focus();
-    });*/
 
     $('#create-new-folder-modal').on('hidden.bs.modal', function () {
         $('#folderName').val("");
@@ -440,8 +425,8 @@ $(document).ready(function () {
                 $('#comment-modals').modal('hide');
                 dtMain.ajax.url("/index/list-all/" + response.data.folder_root).load();
 
-                if(response.is_error != true) {
-                    if (response.tipe === 'description'){
+                if (response.is_error != true) {
+                    if (response.tipe === 'description') {
                         $('#file-descr-text').text(response.data.description);
                         setFilesProperties(response.data, true);
                     } else {
@@ -476,30 +461,98 @@ $(document).ready(function () {
         });
     });
 
+    function populateUserList() {
+        dtShare = $('#dt-share').DataTable({
+            destroy: true,
+            processing: true,
+            // serverSide: true,
+            ajax: {
+                url: "/index/list-user",
+                error: function (xhr, status, err) {
+                    if (err === 'Unauthorized') {
+                        window.location.href = '/login';
+                    }
+                }
+            },
+            columns: [
+                {data: "checkbox", name: "share-checkbox"},
+                {data: "name"}
+            ],
+            columnDefs: [
+                {
+                    targets: [0, 1],
+                    className: "mdl-data-table__cell--non-numeric"
+                },
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    width: '50px'
+                }
+            ]
+        });
+    }
+
     $("#share-file").on("click", function (event) {
         event.preventDefault();
         let id = $('#file-descr-id').val();
 
-        if (id === ''){
+        if (id === '') {
             swal("Warning!!!",
                 'No files/folder selected',
                 'warning');
             return;
         }
 
+        $('#share-modals').on('show.bs.modal', function () {
+            //dtShare.clear().draw();
+            dtShare.destroy();
+            populateUserList();
+        });
+
+        $('#share-modals').modal();
+    });
+
+    $('#dt-share tbody').on('click', 'tr', function () {
+        if ($(this).hasClass('is-selected')) {
+            $(this).removeClass('is-selected');
+        } else {
+            dtShare.$('tr.is-selected').removeClass('is-selected');
+            $(this).addClass('is-selected');
+        }
+    });
+
+    $("#file-share-select-all").on("click", function () {
+        var rows = dtShare.rows({"search": "applied"}).nodes();
+        $('input[type="checkbox"]', rows).prop("checked", this.checked);
+    });
+
+    $('#btn-share').on('click', function () {
+        // e.preventDefault();
+        $('#share-modals').modal('hide');
+        let id = $('#file-descr-id').val();
+        let formData = $('#sharing-form').serialize();
+
         $.ajax({
             url: '/index/share/' + id,
             type: 'POST',
-            data: {'_token': csrf_token},
+            data: formData,
             success: function (response) {
+                let swalTitle, swalType;
                 if (response.success) {
-                    Swal({
-                        title: 'Success!',
-                        text: response.message,
-                        type: 'success',
-                        timer: '2000'
-                    });
+                    swalTitle = "Success!";
+                    swalType = "success";
+                } else {
+                    swalTitle = "Failed!";
+                    swalType = "error";
                 }
+
+                Swal({
+                    title: swalTitle,
+                    text: response.message,
+                    type: swalType,
+                    timer: '2000'
+                });
             },
             fail: function () {
                 Swal({
@@ -517,7 +570,7 @@ $(document).ready(function () {
         e.preventDefault();
         let id = $('#file-descr-id').val();
 
-        if (id === ''){
+        if (id === '') {
             swal("Warning!!!",
                 'No files/folder selected',
                 'warning');
@@ -552,7 +605,7 @@ $(document).ready(function () {
         e.preventDefault();
         let id = $('#file-descr-id').val();
 
-        if (id === ''){
+        if (id === '') {
             swal("Warning!!!",
                 'No files/folder selected',
                 'warning');
@@ -604,12 +657,12 @@ $(document).ready(function () {
         e.preventDefault();
         let id = $('#file-descr-id').val();
 
-        if (id === ''){
+        if (id === '') {
             swal("Warning!!!",
                 'No files/folder selected',
                 'warning');
             return;
-        };
+        }
 
         $.ajax({
             url: "/index/get-file/" + id,
@@ -618,9 +671,9 @@ $(document).ready(function () {
 
                 if (data.is_file === 1) {
                     $('.bs-modal-view-file').modal('show');
-                    $('#modal-view-caption').html('<i class="fa fa-file"></i><span> &nbsp;' + data.name +'</span>');
-                    $('#iframe-view-file').attr('visibility','visible');
-                    $('#iframe-view-file').attr('src', base_url  +"/storage/index/"+ data.url);
+                    $('#modal-view-caption').html('<i class="fa fa-file"></i><span> &nbsp;' + data.name + '</span>');
+                    $('#iframe-view-file').attr('visibility', 'visible');
+                    $('#iframe-view-file').attr('src', base_url + "/storage/index/" + data.url);
                 }
             },
             error: function (response) {
@@ -631,25 +684,25 @@ $(document).ready(function () {
     });
 
     $('.bs-modal-view-file').on('hidden.bs.modal', function (e) {
-        $('#iframe-view-file').attr('src','');
+        $('#iframe-view-file').attr('src', '');
     });
 
     $('.collapse-prop').on("click", function (e) {
-        $(this).closest('.file-prop').fadeOut('slide',function(){
+        $(this).closest('.file-prop').fadeOut('slide', function () {
             $('.mini-submenu').fadeIn();
             $('.main-view').removeClass('col-md-6').addClass('col-md-9');
             $('#file-properties').removeClass('col-md-3');
-            $('.main-view').css("padding-right","60px");
+            $('.main-view').css("padding-right", "60px");
             /*$('#file-properties').css("padding-right","60px");*/
 
         });
     });
 
-    $('.mini-submenu').on('click',function(){
+    $('.mini-submenu').on('click', function () {
         $('.file-prop').fadeIn();
         $('.mini-submenu').hide();
         $('#file-properties').addClass('col-md-3');
-        $('.main-view').css("padding-right","0px");
+        $('.main-view').css("padding-right", "0px");
         $('.main-view').removeClass('col-md-9').addClass('col-md-6');
 
     })
@@ -657,11 +710,11 @@ $(document).ready(function () {
     $('.stretch-main-view').on('click', function (e) {
         // e.preventDefault();
 
-        $('.file-prop').fadeOut('slide',function(){
+        $('.file-prop').fadeOut('slide', function () {
             $('.mini-submenu').fadeIn();
             $('.main-view').removeClass('col-md-6').addClass('col-md-9');
             $('#file-properties').removeClass('col-md-3');
-            $('.main-view').css("padding-right","60px");
+            $('.main-view').css("padding-right", "60px");
 
         });
 

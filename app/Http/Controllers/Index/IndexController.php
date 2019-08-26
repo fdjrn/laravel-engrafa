@@ -10,6 +10,7 @@ use App\Models\Files;
 use App\Models\NotificationReceivers;
 use App\Models\Notifications;
 use App\Traits\FilesTrait;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
@@ -321,41 +322,71 @@ class IndexController extends Controller
         }
     }
 
-    public function shareIt($file_id)
+    public function shareIt($file_id, Request $request)
     {
+        /* get file/folder detail */
         $files = Files::find($file_id);
-        $receivers = DB::table("users")->get();
-        $notification = Notifications::where("modul", "3-File-Explorer")
+
+        /* get current notification if any */
+        $notification = DB::table('notifications')
             ->where("modul_id", $file_id)
             ->where("created_by", Auth::user()->id)
-            ->get();
+            ->whereRaw("substr(modul,1,1)", ['5'])
+            ->first();
 
-        if ($notification->count() > 1) {
-            return response()->json([
-                "success" => false,
-                "message" => "Already Shared",
-                "data" => $files
-            ], 500);
+        /* get selected user from modal popup, convert it to array */
+        foreach ($request->get('selected_user') as $row) {
+            $data[] = json_decode($row);
         }
 
-        $notification = new Notifications();
-        $notification->notification_text = $files->name . ' has been shared by ' . Auth::user()->name;
-        $notification->modul = $files->is_file === 1 ? '5-FileSharing' : '5-FolderSharing';
-        $notification->modul_id = $file_id;
-        $notification->created_by = Auth::user()->id;
-        $notification->save();
+        if ($notification != null) {
+            /* get existing receiver if any */
+            $receivers = DB::table('notification_receivers')
+                ->join('users', 'notification_receivers.receiver', '=', 'users.id')
+                ->where('notification', $notification->id)
+                ->get(['users.id', 'users.name'])->toArray();
 
-        foreach ($receivers as $receiver) {
-            if ($receiver->id !== Auth::user()->id) {
-                $notificationReceiver = new NotificationReceivers;
-                $notificationReceiver->notification = $notification->id;
-                $notificationReceiver->receiver = $receiver->id;
-                $notificationReceiver->is_read = 0;
-                $notificationReceiver->created_by = Auth::user()->id;
-                $notificationReceiver->save();
+            $receivers = array_udiff($data, $receivers, function ($a, $b) {
+                return $a->id - $b->id;
+            });
+        } else {
+            $receivers = $data;
+        }
 
-                broadcast(new NewNotification($notification, $notificationReceiver, Auth::user()));
+        DB::beginTransaction();
+        try {
+            if ($notification == null) {
+                $new_notification = new Notifications();
+                $new_notification->notification_text = $files->name . ' has been shared by ' . Auth::user()->name;
+                $new_notification->modul = $files->is_file === 1 ? '5-FileSharing' : '5-FolderSharing';
+                $new_notification->modul_id = $file_id;
+                $new_notification->created_by = Auth::user()->id;
+                $new_notification->save();
+            } else {
+                $new_notification = Notifications::find($notification->id);
             }
+
+            foreach ($receivers as $user) {
+                if ($user->id !== Auth::user()->id) {
+                    $notificationReceiver = new NotificationReceivers;
+                    $notificationReceiver->notification = $new_notification->id;
+                    $notificationReceiver->receiver = $user->id;
+                    $notificationReceiver->is_read = 0;
+                    $notificationReceiver->created_by = Auth::user()->id;
+                    $notificationReceiver->save();
+
+                    broadcast(new NewNotification($new_notification, $notificationReceiver, Auth::user()));
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return response()->json([
+                "success" => false,
+                "message" => "Error occured. Cannot share current file/folder",
+                "data" => $files
+            ]);
         }
 
         return response()->json([
@@ -363,7 +394,6 @@ class IndexController extends Controller
             "message" => "File/Folder successfully shared.",
             "data" => $files
         ]);
-
     }
 
     /**
@@ -507,6 +537,19 @@ class IndexController extends Controller
             ->addColumn('action', function ($dt) {
                 /*return '<a href="/index/download-file/'.$dt->id.' class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a>';*/
                 return '<a href="/index/download-file/' . $dt->id . '" class="btn btn-xs btn-outline-light"><i class="fa fa-download"></i></a></a>';
+            })
+            ->make(true);
+    }
+
+    public function getListUser()
+    {
+        $users = DB::table('users')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return DataTables::of($users)
+            ->addColumn('checkbox', function ($user) {
+                return '<input type="checkbox" name="selected_user[]" value="' . htmlentities(json_encode($user)) . '">';
             })
             ->make(true);
     }
